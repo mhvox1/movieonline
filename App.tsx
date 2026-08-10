@@ -242,8 +242,9 @@ const calculateCurrentRealtimeGameDate = (referenceDate: Date = new Date()): Dat
 
 const AppContent: React.FC = () => {
   const { playerData, setPlayerData, masterVolume, musicVolume, isMuted, playSfx, isRightClickToMainScreenEnabled, jumpToNewsOnMessage, pauseOnMessage, isF12ReloadEnabled, language, scalingMode, activeDataPackage, customPackages } = useGame();
+  const [authToken, setAuthToken] = useState<string>(() => getStoredAuthToken());
   const onlineSyncState = useOnlineSync(playerData);
-  useDateLoop({ setPlayerData, enabled: !Boolean(getStoredAuthToken()) });
+  useDateLoop({ setPlayerData, enabled: !authToken });
   const [gameState, setGameState] = useState<GameState>(GameState.MainMenu);
   const [gameSpeed, setGameSpeed] = useState<GameSpeed>(GameSpeed.NORMAL);
   const [lastActiveSpeed, setLastActiveSpeed] = useState<GameSpeed>(GameSpeed.NORMAL);
@@ -261,7 +262,6 @@ const AppContent: React.FC = () => {
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [authToken, setAuthToken] = useState<string>(() => getStoredAuthToken());
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [pendingRegistration, setPendingRegistration] = useState(false);
