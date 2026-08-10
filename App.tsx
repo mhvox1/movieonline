@@ -44,6 +44,7 @@ import { clampCeoSalary } from './hooks/helpers';
 import { useOnlineSync } from './hooks/useOnlineSync.ts';
 import { useDateLoop } from './hooks/useDateLoop.ts';
 import AuthLoginScreen from './components/AuthLoginScreen.tsx';
+import GlobalChatOverlay from './components/GlobalChatOverlay';
 import { loadSaveFiles, persistSaveFiles } from './hooks/saveStorage';
 
 // Helper function to generate initial genre trends
@@ -2061,6 +2062,8 @@ const AppContent: React.FC = () => {
     }
   };
 
+  const showGlobalChat = !authLoading && Boolean(authUser) && !pendingRegistration;
+
   return (
     <div className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden">
       <div 
@@ -2086,6 +2089,13 @@ const AppContent: React.FC = () => {
             {renderScreen()}
           </ScreenTransition>
         </AppErrorBoundary>
+
+        <GlobalChatOverlay
+          isVisible={showGlobalChat}
+          language={language}
+          currentUserId={authUser?.id || null}
+          apiRequest={apiRequest}
+        />
       </div>
     </div>
   );

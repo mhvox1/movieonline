@@ -26,6 +26,7 @@ const {
 const { readWorldState, writeWorldState } = require('./worldStateStore');
 const { createListing, buyListing, getMarketOverview } = require('./marketService');
 const { DB_FILE: MARKET_DB_FILE } = require('./marketStore');
+const { DB_FILE: GLOBAL_CHAT_DB_FILE, listGlobalChatMessages, addGlobalChatMessage } = require('./globalChatStore');
 const { validateStudioTalentLocks } = require('./talentLockService');
 const { scheduleFilmRelease } = require('./releaseService');
 const { listUsers, getUserById, getUserByEmail, getUserByUsername, upsertUser, removeUser, DB_FILE: USER_DB_FILE } = require('./userStore');
@@ -203,6 +204,10 @@ function ensurePrimaryAdminUser() {
 function toIsoTimeOrZero(value) {
   const ts = value ? new Date(value).getTime() : Number.NaN;
   return Number.isFinite(ts) ? ts : 0;
+}
+
+function createGlobalChatMessageId() {
+  return `gchat_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function pickPreferredStudio(studios) {
@@ -1738,6 +1743,53 @@ function createServer() {
         return;
       }
       sendJson(res, 200, { user: sanitizeUserForClient(auth.user) });
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/chat/global') {
+      if (!auth.user) {
+        sendJson(res, 401, { error: 'Login required' });
+        return;
+      }
+
+      const limit = Number(url.searchParams.get('limit') || 80);
+      const messages = listGlobalChatMessages(limit);
+      sendJson(res, 200, {
+        messages,
+        dbFile: GLOBAL_CHAT_DB_FILE,
+      });
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/chat/global') {
+      if (!auth.user) {
+        sendJson(res, 401, { error: 'Login required' });
+        return;
+      }
+
+      try {
+        const body = await parseJsonBody(req);
+        const text = String(body?.text || '').trim();
+        if (!text) {
+          sendJson(res, 400, { error: 'Message text is required' });
+          return;
+        }
+
+        const normalizedText = text.slice(0, 400);
+        const message = {
+          id: createGlobalChatMessageId(),
+          userId: String(auth.user.id || ''),
+          username: String(auth.user.username || 'Unknown'),
+          studioName: String(auth.user.studioName || '').trim() || null,
+          text: normalizedText,
+          createdAtIso: new Date().toISOString(),
+        };
+
+        addGlobalChatMessage(message);
+        sendJson(res, 201, { message });
+      } catch (error) {
+        sendJson(res, 400, { error: error instanceof Error ? error.message : 'Unknown error' });
+      }
       return;
     }
 
