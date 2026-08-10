@@ -174,7 +174,7 @@ jobs:
 
           SSH_OPTS=(
             -i ~/.ssh/id_vps_deploy
-            -p "$VPS_PORT"
+            -P "$VPS_PORT"
             -o StrictHostKeyChecking=no
             -o UserKnownHostsFile=/dev/null
             -o ConnectTimeout=20
