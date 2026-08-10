@@ -174,8 +174,15 @@ const resolveApiBaseUrl = (): string => {
   }
 
   const hostname = String(window.location.hostname || '').toLowerCase();
+  const isIpv4Host = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+  const isIpv6Host = hostname.includes(':');
+
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:8787';
+  }
+
+  if (isIpv4Host || isIpv6Host) {
+    return normalizeApiBaseUrl(window.location.origin);
   }
 
   if (hostname.startsWith('api.')) {
@@ -236,7 +243,7 @@ const calculateCurrentRealtimeGameDate = (referenceDate: Date = new Date()): Dat
 const AppContent: React.FC = () => {
   const { playerData, setPlayerData, masterVolume, musicVolume, isMuted, playSfx, isRightClickToMainScreenEnabled, jumpToNewsOnMessage, pauseOnMessage, isF12ReloadEnabled, language, scalingMode, activeDataPackage, customPackages } = useGame();
   const onlineSyncState = useOnlineSync(playerData);
-  useDateLoop({ setPlayerData });
+  useDateLoop({ setPlayerData, enabled: !Boolean(getStoredAuthToken()) });
   const [gameState, setGameState] = useState<GameState>(GameState.MainMenu);
   const [gameSpeed, setGameSpeed] = useState<GameSpeed>(GameSpeed.NORMAL);
   const [lastActiveSpeed, setLastActiveSpeed] = useState<GameSpeed>(GameSpeed.NORMAL);
@@ -265,6 +272,31 @@ const AppContent: React.FC = () => {
 
   // Access translations for logic outside components
   const t = translations[language];
+
+  useEffect(() => {
+    if (!authToken || !onlineSyncState?.currentIngameDateIso) {
+      return;
+    }
+
+    const serverDate = new Date(onlineSyncState.currentIngameDateIso);
+    if (Number.isNaN(serverDate.getTime())) {
+      return;
+    }
+
+    setPlayerData(current => {
+      if (!current) return current;
+
+      const localDate = new Date(current.gameDate);
+      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1000) {
+        return current;
+      }
+
+      return {
+        ...current,
+        gameDate: serverDate,
+      };
+    });
+  }, [authToken, onlineSyncState?.currentIngameDateIso, setPlayerData]);
 
   // ÄNDERUNG: Basis-Auflösung auf 2560x1440 (WQHD) erhöht.
   const BASE_WIDTH = 1920;

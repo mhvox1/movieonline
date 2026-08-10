@@ -40,6 +40,8 @@ const {
 } = require('./authService');
 
 const PORT = Number(process.env.PORT || 8787);
+const AUTO_WORLD_TICK_ENABLED = String(process.env.AUTO_WORLD_TICK_ENABLED || '1').trim() !== '0';
+const AUTO_WORLD_TICK_INTERVAL_MS = Math.max(10_000, Number(process.env.AUTO_WORLD_TICK_INTERVAL_MS || 60_000) || 60_000);
 const VERWALTUNG_FILE = path.join(__dirname, '..', 'public', 'Verwaltung.html');
 const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || 'maik.springer@mein.gmx').trim().toLowerCase();
 const ADMIN_FALLBACK_EMAIL = String(process.env.ADMIN_FALLBACK_EMAIL || 'admin@moviebusiness.local').trim().toLowerCase();
@@ -2178,6 +2180,7 @@ function createServer() {
     }
 
     if (req.method === 'GET' && url.pathname === '/world/charts/latest') {
+      runWorldMarketTick(new Date());
       sendJson(res, 200, { chart: getLatestChart() });
       return;
     }
@@ -2185,6 +2188,17 @@ function createServer() {
     if (req.method === 'GET' && url.pathname === '/world/charts/history') {
       const limit = Number(url.searchParams.get('limit') || '12');
       sendJson(res, 200, { charts: getChartsHistory(limit) });
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/world/time') {
+      const now = new Date();
+      const ingameDate = getCurrentIngameDate(now);
+      sendJson(res, 200, {
+        currentIngameDateIso: ingameDate.toISOString(),
+        ingameYear: ingameDate.getUTCFullYear(),
+        ingameMonth: ingameDate.getUTCMonth() + 1,
+      });
       return;
     }
 
@@ -2404,12 +2418,6 @@ function createServer() {
             if (studioName) {
               studio.studioName = studioName;
             }
-
-            const snapshotGameDate = new Date(stateSnapshot?.gameDate || '');
-            if (!Number.isNaN(snapshotGameDate.getTime())) {
-              studio.ingameYear = snapshotGameDate.getUTCFullYear();
-              studio.ingameMonth = snapshotGameDate.getUTCMonth() + 1;
-            }
           }
 
           const studioWithOwnerOverrides = applyOwnerProfileOverrides(studio);
@@ -2435,6 +2443,7 @@ function createServer() {
             elapsedMonths: simulationResult.elapsedMonths,
             processedMonths: simulationResult.processedMonths,
             events: simulationResult.events,
+            currentIngameDateIso: getCurrentIngameDate(now).toISOString(),
           });
         } catch (error) {
           sendJson(res, 400, { error: error instanceof Error ? error.message : 'Unknown error' });
@@ -2509,8 +2518,58 @@ function createServer() {
   });
 }
 
+function startBackgroundWorldTicker() {
+  if (!AUTO_WORLD_TICK_ENABLED) {
+    console.log('[online-core] background world tick disabled (AUTO_WORLD_TICK_ENABLED=0)');
+    return () => {};
+  }
+
+  const runTick = () => {
+    try {
+      const summary = runWorldTick(new Date());
+      const advancedStudios = Number(summary?.studiosAdvanced || 0);
+      const processedMonths = Number(summary?.totalProcessedMonths || 0);
+
+      if (advancedStudios > 0 || processedMonths > 0) {
+        console.log(
+          `[online-core] world tick advanced ${advancedStudios} studio(s), processedMonths=${processedMonths}, at=${summary?.processedAtIso || new Date().toISOString()}`
+        );
+      }
+    } catch (error) {
+      console.error('[online-core] background world tick failed:', error instanceof Error ? error.message : error);
+    }
+  };
+
+  runTick();
+  const timer = setInterval(runTick, AUTO_WORLD_TICK_INTERVAL_MS);
+  if (typeof timer.unref === 'function') {
+    timer.unref();
+  }
+
+  console.log(`[online-core] background world tick every ${AUTO_WORLD_TICK_INTERVAL_MS}ms`);
+
+  return () => {
+    clearInterval(timer);
+  };
+}
+
 if (require.main === module) {
   const server = createServer();
+  const stopTicker = startBackgroundWorldTicker();
+
+  const shutdown = () => {
+    stopTicker();
+    server.close(() => {
+      process.exit(0);
+    });
+
+    // Fallback in case close callback is delayed.
+    setTimeout(() => process.exit(0), 500).unref?.();
+  };
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+
   server.listen(PORT, () => {
     console.log(`[online-core] listening on http://localhost:${PORT}`);
   });

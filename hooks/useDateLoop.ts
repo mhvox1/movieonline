@@ -9,11 +9,12 @@ import { persistSaveFiles } from './saveStorage';
 
 interface UseDateLoopProps {
   setPlayerData: React.Dispatch<React.SetStateAction<PlayerData | null>>;
+    enabled?: boolean;
 }
 
 const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-export const useDateLoop = ({ setPlayerData }: UseDateLoopProps) => {
+export const useDateLoop = ({ setPlayerData, enabled = true }: UseDateLoopProps) => {
     const accumulatedRealtimeMsRef = useRef(0);
   const lastTimestampRef = useRef(0);
   const animationFrameIdRef = useRef<number | undefined>(undefined);
@@ -40,6 +41,10 @@ export const useDateLoop = ({ setPlayerData }: UseDateLoopProps) => {
     };
 
     useEffect(() => {
+        if (!enabled) {
+            return;
+        }
+
     const gameTick = (timestamp: number) => {
       let deltaTime = timestamp - lastTimestampRef.current;
       lastTimestampRef.current = timestamp;
@@ -354,5 +359,5 @@ export const useDateLoop = ({ setPlayerData }: UseDateLoopProps) => {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
-    }, [setPlayerData, t, language]);
+    }, [enabled, setPlayerData, t, language]);
 };

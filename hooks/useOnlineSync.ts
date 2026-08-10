@@ -7,6 +7,7 @@ export interface OnlineSyncState {
   phase: OnlineSyncPhase;
   studioId: string | null;
   lastSyncIso: string | null;
+  currentIngameDateIso: string | null;
   ingameYear: number | null;
   ingameMonth: number | null;
   elapsedMonths: number;
@@ -54,6 +55,7 @@ const initialState: OnlineSyncState = {
   phase: 'idle',
   studioId: null,
   lastSyncIso: null,
+  currentIngameDateIso: null,
   ingameYear: null,
   ingameMonth: null,
   elapsedMonths: 0,
@@ -89,8 +91,15 @@ const getApiBaseUrl = (): string => {
   }
 
   const hostname = String(window.location.hostname || '').toLowerCase();
+  const isIpv4Host = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+  const isIpv6Host = hostname.includes(':');
+
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:8787';
+  }
+
+  if (isIpv4Host || isIpv6Host) {
+    return normalizeApiBaseUrl(window.location.origin);
   }
 
   if (hostname.startsWith('api.')) {
@@ -174,6 +183,18 @@ async function fetchWorldSnapshot(baseUrl: string): Promise<any> {
   return response.json().catch(() => null);
 }
 
+async function fetchWorldTime(baseUrl: string): Promise<any> {
+  const response = await fetch(`${baseUrl}/world/time`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json().catch(() => null);
+}
+
 export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState => {
   const [state, setState] = useState<OnlineSyncState>(initialState);
   const bootstrapDoneRef = useRef(false);
@@ -228,6 +249,7 @@ export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState =>
           phase: 'ok',
           studioId,
           lastSyncIso: result?.studio?.lastProcessedAtIso || new Date().toISOString(),
+          currentIngameDateIso: String(result?.currentIngameDateIso || result?.studio?.state?.gameDate || '').trim() || null,
           ingameYear: Number(result?.studio?.ingameYear || 0) || null,
           ingameMonth: Number(result?.studio?.ingameMonth || 0) || null,
           elapsedMonths: Number(result?.elapsedMonths || 0) || 0,
@@ -260,10 +282,27 @@ export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState =>
     };
 
     runSync();
-    const intervalId = window.setInterval(runSync, 60_000);
+    const worldTimeIntervalId = window.setInterval(async () => {
+      if (cancelled) {
+        return;
+      }
+      const worldTime = await fetchWorldTime(apiBaseUrl);
+      if (cancelled || !worldTime?.currentIngameDateIso) {
+        return;
+      }
+
+      setState(prev => ({
+        ...prev,
+        currentIngameDateIso: String(worldTime.currentIngameDateIso),
+        ingameYear: Number(worldTime?.ingameYear || prev.ingameYear || 0) || null,
+        ingameMonth: Number(worldTime?.ingameMonth || prev.ingameMonth || 0) || null,
+      }));
+    }, 1_000);
+    const intervalId = window.setInterval(runSync, 15_000);
 
     return () => {
       cancelled = true;
+      window.clearInterval(worldTimeIntervalId);
       window.clearInterval(intervalId);
     };
   }, [apiBaseUrl, playerData]);

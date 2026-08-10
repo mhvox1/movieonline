@@ -678,6 +678,7 @@ function runWorldMarketTick(now = new Date()) {
   const chartEntries = computeChartAndRevenue(studios, worldState, year, month);
 
   const topFilms = chartEntries.slice(0, 10);
+  const topFilmsTop20 = chartEntries.slice(0, 20);
   const totalViewers = chartEntries.reduce((sum, entry) => sum + toNumber(entry.viewers, 0), 0);
   const totalRevenue = chartEntries.reduce((sum, entry) => sum + toNumber(entry.revenue, 0), 0);
 
@@ -687,6 +688,7 @@ function runWorldMarketTick(now = new Date()) {
     monthKey: key,
     processedAtIso: now.toISOString(),
     topFilms,
+    topFilmsTop20,
     totalViewers,
     totalRevenue,
     filmCount: chartEntries.length,
@@ -711,6 +713,7 @@ function runWorldMarketTick(now = new Date()) {
     totalViewers,
     totalRevenue,
     topFilms,
+    topFilmsTop20,
     leaderboard,
     genreTrends: worldState.genreTrends,
   };

@@ -3,17 +3,20 @@ import React, { useMemo } from 'react';
 import { CompetitorFilm } from '../../../types';
 import { useGame } from '../../../contexts/GameContext';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useWorldCharts } from '../../../hooks/useWorldCharts';
 
 const ChartsTab: React.FC = () => {
     const { playerData } = useGame();
     const { t, language } = useTranslation();
+    const { entries: globalCharts } = useWorldCharts();
+    const isOnlineSession = typeof window !== 'undefined' && Boolean((sessionStorage.getItem('mb_auth_token') || localStorage.getItem('mb_auth_token') || '').trim());
     const locale = language === 'de' ? 'de-DE' : 'en-US';
 
     if (!playerData) return null;
 
     const isTestMode = playerData.playerName === 'Max Mustermann' && playerData.studioName === 'Teststudio';
 
-    const kinoChartsTop20 = useMemo(() => {
+    const localKinoChartsTop20 = useMemo(() => {
         const competitorFilms: CompetitorFilm[] = playerData.competitors.flatMap(c => c.completedFilms);
         
         const playerFilmsInCharts: CompetitorFilm[] = playerData.completedFilms
@@ -59,6 +62,16 @@ const ChartsTab: React.FC = () => {
         return allFilmsInCharts.sort((a, b) => b.viewers - a.viewers).slice(0, 20);
     }, [playerData.competitors, playerData.completedFilms, playerData.studioName, playerData.gameDate]);
 
+    const kinoChartsTop20 = useMemo(() => {
+        if (isOnlineSession) {
+            return globalCharts.slice(0, 20);
+        }
+        if (globalCharts.length > 0) {
+            return globalCharts.slice(0, 20);
+        }
+        return localKinoChartsTop20;
+    }, [globalCharts, isOnlineSession, localKinoChartsTop20]);
+
     return (
         <div className="w-full h-full flex flex-col">
             <div className="flex-grow bg-gray-800/80 p-6 rounded-lg shadow-2xl border border-gray-700 overflow-y-auto">
@@ -83,10 +96,10 @@ const ChartsTab: React.FC = () => {
                                 <td className="py-1 px-2 font-bold text-white">{film.title}</td>
                                 <td className="py-1 px-2 text-gray-300">{film.studioName}</td>
                                 <td className={`py-1 px-2 text-center ${film.weeksInCharts === 1 ? 'font-bold text-green-400' : ''}`}>{film.weeksInCharts === 1 ? t.widgets.charts.new : film.weeksInCharts}</td>
-                                <td className="py-1 px-2 text-center text-gray-300">{t.genres[film.genre]}</td>
+                                <td className="py-1 px-2 text-center text-gray-300">{t.genres[(film.genre as keyof typeof t.genres)] || film.genre}</td>
                                 <td className="py-1 px-2 text-right font-mono">{new Intl.NumberFormat(locale).format(film.viewers)}</td>
-                                <td className="py-1 px-2 text-right font-mono text-gray-400">{new Intl.NumberFormat(locale).format(film.totalViewers)}</td>
-                                {isTestMode && <td className="py-1 px-2 text-right font-mono text-cyan-400">{film.chartQuality.toFixed(1)}</td>}
+                                <td className="py-1 px-2 text-right font-mono text-gray-400">{new Intl.NumberFormat(locale).format(film.totalViewers || 0)}</td>
+                                {isTestMode && <td className="py-1 px-2 text-right font-mono text-cyan-400">{Number(film.chartQuality || 0).toFixed(1)}</td>}
                             </tr>
                         ))}
                     </tbody>

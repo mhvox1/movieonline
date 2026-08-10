@@ -103,6 +103,14 @@
             <div class="grid gap-3">
               <input id="createUsernameInput" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Username" />
               <input id="createStudioNameInput" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Studioname" />
+              <input id="createPasswordInput" type="password" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Passwort (mind. 8 Zeichen)" />
+              <div class="grid grid-cols-2 gap-2">
+                <input id="createNegotiationSkillInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Verhandlung" value="20" />
+                <input id="createCharismaInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Charisma" value="20" />
+                <input id="createFinancialSenseInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Finanzsinn" value="20" />
+                <input id="createFilmSenseInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Filmsinn" value="20" />
+                <input id="createOrganizationTalentInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2 col-span-2" placeholder="Organisationstalent" value="20" />
+              </div>
               <input id="createImageInput" type="file" accept="image/*" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" />
               <img id="createImagePreview" class="hidden w-24 h-24 object-cover rounded border border-slate-600" alt="Vorschau" />
             </div>
@@ -438,6 +446,14 @@
             <span class="block mb-1">Rolle</span>
             <input id="editUserRoleInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" readonly />
           </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Passwort</span>
+            <div class="flex gap-2">
+              <input id="editUserPasswordInput" type="password" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" placeholder="Passwort" />
+              <button id="toggleEditUserPasswordBtn" type="button" class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600" title="Passwort anzeigen/ausblenden">Auge</button>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Leer lassen, um das aktuelle Passwort beizubehalten.</p>
+          </label>
         </div>
       </div>
 
@@ -519,7 +535,36 @@
   </div>
 
   <script>
-    const API = 'http://localhost:8787';
+    function normalizeApiBaseUrl(value) {
+      return String(value || '').trim().replace(/\/$/, '');
+    }
+
+    function resolveApiBaseUrl() {
+      const queryApi = normalizeApiBaseUrl(new URLSearchParams(window.location.search).get('api'));
+      if (queryApi) {
+        return queryApi;
+      }
+
+      const hostname = String(window.location.hostname || '').toLowerCase();
+      const isIpv4Host = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+      const isIpv6Host = hostname.includes(':');
+
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:8787';
+      }
+
+      if (isIpv4Host || isIpv6Host) {
+        return normalizeApiBaseUrl(window.location.origin);
+      }
+
+      if (hostname.startsWith('api.')) {
+        return normalizeApiBaseUrl(window.location.origin);
+      }
+
+      return `${window.location.protocol}//api.${window.location.host}`;
+    }
+
+    const API = resolveApiBaseUrl();
     const TOKEN_KEY = 'mb_auth_token';
     const ADMIN_EMAIL = 'maik.springer@mein.gmx';
 
@@ -559,6 +604,12 @@
     const submitCreateUserBtn = document.getElementById('submitCreateUserBtn');
     const createUsernameInput = document.getElementById('createUsernameInput');
     const createStudioNameInput = document.getElementById('createStudioNameInput');
+    const createPasswordInput = document.getElementById('createPasswordInput');
+    const createNegotiationSkillInput = document.getElementById('createNegotiationSkillInput');
+    const createCharismaInput = document.getElementById('createCharismaInput');
+    const createFinancialSenseInput = document.getElementById('createFinancialSenseInput');
+    const createFilmSenseInput = document.getElementById('createFilmSenseInput');
+    const createOrganizationTalentInput = document.getElementById('createOrganizationTalentInput');
     const createImageInput = document.getElementById('createImageInput');
     const createImagePreview = document.getElementById('createImagePreview');
     const talentSubtabActors = document.getElementById('talentSubtabActors');
@@ -619,6 +670,8 @@
     const editUserUsernameInput = document.getElementById('editUserUsernameInput');
     const editUserStudioNameInput = document.getElementById('editUserStudioNameInput');
     const editUserRoleInput = document.getElementById('editUserRoleInput');
+    const editUserPasswordInput = document.getElementById('editUserPasswordInput');
+    const toggleEditUserPasswordBtn = document.getElementById('toggleEditUserPasswordBtn');
     const userTabBasic = document.getElementById('userTabBasic');
     const userTabStatus = document.getElementById('userTabStatus');
     const userTabMessage = document.getElementById('userTabMessage');
@@ -814,9 +867,21 @@
     function resetCreateUserForm() {
       createUsernameInput.value = '';
       createStudioNameInput.value = '';
+      createPasswordInput.value = '';
+      createNegotiationSkillInput.value = '20';
+      createCharismaInput.value = '20';
+      createFinancialSenseInput.value = '20';
+      createFilmSenseInput.value = '20';
+      createOrganizationTalentInput.value = '20';
       createImageInput.value = '';
       createImagePreview.src = '';
       createImagePreview.classList.add('hidden');
+    }
+
+    function clampSkillInput(value, fallback = 20) {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) return fallback;
+      return Math.max(0, Math.min(100, Math.round(parsed)));
     }
 
     function setUserImagePreview(dataUrl) {
@@ -1032,6 +1097,8 @@
         editUserUsernameInput.value = String(user.username || '');
         editUserStudioNameInput.value = String(user.studioName || '');
         editUserRoleInput.value = String(user.role || '');
+        editUserPasswordInput.type = 'password';
+        editUserPasswordInput.value = String(user.adminPlainPassword || '');
         userLastLoginInfo.textContent = `Letzter Login: ${formatIsoDateTime(user.lastLoginAtIso)}`;
         renderUserRuntimeStatus(studios);
         userMessageSenderInput.value = 'Verwaltung';
@@ -1056,6 +1123,8 @@
       selectedUserProfileImageData = null;
       pendingUserImageData = null;
       editUserImageInput.value = '';
+      editUserPasswordInput.type = 'password';
+      editUserPasswordInput.value = '';
       setUserImagePreview(null);
       userLastLoginInfo.textContent = 'Letzter Login: -';
       userRuntimeInfo.innerHTML = '';
@@ -1069,10 +1138,12 @@
       }
 
       try {
+        const nextPassword = editUserPasswordInput.value;
         const payload = {
           username: editUserUsernameInput.value.trim(),
           studioName: editUserStudioNameInput.value.trim(),
           profileImageData: pendingUserImageData !== null ? pendingUserImageData : selectedUserProfileImageData,
+          password: nextPassword.trim().length > 0 ? nextPassword : '',
         };
 
         await api(`/admin/users/${encodeURIComponent(selectedUserId)}/update`, {
@@ -1134,6 +1205,14 @@
       if (!showList) {
         createUsernameInput.focus();
       }
+    }
+
+    function renderEmptyTableRow(tableBody, colSpan, message) {
+      tableBody.innerHTML = '';
+      const tr = document.createElement('tr');
+      tr.className = 'border-b border-slate-800';
+      tr.innerHTML = `<td colspan="${colSpan}" class="py-4 text-center text-slate-400">${message}</td>`;
+      tableBody.appendChild(tr);
     }
 
     function fileToDataUrl(file) {
@@ -1290,6 +1369,7 @@
 
       marketFeedbackTable.innerHTML = '';
       if (!selected) {
+        renderEmptyTableRow(marketFeedbackTable, 4, 'Noch kein Marktfeedback vorhanden. Erstelle zuerst ein Online-Studio.');
         marketTrendTypeInput.value = 'none';
         marketTrendDurationInput.value = '';
         marketTrendMinFactorInput.value = '';
@@ -1304,6 +1384,10 @@
       marketTrendMaxFactorInput.value = trend ? String(Number(trend.maxFactor || 0)) : '';
 
       const rows = Array.isArray(selected.genreTrends) ? selected.genreTrends : [];
+      if (rows.length === 0) {
+        renderEmptyTableRow(marketFeedbackTable, 4, 'Für dieses Studio liegen noch keine Genre-Trends vor.');
+        return;
+      }
       rows.forEach(entry => {
         const tr = document.createElement('tr');
         tr.className = 'border-b border-slate-800';
@@ -1624,8 +1708,14 @@
     async function refreshStudios() {
       try {
         const result = await api('/admin/studios');
+        const studios = Array.isArray(result.studios) ? result.studios : [];
+        if (studios.length === 0) {
+          renderEmptyTableRow(studiosTable, 7, 'Keine Studios auf dem Server gefunden.');
+          return;
+        }
+
         studiosTable.innerHTML = '';
-        result.studios.forEach(studio => {
+        studios.forEach(studio => {
           const tr = document.createElement('tr');
           tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
           tr.innerHTML = `
@@ -1648,8 +1738,14 @@
     async function refreshFilms() {
       try {
         const result = await api('/admin/films');
+        const films = Array.isArray(result.films) ? result.films : [];
+        if (films.length === 0) {
+          renderEmptyTableRow(filmsTable, 7, 'Keine Filme vorhanden.');
+          return;
+        }
+
         filmsTable.innerHTML = '';
-        result.films.forEach(film => {
+        films.forEach(film => {
           const tr = document.createElement('tr');
           tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
           tr.innerHTML = `
@@ -1672,9 +1768,15 @@
     async function refreshTalents() {
       try {
         const result = await api('/admin/talents');
+        const actors = Array.isArray(result.actors) ? result.actors : [];
+        const directors = Array.isArray(result.directors) ? result.directors : [];
 
-        actorsTable.innerHTML = '';
-        (result.actors || []).forEach(actor => {
+        if (actors.length === 0) {
+          renderEmptyTableRow(actorsTable, 7, 'Keine Schauspieler vorhanden.');
+        } else {
+          actorsTable.innerHTML = '';
+        }
+        actors.forEach(actor => {
           const tr = document.createElement('tr');
           tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
           tr.innerHTML = `
@@ -1690,8 +1792,12 @@
           actorsTable.appendChild(tr);
         });
 
-        directorsTable.innerHTML = '';
-        (result.directors || []).forEach(director => {
+        if (directors.length === 0) {
+          renderEmptyTableRow(directorsTable, 7, 'Keine Regisseure vorhanden.');
+        } else {
+          directorsTable.innerHTML = '';
+        }
+        directors.forEach(director => {
           const tr = document.createElement('tr');
           tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
           tr.innerHTML = `
@@ -1784,10 +1890,23 @@
     async function createUser() {
       const username = createUsernameInput.value.trim();
       const studioName = createStudioNameInput.value.trim();
+      const password = createPasswordInput.value;
+      const preferredSkills = {
+        negotiationSkill: clampSkillInput(createNegotiationSkillInput.value),
+        charisma: clampSkillInput(createCharismaInput.value),
+        financialSense: clampSkillInput(createFinancialSenseInput.value),
+        filmSense: clampSkillInput(createFilmSenseInput.value),
+        organizationTalent: clampSkillInput(createOrganizationTalentInput.value),
+      };
       const file = createImageInput.files && createImageInput.files[0] ? createImageInput.files[0] : null;
 
-      if (!username || !studioName) {
-        log('User anlegen fehlgeschlagen', { error: 'Username und Studioname sind Pflichtfelder' });
+      if (!username || !studioName || !password) {
+        log('User anlegen fehlgeschlagen', { error: 'Username, Studioname und Passwort sind Pflichtfelder' });
+        return;
+      }
+
+      if (password.length < 8) {
+        log('User anlegen fehlgeschlagen', { error: 'Passwort muss mindestens 8 Zeichen lang sein' });
         return;
       }
 
@@ -1799,14 +1918,15 @@
         }
         const result = await api('/admin/users/create', {
           method: 'POST',
-          body: JSON.stringify({ username, studioName, imageData }),
+          body: JSON.stringify({ username, studioName, password, preferredSkills, imageData }),
         });
 
         log('User angelegt', {
           userId: result.user?.id,
           username: result.user?.username,
           email: result.login?.email,
-          tempPassword: result.login?.tempPassword,
+          password: result.login?.password,
+          preferredSkills: result.user?.preferredSkills || preferredSkills,
         });
 
         resetCreateUserForm();
@@ -1903,6 +2023,10 @@
       } catch (error) {
         log('User-Porträt laden fehlgeschlagen', { error: error.message });
       }
+    });
+
+    toggleEditUserPasswordBtn.addEventListener('click', () => {
+      editUserPasswordInput.type = editUserPasswordInput.type === 'password' ? 'text' : 'password';
     });
 
     talentSubtabActors.addEventListener('click', () => setTalentSubtab('actors'));

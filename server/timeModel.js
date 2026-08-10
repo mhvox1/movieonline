@@ -24,6 +24,10 @@ function addMonthsUtc(date, months) {
   ));
 }
 
+function getDaysInUtcMonth(date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+}
+
 function getServerEpochRealUtc() {
   const worldState = readWorldState();
   const resetStartDateIso = String(worldState?.resetStartDateIso || '').trim();
@@ -44,8 +48,17 @@ function getIngameMonthIndex(now = new Date()) {
 }
 
 function getCurrentIngameDate(now = new Date()) {
-  const monthIndex = getIngameMonthIndex(now);
-  return addMonthsUtc(GAME_EPOCH_UTC, monthIndex);
+  const epochRealUtc = getServerEpochRealUtc();
+  const elapsedRealMs = Math.max(0, now.getTime() - epochRealUtc.getTime());
+  const elapsedRealDays = elapsedRealMs / 86400000;
+  const fullMonthsElapsed = Math.floor(elapsedRealDays);
+  const monthFraction = elapsedRealDays - fullMonthsElapsed;
+
+  const current = addMonthsUtc(GAME_EPOCH_UTC, fullMonthsElapsed);
+  const daysInCurrentMonth = getDaysInUtcMonth(current);
+  const dayOffsetMs = monthFraction * daysInCurrentMonth * 86400000;
+
+  return new Date(current.getTime() + dayOffsetMs);
 }
 
 function calculateElapsedIngameMonths(lastProcessedAtIso, now = new Date()) {

@@ -4,6 +4,7 @@ import { CompetitorFilm, Genre, OfficeTabType } from '../../types';
 import DashboardWidget from '../DashboardWidget';
 import { useGame } from '../../contexts/GameContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useWorldCharts } from '../../hooks/useWorldCharts';
 
 
 interface KinoChartsWidgetProps {
@@ -13,10 +14,12 @@ interface KinoChartsWidgetProps {
 const KinoChartsWidget: React.FC<KinoChartsWidgetProps> = ({ onNavigateToOfficeTab }) => {
     const { playerData } = useGame();
     const { t } = useTranslation();
+    const { entries: globalCharts } = useWorldCharts();
+    const isOnlineSession = typeof window !== 'undefined' && Boolean((sessionStorage.getItem('mb_auth_token') || localStorage.getItem('mb_auth_token') || '').trim());
     
     if (!playerData) return null;
     
-    const kinoCharts = useMemo(() => {
+    const localKinoCharts = useMemo(() => {
         const competitorFilms: CompetitorFilm[] = playerData.competitors.flatMap(c => c.completedFilms);
         
         const playerFilmsInCharts: CompetitorFilm[] = playerData.completedFilms
@@ -63,6 +66,16 @@ const KinoChartsWidget: React.FC<KinoChartsWidgetProps> = ({ onNavigateToOfficeT
         const allFilms = [...competitorFilms, ...playerFilmsInCharts];
         return allFilms.sort((a, b) => b.viewers - a.viewers).slice(0, 10);
     }, [playerData.competitors, playerData.completedFilms, playerData.studioName, playerData.gameDate]);
+
+    const kinoCharts = useMemo(() => {
+        if (isOnlineSession) {
+            return globalCharts.slice(0, 10);
+        }
+        if (globalCharts.length > 0) {
+            return globalCharts.slice(0, 10);
+        }
+        return localKinoCharts;
+    }, [globalCharts, isOnlineSession, localKinoCharts]);
 
     return (
         <div onClick={() => onNavigateToOfficeTab('charts')} className="cursor-pointer">

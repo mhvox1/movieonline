@@ -80,6 +80,28 @@ The project now includes a first server-authoritative online core in `server/`.
 
 Default port is `8787` (override with `PORT`).
 
+### Always-on operation (recommended for production)
+
+For real online progression, the backend must run permanently on your host/VPS.
+If the process stops, no API is reachable; when it runs again, catch-up is applied from real time.
+
+Built-in background ticking:
+
+- `AUTO_WORLD_TICK_ENABLED=1` (default): runs world ticks continuously on the server.
+- `AUTO_WORLD_TICK_INTERVAL_MS=60000` (default): tick cadence in milliseconds.
+
+Example with PM2 on Linux/VPS:
+
+1. Install PM2:
+   `npm install -g pm2`
+2. Start backend permanently:
+   `pm2 start server/index.js --name movie-business-core`
+3. Persist across reboot:
+   `pm2 save`
+   `pm2 startup`
+
+Optional (systemd alternative): run `node server/index.js` as a system service.
+
 ### World tick processing
 
 To advance all studios in one server-side run:
