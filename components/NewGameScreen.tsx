@@ -274,7 +274,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                             gender === 'männlich' ? 'bg-amber-500 text-gray-900 ring-2 ring-amber-300' : 'bg-gray-700 text-white hover:bg-gray-600'
                         }`}
                         >
-                        ♂
+                        �"
                         </button>
                         <button
                         onClick={() => setGender('weiblich')}
@@ -282,7 +282,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                             gender === 'weiblich' ? 'bg-amber-500 text-gray-900 ring-2 ring-amber-300' : 'bg-gray-700 text-white hover:bg-gray-600'
                         }`}
                         >
-                        ♀
+                        �"�
                         </button>
                     </div>
                 </div>
@@ -304,7 +304,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                             ) : (
                                 availablePortraits.length > 0 && (
                                     <img 
-                                        src={`https://www.schnoxcore.com/media/portraits/${availablePortraits[currentPortraitIndex]}j.png`} 
+                                        src={`https://www.schnoxcore.com/media/portrait/${availablePortraits[currentPortraitIndex]}j.png`} 
                                   alt={t.newGame.playerPortraitAlt} 
                                         className="w-full h-full object-cover" 
                                     />
@@ -423,3 +423,4 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
 };
 
 export default NewGameScreen;
+

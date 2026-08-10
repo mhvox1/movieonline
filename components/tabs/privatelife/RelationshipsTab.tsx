@@ -83,7 +83,7 @@ const getPortraitUrl = (baseId: string | undefined | null, birthDate: Date | und
         ageSuffix = 'a';
     }
     
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${baseId}${ageSuffix}.png`;
 };
 
 // Helper for Child Portraits
@@ -678,9 +678,9 @@ export const RelationshipsTab: React.FC = () => {
                             <h3 className="text-xl font-cinzel text-amber-400 mb-3">{t.privatelife.family.dating.encounterTitle}</h3>
                             <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mb-3 overflow-hidden border-2 border-gray-500">
                                 {potentialPartner.portraitId ? (
-                                    <img src={`https://www.schnoxcore.com/media/portraits/${potentialPartner.portraitId}j.png`} alt={language === 'de' ? 'Potenzieller Partner' : 'Potential Partner'} className="w-full h-full object-cover" />
+                                    <img src={`https://www.schnoxcore.com/media/portrait/${potentialPartner.portraitId}j.png`} alt={language === 'de' ? 'Potenzieller Partner' : 'Potential Partner'} className="w-full h-full object-cover" />
                                 ) : (
-                                    <span className="text-3xl">{potentialPartner.gender === 'weiblich' ? '♀' : '♂'}</span>
+                                    <span className="text-3xl">{potentialPartner.gender === 'weiblich' ? '�"�' : '�"'}</span>
                                 )}
                             </div>
                             <p className="text-base text-white font-bold">{potentialPartner.name}</p>
@@ -707,7 +707,7 @@ export const RelationshipsTab: React.FC = () => {
                                      {playerData.partnerPortraitId ? (
                                         <img src={getPortraitUrl(playerData.partnerPortraitId, playerData.partnerBirthDate, playerData.gameDate) || ""} alt="Partner" className="w-full h-full object-cover" />
                                     ) : (
-                                        playerData.partnerGender === 'weiblich' ? '♀' : '♂'
+                                        playerData.partnerGender === 'weiblich' ? '�"�' : '�"'
                                     )}
                                 </div>
                                 <div>
@@ -809,7 +809,7 @@ export const RelationshipsTab: React.FC = () => {
                                 {playerData.partnerPortraitId ? (
                                     <img src={getPortraitUrl(playerData.partnerPortraitId, playerData.partnerBirthDate, playerData.gameDate) || ""} alt={playerData.partnerName || 'Partner'} className="w-full h-full object-cover" />
                                 ) : (
-                                    <span className="text-xl">{playerData.partnerGender === 'weiblich' ? '♀' : '♂'}</span>
+                                    <span className="text-xl">{playerData.partnerGender === 'weiblich' ? '�"�' : '�"'}</span>
                                 )}
                             </div>
                             <div className="min-w-0">
@@ -842,7 +842,7 @@ export const RelationshipsTab: React.FC = () => {
                                             {portraitUrl ? (
                                                 <img src={portraitUrl} alt={child.name} className="w-full h-full object-cover" />
                                             ) : (
-                                                <span className="text-base">👶</span>
+                                                <span className="text-base">�x�</span>
                                             )}
                                         </div>
                                         <div className="min-w-0">
@@ -990,8 +990,8 @@ export const RelationshipsTab: React.FC = () => {
                         <h3 className="text-lg font-bold text-white mb-3">{t.privatelife.searchOptions?.[pendingSearchOption.id]?.name || pendingSearchOption.name}</h3>
                         <p className="text-gray-300 text-xs mb-5">{language === 'de' ? 'Wen möchten Sie suchen?' : 'Who would you like to search for?'}</p>
                         <div className="flex gap-3">
-                            <button onClick={() => handleFindPartner('weiblich')} className="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 rounded">{language === 'de' ? '♀ Frau' : '♀ Woman'}</button>
-                            <button onClick={() => handleFindPartner('männlich')} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded">{language === 'de' ? '♂ Mann' : '♂ Man'}</button>
+                            <button onClick={() => handleFindPartner('weiblich')} className="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 rounded">{language === 'de' ? '�"� Frau' : '�"� Woman'}</button>
+                            <button onClick={() => handleFindPartner('männlich')} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded">{language === 'de' ? '�" Mann' : '�" Man'}</button>
                         </div>
                         <button onClick={() => setPendingSearchOption(null)} className="mt-4 text-gray-500 hover:text-white underline text-[10px]">{t.common.cancel}</button>
                     </div>
@@ -1051,3 +1051,4 @@ export const RelationshipsTab: React.FC = () => {
         </div>
     );
 };
+

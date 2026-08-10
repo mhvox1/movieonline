@@ -650,7 +650,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ onBack }) => {
                                         className="text-red-400 hover:text-red-300 font-bold px-1"
                                         title="Entfernen"
                                      >
-                                         ×
+                                         �
                                      </button>
                                   </div>
                               ))}
@@ -688,7 +688,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ onBack }) => {
                                       editingTalent.portraitUrl.startsWith('data:') ? (
                                           <img src={editingTalent.portraitUrl} className="w-full h-full object-cover" alt="Portrait"/>
                                       ) : (
-                                          <img src={`https://www.schnoxcore.com/media/portraits/${editingTalent.portraitUrl}${currentAgeSuffix}.png`} className="w-full h-full object-cover" alt="Portrait"/>
+                                          <img src={`https://www.schnoxcore.com/media/portrait/${editingTalent.portraitUrl}${currentAgeSuffix}.png`} className="w-full h-full object-cover" alt="Portrait"/>
                                       )
                                   ) : null}
                               </div>
@@ -723,7 +723,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ onBack }) => {
                     {(editingTalent?.gender === 'weiblich' ? ALL_FEMALE_PORTRAITS : ALL_MALE_PORTRAITS).map(id => (
                         <img 
                             key={id} 
-                            src={`https://www.schnoxcore.com/media/portraits/${id}${currentAgeSuffix}.png`} 
+                            src={`https://www.schnoxcore.com/media/portrait/${id}${currentAgeSuffix}.png`} 
                             className="w-full h-auto cursor-pointer hover:scale-110 transition-transform border border-transparent hover:border-amber-500" 
                             onClick={() => {
                                 setEditingTalent(prev => prev ? {...prev, portraitUrl: id} : null);
@@ -1010,7 +1010,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ onBack }) => {
                 <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-2xl w-full max-w-lg p-6" onClick={e => e.stopPropagation()}>
                     <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-2">
                         <h2 className="text-xl font-bold font-cinzel text-white">{t.editor.package.manageTitle}</h2>
-                        <button onClick={() => setShowManageModal(false)} className="text-gray-400 hover:text-white">✕</button>
+                        <button onClick={() => setShowManageModal(false)} className="text-gray-400 hover:text-white">�S"</button>
                     </div>
 
                     <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
@@ -1066,3 +1066,4 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ onBack }) => {
 };
 
 export default EditorScreen;
+

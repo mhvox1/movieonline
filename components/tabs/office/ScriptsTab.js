@@ -39,7 +39,7 @@ const ScriptsTab = () => {
                 salary: 0,
                 experience: 0,
                 satisfaction: 100,
-                portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portraits/${playerData.partnerPortraitId}.png` : undefined
+                portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portrait/${playerData.partnerPortraitId}.png` : undefined
             };
             employeeWriters.push(partnerWriter);
         }
@@ -274,3 +274,4 @@ const ScriptsTab = () => {
                                         }) })] }))] })] }), scriptToSell && (_jsx("div", { className: "absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50", children: _jsxs("div", { className: "bg-gray-800 border border-amber-500 rounded-lg shadow-2xl w-full max-w-lg p-8 text-center", children: [_jsx("h2", { className: "text-3xl font-bold font-cinzel text-amber-400 mb-4", children: t.project.scripts.sellConfirmTitle }), _jsx("p", { className: "text-gray-300 text-lg mb-6", children: t.project.scripts.sellConfirmText.replace('{title}', getTranslatedScriptTitle(scriptToSell.script, t)).replace('{price}', formatCurrency(scriptToSell.price)) }), _jsxs("div", { className: "flex justify-center gap-4", children: [_jsx("button", { onClick: () => setScriptToSell(null), className: "bg-gray-600 text-white font-bold py-2 px-8 rounded-sm uppercase tracking-wider hover:bg-gray-500 transition-all", children: t.common.cancel }), _jsx("button", { onClick: confirmSellScript, className: "bg-green-600 text-white font-bold py-2 px-8 rounded-sm uppercase tracking-wider hover:bg-green-500 transition-all", children: t.common.confirm })] })] }) })), selectedScriptForModal && (_jsx(ScriptDossierModal, { script: selectedScriptForModal, onClose: () => setSelectedScriptForModal(null), onBuy: handleBuyScript, playerCapital: playerData.capital, isTestMode: isTestMode }))] }));
 };
 export default ScriptsTab;
+

@@ -94,7 +94,7 @@ const getChildPortraitUrl = (portraitId, age) => {
         suffix = 'm';
     else if (age >= 60)
         suffix = 'a';
-    return `https://www.schnoxcore.com/media/portraits/${portraitId}${suffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${portraitId}${suffix}.png`;
 };
 // Custom Star Rating for Schools (supports halves)
 const SchoolStarRating = ({ stars }) => {
@@ -201,3 +201,4 @@ const SchoolEnrollmentModal = () => {
                     })())) }), _jsx("button", { onClick: handleConfirm, className: "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded uppercase text-lg shadow-lg", children: t.common.confirm })] }) }));
 };
 export default SchoolEnrollmentModal;
+

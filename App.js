@@ -156,11 +156,13 @@ const clampSkillValue = (value, fallback = 20) => {
   return Math.max(0, Math.min(100, Math.round(parsed)));
 };
 const normalizeEmployeePortraitUrl = (value) => {
+  const portraitBaseUrl = "https://www.schnoxcore.com/media/portrait";
   const raw = String(value || "").trim();
   if (!raw) return "";
   if (raw.startsWith("data:image")) return raw;
   const filename = raw.split("/").pop() || raw;
-  return `/portrait/${filename}`;
+  const filenameWithExt = /\.(png|jpg|jpeg|webp)$/i.test(filename) ? filename : `${filename}.png`;
+  return `${portraitBaseUrl}/${filenameWithExt}`;
 };
 const getDaysInMonth = (date) => {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();

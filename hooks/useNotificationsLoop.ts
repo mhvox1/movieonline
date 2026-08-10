@@ -20,13 +20,18 @@ interface UseNotificationsLoopProps {
 // Helper to calculate age suffix for player manually if needed
 const getPlayerPortrait = (portraitId: string | undefined, birthDate: Date | undefined, gameDate: Date) => {
     if (!portraitId || !birthDate) return undefined;
-    if (portraitId.startsWith('data:')) return portraitId;
+    const normalizedRaw = String(portraitId || '').trim();
+    if (normalizedRaw.startsWith('data:')) return normalizedRaw;
+    const filename = normalizedRaw.split('/').pop() || normalizedRaw;
+    const withoutExt = filename.replace(/\.(png|jpg|jpeg|webp)$/i, '');
+    const baseId = withoutExt.replace(/([0-9])(k|j|m|a)$/i, '$1');
+    if (!baseId) return undefined;
     const age = gameDate.getFullYear() - new Date(birthDate).getFullYear();
     let suffix = 'k';
     if (age >= 16 && age <= 34) suffix = 'j';
     else if (age >= 35 && age <= 59) suffix = 'm';
     else if (age >= 60) suffix = 'a';
-    return `https://www.schnoxcore.com/media/portraits/${portraitId}${suffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${baseId}${suffix}.png`;
 };
 
 // HELPER: Date Calculation for Fallbacks

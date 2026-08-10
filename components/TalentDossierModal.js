@@ -11,6 +11,7 @@ import ArrowLeftIcon from './icons/ArrowLeftIcon';
 import ArrowRightIcon from './icons/ArrowRightIcon';
 import { useTranslation } from '../hooks/useTranslation';
 export const getTalentPortraitUrl = (talent, gameDate) => {
+    const portraitBaseUrl = 'https://www.schnoxcore.com/media/portrait';
     if (!talent.portraitUrl) {
         return '';
     }
@@ -18,12 +19,13 @@ export const getTalentPortraitUrl = (talent, gameDate) => {
     if (talent.portraitUrl.startsWith('data:image')) {
         return talent.portraitUrl;
     }
-    const portraitBaseId = String(talent.portraitUrl || '').trim().split('/').pop()?.replace(/\.(png|jpg|jpeg|webp)$/i, '') || '';
+    const portraitIdRaw = String(talent.portraitUrl || '').trim().split('/').pop()?.replace(/\.(png|jpg|jpeg|webp)$/i, '') || '';
+    const portraitBaseId = portraitIdRaw.replace(/([0-9])(k|j|m|a)$/i, '$1');
     if (!portraitBaseId) {
         return '';
     }
     if (!talent.birthDate) {
-        return `/portrait/${portraitBaseId}m.png`; // Fallback default age
+        return `${portraitBaseUrl}/${portraitBaseId}m.png`; // Fallback default age
     }
     const birthDate = new Date(talent.birthDate);
     let age = gameDate.getFullYear() - birthDate.getFullYear();
@@ -45,7 +47,7 @@ export const getTalentPortraitUrl = (talent, gameDate) => {
         ageSuffix = 'a';
     }
     const baseId = portraitBaseId;
-    return `/portrait/${baseId}${ageSuffix}.png`;
+    return `${portraitBaseUrl}/${baseId}${ageSuffix}.png`;
 };
 // Deterministic shuffle logic for Fog of War
 const seededRandom = (seed) => {

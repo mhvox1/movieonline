@@ -273,7 +273,7 @@ const ProjectPlanningTab = ({ setGameState, setCurrentView, planningMode, onBack
         salary: 0,
         experience: 0,
         satisfaction: 100,
-        portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portraits/${playerData.partnerPortraitId}.png` : void 0
+        portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portrait/${playerData.partnerPortraitId}.png` : void 0
       };
       employeePlanners.push(partnerPlanner);
     }
@@ -1337,3 +1337,4 @@ var ProjectPlanningTab_default = ProjectPlanningTab;
 export {
   ProjectPlanningTab_default as default
 };
+

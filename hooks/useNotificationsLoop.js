@@ -5,13 +5,18 @@ import { useTranslation } from "./useTranslation";
 import { getTalentPortraitUrl } from "../components/TalentDossierModal";
 const getPlayerPortrait = (portraitId, birthDate, gameDate) => {
   if (!portraitId || !birthDate) return void 0;
-  if (portraitId.startsWith('data:')) return portraitId;
+  const normalizedRaw = String(portraitId || "").trim();
+  if (normalizedRaw.startsWith("data:")) return normalizedRaw;
+  const filename = normalizedRaw.split("/").pop() || normalizedRaw;
+  const withoutExt = filename.replace(/\.(png|jpg|jpeg|webp)$/i, "");
+  const baseId = withoutExt.replace(/([0-9])(k|j|m|a)$/i, "$1");
+  if (!baseId) return void 0;
   const age = gameDate.getFullYear() - new Date(birthDate).getFullYear();
   let suffix = "k";
   if (age >= 16 && age <= 34) suffix = "j";
   else if (age >= 35 && age <= 59) suffix = "m";
   else if (age >= 60) suffix = "a";
-  return `https://www.schnoxcore.com/media/portraits/${portraitId}${suffix}.png`;
+  return `https://www.schnoxcore.com/media/portrait/${baseId}${suffix}.png`;
 };
 const calcDate = (base, months) => {
   const d = new Date(base);

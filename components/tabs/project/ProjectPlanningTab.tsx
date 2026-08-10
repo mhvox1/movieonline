@@ -268,7 +268,7 @@ const ProjectPlanningTab: React.FC<ProjectPlanningTabProps> = ({ setGameState, s
                 salary: 0,
                 experience: 0,
                 satisfaction: 100,
-                portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portraits/${playerData.partnerPortraitId}.png` : undefined
+                portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portrait/${playerData.partnerPortraitId}.png` : undefined
             };
             employeePlanners.push(partnerPlanner);
         }
@@ -939,7 +939,7 @@ const ProjectPlanningTab: React.FC<ProjectPlanningTabProps> = ({ setGameState, s
             // Use translation or hardcoded German for now as translation structure for this specific dynamic mail is complex to inject
             // But we use the locale formatted currency
             const body = language === 'de' 
-                ? `Sehr geehrte Damen und Herren,\n\nmit Bedauern nehmen wir zur Kenntnis, dass Sie die Planung für die Auftragsproduktion "${initialContract.title}" abgebrochen haben.\n\nDies stellt einen Bruch unserer Vereinbarung dar. Gemäß Vertrag wird die vereinbarte Vertragsstrafe in Höhe von ${formattedPenalty} hiermit fällig.\n\nZusätzlich fordern wir den geleisteten Vorschuss in Höhe von ${formattedUpfront} zurück.\n\nDie Gesamtsumme wird Ihrem Konto belastet.\n\nMit freundlichen Grüßen,\n${initialContract.stationName}`
+                ? `Sehr geehrte Damen und Herren,\n\nmit Bedauern nehmen wir zur Kenntnis, dass Sie die Planung für die Auftragsproduktion "${initialContract.title}" abgebrochen haben.\n\nDies stellt einen Bruch unserer Vereinbarung dar. Gemä�x Vertrag wird die vereinbarte Vertragsstrafe in Höhe von ${formattedPenalty} hiermit fällig.\n\nZusätzlich fordern wir den geleisteten Vorschuss in Höhe von ${formattedUpfront} zurück.\n\nDie Gesamtsumme wird Ihrem Konto belastet.\n\nMit freundlichen Grü�xen,\n${initialContract.stationName}`
                 : `Dear Sir or Madam,\n\nWe regret to note that you have cancelled the planning for the commissioned production "${initialContract.title}".\n\nThis constitutes a breach of our agreement. According to the contract, the agreed penalty of ${formattedPenalty} is hereby due.\n\nAdditionally, we demand the repayment of the advance of ${formattedUpfront}.\n\nThe total amount will be charged to your account.\n\nSincerely,\n${initialContract.stationName}`;
 
             setPlayerData(prev => {
@@ -1499,3 +1499,4 @@ const ProjectPlanningTab: React.FC<ProjectPlanningTabProps> = ({ setGameState, s
 };
 
 export default ProjectPlanningTab;
+

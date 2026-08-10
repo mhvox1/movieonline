@@ -4,6 +4,7 @@ import { MALE_FIRST_NAMES, FEMALE_FIRST_NAMES, LAST_NAMES } from './nameData';
 import { EMPLOYEE_MALE_PORTRAITS, EMPLOYEE_FEMALE_PORTRAITS } from './portraits';
 
 const pickRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const PORTRAIT_BASE_URL = 'https://www.schnoxcore.com/media/portrait';
 
 const toLocalEmployeePortraitUrl = (value: string): string => {
     const raw = String(value || '').trim();
@@ -11,7 +12,7 @@ const toLocalEmployeePortraitUrl = (value: string): string => {
     if (raw.startsWith('data:image')) return raw;
 
     const filename = raw.split('/').pop() || raw;
-    return `/portrait/${filename}`;
+    return `${PORTRAIT_BASE_URL}/${filename}`;
 };
 
 const shuffleArray = <T>(array: T[]): T[] => {
@@ -28,13 +29,13 @@ const getUniquePortrait = (gender: 'male' | 'female', usedPortraits: Set<string>
     const pool = gender === 'male' ? EMPLOYEE_MALE_PORTRAITS : EMPLOYEE_FEMALE_PORTRAITS;
     // Filter out portraits that are already used (by checking local normalized path)
     const available = pool.filter(id => {
-        const localPath = `/portrait/${id}.png`;
+        const localPath = `${PORTRAIT_BASE_URL}/${id}.png`;
         return !usedPortraits.has(localPath);
     });
     
     // Fallback if all 100 are taken (unlikely but safe) -> pick any random
     const selectedId = available.length > 0 ? pickRandom(available) : pickRandom(pool);
-    return `/portrait/${selectedId}.png`;
+    return `${PORTRAIT_BASE_URL}/${selectedId}.png`;
 };
 
 // Modified signature to accept usedPortraits set

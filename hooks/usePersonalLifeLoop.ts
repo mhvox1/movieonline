@@ -32,11 +32,18 @@ const randomBetween = (min: number, max: number) => Math.floor(Math.random() * (
 const getPortraitUrl = (baseId: string | undefined | null, birthDate: Date | undefined, gameDate: Date): string | null => {
     if (!baseId) return null;
 
+    const normalizedRaw = String(baseId || '').trim();
+
     // FIX: Support Custom Images (Base64 Data URLs)
     // If it starts with data:, return it directly without appending path or age suffix
-    if (baseId.startsWith('data:')) {
-        return baseId;
+    if (normalizedRaw.startsWith('data:')) {
+        return normalizedRaw;
     }
+
+    const filename = normalizedRaw.split('/').pop() || normalizedRaw;
+    const withoutExt = filename.replace(/\.(png|jpg|jpeg|webp)$/i, '');
+    const normalizedBaseId = withoutExt.replace(/([0-9])(k|j|m|a)$/i, '$1');
+    if (!normalizedBaseId) return null;
     
     if (!birthDate) return null;
     
@@ -59,7 +66,7 @@ const getPortraitUrl = (baseId: string | undefined | null, birthDate: Date | und
         ageSuffix = 'a';
     }
     
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${normalizedBaseId}${ageSuffix}.png`;
 };
 
 

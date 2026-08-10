@@ -38,7 +38,7 @@ const getPlayerPortraitUrl = (baseId: string | undefined | null, birthDate: Date
         ageSuffix = 'a';
     }
     
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${baseId}${ageSuffix}.png`;
 };
 
 const PersonalWidget: React.FC<PersonalWidgetProps> = ({ onClick }) => {
@@ -115,7 +115,7 @@ const PersonalWidget: React.FC<PersonalWidgetProps> = ({ onClick }) => {
                                     {playerPortraitUrl ? (
                                         <img src={playerPortraitUrl} alt={t.privatelife.overview.personal} className="w-full h-full object-cover" />
                                     ) : (
-                                        <span className="text-4xl">{playerData.gender === 'weiblich' ? '♀' : '♂'}</span>
+                                        <span className="text-4xl">{playerData.gender === 'weiblich' ? '�"�' : '�"'}</span>
                                     )}
                                 </div>
                             </div>
@@ -139,3 +139,4 @@ const PersonalWidget: React.FC<PersonalWidgetProps> = ({ onClick }) => {
 };
 
 export default PersonalWidget;
+

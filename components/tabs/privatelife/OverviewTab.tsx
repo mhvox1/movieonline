@@ -46,7 +46,7 @@ const getPlayerPortraitUrl = (baseId: string | undefined | null, birthDate: Date
         ageSuffix = 'a';
     }
     
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${baseId}${ageSuffix}.png`;
 };
 
 export const OverviewTab: React.FC = () => {
@@ -179,7 +179,7 @@ export const OverviewTab: React.FC = () => {
                                 {playerPortraitUrl ? (
                                     <img src={playerPortraitUrl} alt="Spieler" className="w-full h-full object-cover" />
                                 ) : (
-                                    <span className="text-6xl">{playerData.gender === 'weiblich' ? '♀' : '♂'}</span>
+                                    <span className="text-6xl">{playerData.gender === 'weiblich' ? '�"�' : '�"'}</span>
                                 )}
                             </div>
                             <div>
@@ -239,3 +239,4 @@ export const OverviewTab: React.FC = () => {
         </div>
     );
 };
+

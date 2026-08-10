@@ -13,7 +13,6 @@ import RandomEventModal from "../../RandomEventModal";
 import { DECISION_EVENTS, resolveDecisionEvent } from "../../events/studio/decisionEvents";
 import BriefcaseIcon from "../../icons/BriefcaseIcon";
 import { getCoverPath } from "../../coverConfig";
-import { loadSaveFiles, persistSaveFiles } from "../../../hooks/saveStorage";
 const NachrichtenTab = () => {
   const { playerData, setPlayerData } = useGame();
   const { t, language } = useTranslation();
@@ -31,31 +30,9 @@ const NachrichtenTab = () => {
   const [activeDecisionEvent, setActiveDecisionEvent] = useState(null);
   const [activeDecisionMessageId, setActiveDecisionMessageId] = useState(null);
   if (!playerData) return null;
-  const persistAutosaveSnapshot = (snapshot) => {
-    void (async () => {
-      try {
-        const saves = await loadSaveFiles();
-        const withoutAuto = saves.filter((save) => save.slotId !== 0);
-        await persistSaveFiles([
-          {
-            slotId: 0,
-            timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-            data: snapshot
-          },
-          ...withoutAuto
-        ]);
-      } catch (error) {
-        console.warn("Autosave after message read failed:", error);
-      }
-    })();
-  };
   const setPlayerDataAndPersist = (updater) => {
     setPlayerData((prev) => {
-      const nextState = updater(prev);
-      if (nextState && nextState !== prev) {
-        persistAutosaveSnapshot(nextState);
-      }
-      return nextState;
+      return updater(prev);
     });
   };
   const getTranslationValue = (key) => {

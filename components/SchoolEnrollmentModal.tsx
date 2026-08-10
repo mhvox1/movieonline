@@ -98,7 +98,7 @@ const getChildPortraitUrl = (portraitId: string | undefined, age: number): strin
     else if (age >= 35 && age <= 59) suffix = 'm';
     else if (age >= 60) suffix = 'a';
 
-    return `https://www.schnoxcore.com/media/portraits/${portraitId}${suffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${portraitId}${suffix}.png`;
 };
 
 // Custom Star Rating for Schools (supports halves)
@@ -222,7 +222,7 @@ const SchoolEnrollmentModal: React.FC = () => {
                          {portraitSrc ? (
                             <img src={portraitSrc} alt={child.name} className="w-full h-full object-cover" />
                         ) : (
-                            <span className="text-4xl">🎓</span>
+                            <span className="text-4xl">�x}</span>
                         )}
                     </div>
                     <div>
@@ -279,3 +279,4 @@ const SchoolEnrollmentModal: React.FC = () => {
 };
 
 export default SchoolEnrollmentModal;
+

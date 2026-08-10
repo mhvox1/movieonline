@@ -40,7 +40,7 @@ const getPrivatePortraitUrl = (baseId: string | undefined | null, birthDate: Dat
         ageSuffix = 'a';
     }
     
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portrait/${baseId}${ageSuffix}.png`;
 };
 
 // Helper to apply private transactions and stat changes
@@ -404,3 +404,4 @@ export const FAMILY_EVENTS: RandomEvent[] = [
         effect: (data) => applyPrivateEffect(data, 0, 5, 0, 'child'), // Helping Hand
     },
 ];
+

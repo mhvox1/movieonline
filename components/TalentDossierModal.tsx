@@ -20,6 +20,7 @@ import ArrowRightIcon from './icons/ArrowRightIcon';
 import { useTranslation } from '../hooks/useTranslation';
 
 export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): string => {
+    const portraitBaseUrl = 'https://www.schnoxcore.com/media/portrait';
     if (!talent.portraitUrl) {
         return '';
     }
@@ -29,13 +30,14 @@ export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): 
         return talent.portraitUrl;
     }
 
-    const portraitBaseId = String(talent.portraitUrl || '').trim().split('/').pop()?.replace(/\.(png|jpg|jpeg|webp)$/i, '') || '';
+        const portraitIdRaw = String(talent.portraitUrl || '').trim().split('/').pop()?.replace(/\.(png|jpg|jpeg|webp)$/i, '') || '';
+        const portraitBaseId = portraitIdRaw.replace(/([0-9])(k|j|m|a)$/i, '$1');
     if (!portraitBaseId) {
         return '';
     }
     
     if (!talent.birthDate) {
-         return `/portrait/${portraitBaseId}m.png`; // Fallback default age
+            return `${portraitBaseUrl}/${portraitBaseId}m.png`; // Fallback default age
     }
     
     const birthDate = new Date(talent.birthDate);
@@ -58,7 +60,7 @@ export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): 
     
     const baseId = portraitBaseId;
     
-    return `/portrait/${baseId}${ageSuffix}.png`;
+    return `${portraitBaseUrl}/${baseId}${ageSuffix}.png`;
 };
 
 interface TalentDossierModalProps {
