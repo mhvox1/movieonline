@@ -40,12 +40,33 @@ const slugify = (input: string): string =>
     .replace(/(^-|-$)/g, '')
     .slice(0, 48);
 
+const normalizeApiBaseUrl = (value: string): string => String(value || '').trim().replace(/\/$/, '');
+
 const getApiBaseUrl = (): string => {
   const envUrl = (import.meta as any)?.env?.VITE_ONLINE_CORE_URL;
   if (typeof envUrl === 'string' && envUrl.trim().length > 0) {
-    return envUrl.trim().replace(/\/$/, '');
+    return normalizeApiBaseUrl(envUrl);
   }
-  return 'http://localhost:8787';
+
+  if (typeof window === 'undefined') {
+    return 'http://localhost:8787';
+  }
+
+  const queryApi = normalizeApiBaseUrl(new URLSearchParams(window.location.search).get('api') || '');
+  if (queryApi) {
+    return queryApi;
+  }
+
+  const hostname = String(window.location.hostname || '').toLowerCase();
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8787';
+  }
+
+  if (hostname.startsWith('api.')) {
+    return normalizeApiBaseUrl(window.location.origin);
+  }
+
+  return `${window.location.protocol}//api.${window.location.host}`;
 };
 
 const ensureStudioId = (playerData: PlayerData): string => {

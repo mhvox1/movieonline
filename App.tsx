@@ -84,7 +84,36 @@ const REALTIME_GAME_START_INGAME = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
 const MS_PER_REAL_DAY = 24 * 60 * 60 * 1000;
 const AUTH_TOKEN_KEY = 'mb_auth_token';
 const LOCAL_STUDIO_ID_KEY = 'movie_business_online_studio_id_v1';
-const API_BASE = 'http://localhost:8787';
+const normalizeApiBaseUrl = (value: string): string => String(value || '').trim().replace(/\/$/, '');
+
+const resolveApiBaseUrl = (): string => {
+  const envUrl = (import.meta as any)?.env?.VITE_ONLINE_CORE_URL;
+  if (typeof envUrl === 'string' && envUrl.trim().length > 0) {
+    return normalizeApiBaseUrl(envUrl);
+  }
+
+  if (typeof window === 'undefined') {
+    return 'http://localhost:8787';
+  }
+
+  const queryApi = normalizeApiBaseUrl(new URLSearchParams(window.location.search).get('api') || '');
+  if (queryApi) {
+    return queryApi;
+  }
+
+  const hostname = String(window.location.hostname || '').toLowerCase();
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8787';
+  }
+
+  if (hostname.startsWith('api.')) {
+    return normalizeApiBaseUrl(window.location.origin);
+  }
+
+  return `${window.location.protocol}//api.${window.location.host}`;
+};
+
+const API_BASE = resolveApiBaseUrl();
 const SAVE_KEY = 'film_tycoon_saves';
 const AUTO_SAVE_INTERVAL_MS = 15000;
 
