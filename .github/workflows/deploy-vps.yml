@@ -103,7 +103,7 @@ jobs:
         run: |
           set +e
 
-          CANDIDATES="${BASE_PORT},22"
+          CANDIDATES="${BASE_PORT},22,2222"
           SELECTED=""
 
           IFS=',' read -ra PORTS <<< "$CANDIDATES"
@@ -127,9 +127,10 @@ jobs:
           done
 
           if [ -z "$SELECTED" ]; then
-            echo "No reachable SSH port found for host $VPS_HOST (checked: $CANDIDATES)."
-            echo "Continuing with fallback SSH port $BASE_PORT; deploy may still work depending on network/firewall timing."
-            SELECTED="$BASE_PORT"
+            echo "No reachable SSH port found for host $VPS_HOST (checked: $CANDIDATES)." >&2
+            echo "Likely causes: wrong VPS_HOST/VPS_PORT secret, firewall blocks GitHub runner, or SSH disabled on provider side." >&2
+            echo "Failing early to avoid misleading SCP retries." >&2
+            exit 1
           fi
 
           echo "port=$SELECTED" >> "$GITHUB_OUTPUT"
