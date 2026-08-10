@@ -1534,6 +1534,11 @@ function createServer() {
           return;
         }
 
+        if (getUserByUsername(normalized.username)) {
+          sendJson(res, 409, { error: 'Account with this username already exists' });
+          return;
+        }
+
         const existingUsers = listUsers();
         const nowIso = new Date().toISOString();
         const passwordSaltHash = hashPassword(normalized.password);
@@ -2053,15 +2058,43 @@ function createServer() {
         const body = await parseJsonBody(req);
         const username = String(body?.username || '').trim();
         const studioName = String(body?.studioName || '').trim();
+        const password = String(body?.password || '');
         const imageData = typeof body?.imageData === 'string' ? body.imageData.trim() : '';
+        const rawPreferredSkills = body?.preferredSkills && typeof body.preferredSkills === 'object' && !Array.isArray(body.preferredSkills)
+          ? body.preferredSkills
+          : {};
+
+        const normalizeSkill = (value, fallback = 20) => {
+          const parsed = Number(value);
+          if (!Number.isFinite(parsed)) return fallback;
+          return Math.max(0, Math.min(100, Math.round(parsed)));
+        };
+
+        const preferredSkills = {
+          negotiationSkill: normalizeSkill(rawPreferredSkills.negotiationSkill),
+          charisma: normalizeSkill(rawPreferredSkills.charisma),
+          financialSense: normalizeSkill(rawPreferredSkills.financialSense),
+          filmSense: normalizeSkill(rawPreferredSkills.filmSense),
+          organizationTalent: normalizeSkill(rawPreferredSkills.organizationTalent),
+        };
 
         if (!username || username.length < 3) {
           sendJson(res, 400, { error: 'Username must be at least 3 characters' });
           return;
         }
 
+        if (getUserByUsername(username)) {
+          sendJson(res, 409, { error: 'Account with this username already exists' });
+          return;
+        }
+
         if (!studioName || studioName.length < 2) {
           sendJson(res, 400, { error: 'Studio name must be at least 2 characters' });
+          return;
+        }
+
+        if (!password || password.length < 8) {
+          sendJson(res, 400, { error: 'Password must be at least 8 characters' });
           return;
         }
 
@@ -2071,8 +2104,7 @@ function createServer() {
         }
 
         const email = generateUniqueManagedEmail(username);
-        const tempPassword = generateTempPassword();
-        const passwordSaltHash = hashPassword(tempPassword);
+        const passwordSaltHash = hashPassword(password);
         const nowIso = new Date().toISOString();
 
         const createdUser = {
@@ -2087,6 +2119,7 @@ function createServer() {
           lastLoginAtIso: null,
           importedLegacySaves: false,
           profileImageData: imageData || null,
+          preferredSkills,
         };
 
         upsertUser(createdUser);
@@ -2095,8 +2128,9 @@ function createServer() {
           ok: true,
           user: sanitizeUserForClient(createdUser),
           login: {
+            username,
             email,
-            tempPassword,
+            password,
           },
         });
       } catch (error) {

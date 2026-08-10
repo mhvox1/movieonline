@@ -118,6 +118,29 @@ const API_BASE = resolveApiBaseUrl();
 const SAVE_KEY = 'film_tycoon_saves';
 const AUTO_SAVE_INTERVAL_MS = 15000;
 
+type UserPreferredSkills = {
+  negotiationSkill: number;
+  charisma: number;
+  financialSense: number;
+  filmSense: number;
+  organizationTalent: number;
+};
+
+type AuthUser = {
+  id: string;
+  email: string;
+  username: string;
+  role: string;
+  studioName?: string | null;
+  preferredSkills?: UserPreferredSkills | null;
+};
+
+const clampSkillValue = (value: unknown, fallback = 20): number => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, Math.min(100, Math.round(parsed)));
+};
+
 const getDaysInMonth = (date: Date): number => {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
 };
@@ -160,7 +183,7 @@ const AppContent: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [authToken, setAuthToken] = useState<string>(() => localStorage.getItem(AUTH_TOKEN_KEY) || '');
-  const [authUser, setAuthUser] = useState<{ id: string; email: string; username: string; role: string; studioName?: string | null } | null>(null);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [pendingRegistration, setPendingRegistration] = useState(false);
   const lastAppliedAdminRevisionRef = useRef<string>('');
@@ -1603,6 +1626,7 @@ const AppContent: React.FC = () => {
         }
 
         const studioName = String(authUser.studioName || '').trim() || `${authUser.username} Studios`;
+        const preferredSkills = authUser.preferredSkills || null;
         await handleStartGame({
           username: authUser.username,
           studioName,
@@ -1610,11 +1634,11 @@ const AppContent: React.FC = () => {
           birthDay: 1,
           birthMonth: 0,
           playerPortraitId: 'm1',
-          negotiationSkill: 20,
-          charisma: 20,
-          financialSense: 20,
-          filmSense: 20,
-          organizationTalent: 20,
+          negotiationSkill: clampSkillValue(preferredSkills?.negotiationSkill, 20),
+          charisma: clampSkillValue(preferredSkills?.charisma, 20),
+          financialSense: clampSkillValue(preferredSkills?.financialSense, 20),
+          filmSense: clampSkillValue(preferredSkills?.filmSense, 20),
+          organizationTalent: clampSkillValue(preferredSkills?.organizationTalent, 20),
         });
       } catch {
         if (!cancelled) {

@@ -103,6 +103,14 @@
             <div class="grid gap-3">
               <input id="createUsernameInput" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Username" />
               <input id="createStudioNameInput" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Studioname" />
+              <input id="createPasswordInput" type="password" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Passwort (mind. 8 Zeichen)" />
+              <div class="grid grid-cols-2 gap-2">
+                <input id="createNegotiationSkillInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Verhandlung" value="20" />
+                <input id="createCharismaInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Charisma" value="20" />
+                <input id="createFinancialSenseInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Finanzsinn" value="20" />
+                <input id="createFilmSenseInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Filmsinn" value="20" />
+                <input id="createOrganizationTalentInput" type="number" min="0" max="100" class="bg-slate-900 border border-slate-600 rounded px-3 py-2 col-span-2" placeholder="Organisationstalent" value="20" />
+              </div>
               <input id="createImageInput" type="file" accept="image/*" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" />
               <img id="createImagePreview" class="hidden w-24 h-24 object-cover rounded border border-slate-600" alt="Vorschau" />
             </div>
@@ -581,6 +589,12 @@
     const submitCreateUserBtn = document.getElementById('submitCreateUserBtn');
     const createUsernameInput = document.getElementById('createUsernameInput');
     const createStudioNameInput = document.getElementById('createStudioNameInput');
+    const createPasswordInput = document.getElementById('createPasswordInput');
+    const createNegotiationSkillInput = document.getElementById('createNegotiationSkillInput');
+    const createCharismaInput = document.getElementById('createCharismaInput');
+    const createFinancialSenseInput = document.getElementById('createFinancialSenseInput');
+    const createFilmSenseInput = document.getElementById('createFilmSenseInput');
+    const createOrganizationTalentInput = document.getElementById('createOrganizationTalentInput');
     const createImageInput = document.getElementById('createImageInput');
     const createImagePreview = document.getElementById('createImagePreview');
     const talentSubtabActors = document.getElementById('talentSubtabActors');
@@ -836,9 +850,21 @@
     function resetCreateUserForm() {
       createUsernameInput.value = '';
       createStudioNameInput.value = '';
+      createPasswordInput.value = '';
+      createNegotiationSkillInput.value = '20';
+      createCharismaInput.value = '20';
+      createFinancialSenseInput.value = '20';
+      createFilmSenseInput.value = '20';
+      createOrganizationTalentInput.value = '20';
       createImageInput.value = '';
       createImagePreview.src = '';
       createImagePreview.classList.add('hidden');
+    }
+
+    function clampSkillInput(value, fallback = 20) {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) return fallback;
+      return Math.max(0, Math.min(100, Math.round(parsed)));
     }
 
     function setUserImagePreview(dataUrl) {
@@ -1841,10 +1867,23 @@
     async function createUser() {
       const username = createUsernameInput.value.trim();
       const studioName = createStudioNameInput.value.trim();
+      const password = createPasswordInput.value;
+      const preferredSkills = {
+        negotiationSkill: clampSkillInput(createNegotiationSkillInput.value),
+        charisma: clampSkillInput(createCharismaInput.value),
+        financialSense: clampSkillInput(createFinancialSenseInput.value),
+        filmSense: clampSkillInput(createFilmSenseInput.value),
+        organizationTalent: clampSkillInput(createOrganizationTalentInput.value),
+      };
       const file = createImageInput.files && createImageInput.files[0] ? createImageInput.files[0] : null;
 
-      if (!username || !studioName) {
-        log('User anlegen fehlgeschlagen', { error: 'Username und Studioname sind Pflichtfelder' });
+      if (!username || !studioName || !password) {
+        log('User anlegen fehlgeschlagen', { error: 'Username, Studioname und Passwort sind Pflichtfelder' });
+        return;
+      }
+
+      if (password.length < 8) {
+        log('User anlegen fehlgeschlagen', { error: 'Passwort muss mindestens 8 Zeichen lang sein' });
         return;
       }
 
@@ -1856,14 +1895,15 @@
         }
         const result = await api('/admin/users/create', {
           method: 'POST',
-          body: JSON.stringify({ username, studioName, imageData }),
+          body: JSON.stringify({ username, studioName, password, preferredSkills, imageData }),
         });
 
         log('User angelegt', {
           userId: result.user?.id,
           username: result.user?.username,
           email: result.login?.email,
-          tempPassword: result.login?.tempPassword,
+          password: result.login?.password,
+          preferredSkills: result.user?.preferredSkills || preferredSkills,
         });
 
         resetCreateUserForm();

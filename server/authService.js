@@ -47,6 +47,17 @@ function createSessionRecord(userId) {
 
 function sanitizeUserForClient(user) {
   if (!user) return null;
+
+  const preferredSkills = user.preferredSkills && typeof user.preferredSkills === 'object'
+    ? {
+        negotiationSkill: Number(user.preferredSkills.negotiationSkill || 20),
+        charisma: Number(user.preferredSkills.charisma || 20),
+        financialSense: Number(user.preferredSkills.financialSense || 20),
+        filmSense: Number(user.preferredSkills.filmSense || 20),
+        organizationTalent: Number(user.preferredSkills.organizationTalent || 20),
+      }
+    : null;
+
   return {
     id: user.id,
     email: user.email,
@@ -56,6 +67,7 @@ function sanitizeUserForClient(user) {
     lastLoginAtIso: user.lastLoginAtIso || null,
     studioName: user.studioName || null,
     importedLegacySaves: Boolean(user.importedLegacySaves),
+    preferredSkills,
   };
 }
 
