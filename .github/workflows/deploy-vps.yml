@@ -90,6 +90,26 @@ jobs:
               sudo apt-get install -y nginx
             fi
 
+            API_DOMAIN="${{ secrets.VPS_API_DOMAIN }}"
+            if [ -n "$API_DOMAIN" ]; then
+              sudo tee /etc/nginx/sites-available/movie-business-api >/dev/null <<EOF
+server {
+    listen 80;
+    server_name ${API_DOMAIN};
+
+    location / {
+        proxy_pass http://127.0.0.1:8787;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
+              sudo ln -sf /etc/nginx/sites-available/movie-business-api /etc/nginx/sites-enabled/movie-business-api
+            fi
+
             pm2 startOrReload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs --update-env
             pm2 save
 
