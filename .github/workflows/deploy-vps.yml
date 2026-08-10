@@ -120,97 +120,157 @@ jobs:
           echo "Resolved SSH host: ${{ steps.ssh_target.outputs.host }}"
           echo "Resolved SSH port: ${{ steps.ssh_port.outputs.port }}"
 
-      - name: Copy archive to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ steps.ssh_target.outputs.host }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ steps.ssh_port.outputs.port }}
-          timeout: 120s
-          command_timeout: 10m
-          debug: true
-          source: movie-business-deploy.tgz
-          target: /tmp
+      - name: Prepare SSH key
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_vps_deploy
+          chmod 600 ~/.ssh/id_vps_deploy
 
-      - name: Deploy on VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ steps.ssh_target.outputs.host }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ steps.ssh_port.outputs.port }}
-          timeout: 120s
-          command_timeout: 15m
-          debug: true
-          script: |
-            set -e
-            APP_DIR="${{ secrets.VPS_APP_DIR }}"
-            sudo mkdir -p "$APP_DIR"
-            sudo chown -R $USER:$USER "$APP_DIR"
-            cd "$APP_DIR"
+      - name: Copy archive to VPS (with retries)
+        env:
+          VPS_HOST: ${{ steps.ssh_target.outputs.host }}
+          VPS_PORT: ${{ steps.ssh_port.outputs.port }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          set -euo pipefail
 
-            if ! command -v npm > /dev/null; then
-              sudo apt-get update
-              sudo apt-get install -y ca-certificates curl
-              curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-              sudo apt-get install -y nodejs
+          SSH_OPTS=(
+            -i ~/.ssh/id_vps_deploy
+            -p "$VPS_PORT"
+            -o StrictHostKeyChecking=no
+            -o UserKnownHostsFile=/dev/null
+            -o ConnectTimeout=20
+            -o ServerAliveInterval=15
+            -o ServerAliveCountMax=4
+          )
+
+          success=0
+          for attempt in 1 2 3 4; do
+            echo "SCP attempt ${attempt}/4"
+            if scp "${SSH_OPTS[@]}" movie-business-deploy.tgz "$VPS_USER@$VPS_HOST:/tmp/movie-business-deploy.tgz"; then
+              success=1
+              break
             fi
+            echo "SCP failed on attempt ${attempt}; retrying in 10s..."
+            sleep 10
+          done
 
-            tar -xzf /tmp/movie-business-deploy.tgz -C "$APP_DIR"
+          if [ "$success" -ne 1 ]; then
+            echo "SCP failed after 4 attempts. Check VPS_HOST/VPS_PORT/firewall (OpenSSH) and Hostinger SSH access." >&2
+            exit 1
+          fi
 
-            npm ci --omit=dev
+      - name: Deploy on VPS (with retries)
+        env:
+          VPS_HOST: ${{ steps.ssh_target.outputs.host }}
+          VPS_PORT: ${{ steps.ssh_port.outputs.port }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
+          VPS_FRONTEND_DOMAIN: ${{ secrets.VPS_FRONTEND_DOMAIN }}
+          VPS_API_DOMAIN: ${{ secrets.VPS_API_DOMAIN }}
+        run: |
+          set -euo pipefail
 
-            if ! command -v pm2 > /dev/null; then
-              sudo npm install -g pm2
+          SSH_OPTS=(
+            -i ~/.ssh/id_vps_deploy
+            -p "$VPS_PORT"
+            -o StrictHostKeyChecking=no
+            -o UserKnownHostsFile=/dev/null
+            -o ConnectTimeout=20
+            -o ServerAliveInterval=15
+            -o ServerAliveCountMax=4
+          )
+
+          run_remote_deploy() {
+            ssh "${SSH_OPTS[@]}" "$VPS_USER@$VPS_HOST" \
+              APP_DIR="$VPS_APP_DIR" FRONTEND_DOMAIN="$VPS_FRONTEND_DOMAIN" API_DOMAIN="$VPS_API_DOMAIN" \
+              'bash -s' <<'REMOTE'
+          set -e
+          sudo mkdir -p "$APP_DIR"
+          sudo chown -R $USER:$USER "$APP_DIR"
+          cd "$APP_DIR"
+
+          if ! command -v npm > /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y ca-certificates curl
+            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          fi
+
+          tar -xzf /tmp/movie-business-deploy.tgz -C "$APP_DIR"
+
+          npm ci --omit=dev
+
+          if ! command -v pm2 > /dev/null; then
+            sudo npm install -g pm2
+          fi
+
+          if ! command -v nginx > /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y nginx
+          fi
+
+          if [ -n "$FRONTEND_DOMAIN" ]; then
+            sudo printf '%s\n' \
+              "server {" \
+              "  listen 80;" \
+              "  server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN};" \
+              "  root ${APP_DIR}/dist;" \
+              "  index index.html;" \
+              "" \
+              "  location / {" \
+              "    try_files \$uri \$uri/ /index.html;" \
+              "  }" \
+              "}" | sudo tee /etc/nginx/sites-available/movie-business-frontend >/dev/null
+            sudo ln -sf /etc/nginx/sites-available/movie-business-frontend /etc/nginx/sites-enabled/movie-business-frontend
+          fi
+
+          if [ -n "$API_DOMAIN" ]; then
+            sudo printf '%s\n' \
+              "server {" \
+              "  listen 80;" \
+              "  server_name ${API_DOMAIN};" \
+              "" \
+              "  location / {" \
+              "    proxy_pass http://127.0.0.1:8787;" \
+              "    proxy_http_version 1.1;" \
+              '    proxy_set_header Host $host;' \
+              '    proxy_set_header X-Real-IP $remote_addr;' \
+              '    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+              '    proxy_set_header X-Forwarded-Proto $scheme;' \
+              "  }" \
+              "}" | sudo tee /etc/nginx/sites-available/movie-business-api >/dev/null
+            sudo ln -sf /etc/nginx/sites-available/movie-business-api /etc/nginx/sites-enabled/movie-business-api
+          fi
+
+          sudo rm -f /etc/nginx/sites-enabled/default
+
+          pm2 startOrReload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs --update-env
+          pm2 save
+
+          sudo nginx -t
+          sudo systemctl enable nginx || true
+          sudo systemctl start nginx || true
+          sudo systemctl reload nginx
+REMOTE
+          }
+
+          success=0
+          for attempt in 1 2 3; do
+            echo "SSH deploy attempt ${attempt}/3"
+            if run_remote_deploy; then
+              success=1
+              break
             fi
+            echo "SSH deploy failed on attempt ${attempt}; retrying in 10s..."
+            sleep 10
+          done
 
-            if ! command -v nginx > /dev/null; then
-              sudo apt-get update
-              sudo apt-get install -y nginx
-            fi
-
-            FRONTEND_DOMAIN="${{ secrets.VPS_FRONTEND_DOMAIN }}"
-            if [ -n "$FRONTEND_DOMAIN" ]; then
-              sudo printf '%s\n' \
-                "server {" \
-                "  listen 80;" \
-                "  server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN};" \
-                "  root ${APP_DIR}/dist;" \
-                "  index index.html;" \
-                "" \
-                "  location / {" \
-                "    try_files \$uri \$uri/ /index.html;" \
-                "  }" \
-                "}" | sudo tee /etc/nginx/sites-available/movie-business-frontend >/dev/null
-              sudo ln -sf /etc/nginx/sites-available/movie-business-frontend /etc/nginx/sites-enabled/movie-business-frontend
-            fi
-
-            API_DOMAIN="${{ secrets.VPS_API_DOMAIN }}"
-            if [ -n "$API_DOMAIN" ]; then
-              sudo printf '%s\n' \
-                "server {" \
-                "  listen 80;" \
-                "  server_name ${API_DOMAIN};" \
-                "" \
-                "  location / {" \
-                "    proxy_pass http://127.0.0.1:8787;" \
-                "    proxy_http_version 1.1;" \
-                '    proxy_set_header Host $host;' \
-                '    proxy_set_header X-Real-IP $remote_addr;' \
-                '    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
-                '    proxy_set_header X-Forwarded-Proto $scheme;' \
-                "  }" \
-                "}" | sudo tee /etc/nginx/sites-available/movie-business-api >/dev/null
-              sudo ln -sf /etc/nginx/sites-available/movie-business-api /etc/nginx/sites-enabled/movie-business-api
-            fi
-
-            sudo rm -f /etc/nginx/sites-enabled/default
-
-            pm2 startOrReload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs --update-env
-            pm2 save
-
-            sudo nginx -t
-            sudo systemctl enable nginx || true
-            sudo systemctl start nginx || true
-            sudo systemctl reload nginx
+          if [ "$success" -ne 1 ]; then
+            echo "SSH deploy failed after 3 attempts." >&2
+            exit 1
+          fi
