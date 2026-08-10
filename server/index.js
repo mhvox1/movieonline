@@ -26,6 +26,7 @@ const {
 const { readWorldState, writeWorldState } = require('./worldStateStore');
 const { createListing, buyListing, getMarketOverview } = require('./marketService');
 const { DB_FILE: MARKET_DB_FILE } = require('./marketStore');
+const { validateStudioTalentLocks } = require('./talentLockService');
 const { scheduleFilmRelease } = require('./releaseService');
 const { listUsers, getUserById, getUserByEmail, getUserByUsername, upsertUser, removeUser, DB_FILE: USER_DB_FILE } = require('./userStore');
 const { createSession, getSession, removeSession, pruneExpiredSessions } = require('./sessionStore');
@@ -2527,6 +2528,16 @@ function createServer() {
             studio.state = {
               ...(studioWithOwnerOverrides.state || {}),
             };
+          }
+
+          const lockValidation = validateStudioTalentLocks(studio, listStudios(), now);
+          if (!lockValidation.ok) {
+            sendJson(res, 409, {
+              error: 'Global talent lock conflict',
+              details: lockValidation.conflicts,
+              message: 'One or more talents are currently locked by another studio (active project or exclusive contract).',
+            });
+            return;
           }
 
           const simulationResult = processStudioSync(studio, now);

@@ -5,6 +5,7 @@ const {
   removeTalentListing,
   getTalentListing,
 } = require('./marketStore');
+const { isTalentLockedInStudioState } = require('./talentLockService');
 
 function toNumber(value, fallback = 0) {
   const n = Number(value);
@@ -59,6 +60,10 @@ function createListing({ sellerStudioId, talentType, talentId, price }) {
   const safePrice = Math.max(1, Math.floor(toNumber(price, 0)));
   if (safePrice <= 0) {
     return { error: 'Price must be positive' };
+  }
+
+  if (isTalentLockedInStudioState(seller.state, talentType, talentId, new Date())) {
+    return { error: 'Talent is currently locked (active project or exclusive contract)' };
   }
 
   const talent = findAndExtractTalent(seller, talentType, talentId);
