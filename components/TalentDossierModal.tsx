@@ -30,7 +30,7 @@ export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): 
     }
     
     if (!talent.birthDate) {
-         return `./portrait/${talent.portraitUrl}m.png`; // Fallback default age
+         return `https://www.schnoxcore.com/media/portraits/${talent.portraitUrl}m.png`; // Fallback default age
     }
     
     const birthDate = new Date(talent.birthDate);
@@ -53,7 +53,7 @@ export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): 
     
     const baseId = talent.portraitUrl;
     
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 
 interface TalentDossierModalProps {

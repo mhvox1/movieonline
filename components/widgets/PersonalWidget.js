@@ -31,7 +31,7 @@ const getPlayerPortraitUrl = (baseId, birthDate, gameDate) => {
     else { // age >= 60
         ageSuffix = 'a';
     }
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 const PersonalWidget = ({ onClick }) => {
     const { playerData } = useGame();

@@ -59,7 +59,7 @@ const getPortraitUrl = (baseId: string | undefined | null, birthDate: Date | und
         ageSuffix = 'a';
     }
     
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 
 

@@ -215,7 +215,7 @@ export const TalentManagementTab = () => {
                 salary: 0,
                 experience: 0,
                 satisfaction: 100,
-                portraitUrl: playerData.partnerPortraitId ? `./portrait/${playerData.partnerPortraitId}.png` : undefined
+                portraitUrl: playerData.partnerPortraitId ? `https://www.schnoxcore.com/media/portraits/${playerData.partnerPortraitId}.png` : undefined
             };
             agents.push(partnerAgent);
         }

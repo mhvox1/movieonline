@@ -243,7 +243,7 @@ const NewGameScreen = ({ onStart, onBack, requiresAccountRegistration = false })
                     ) : (
                       availablePortraits.length > 0 && (
                         <img
-                          src={`./portrait/${availablePortraits[currentPortraitIndex]}j.png`}
+                          src={`https://www.schnoxcore.com/media/portraits/${availablePortraits[currentPortraitIndex]}j.png`}
                           alt={t.newGame.playerPortraitAlt}
                           className="w-full h-full object-cover"
                         />

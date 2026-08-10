@@ -98,7 +98,7 @@ const getChildPortraitUrl = (portraitId: string | undefined, age: number): strin
     else if (age >= 35 && age <= 59) suffix = 'm';
     else if (age >= 60) suffix = 'a';
 
-    return `./portrait/${portraitId}${suffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${portraitId}${suffix}.png`;
 };
 
 // Custom Star Rating for Schools (supports halves)

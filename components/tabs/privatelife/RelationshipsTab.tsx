@@ -83,7 +83,7 @@ const getPortraitUrl = (baseId: string | undefined | null, birthDate: Date | und
         ageSuffix = 'a';
     }
     
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 
 // Helper for Child Portraits
@@ -678,7 +678,7 @@ export const RelationshipsTab: React.FC = () => {
                             <h3 className="text-xl font-cinzel text-amber-400 mb-3">{t.privatelife.family.dating.encounterTitle}</h3>
                             <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mb-3 overflow-hidden border-2 border-gray-500">
                                 {potentialPartner.portraitId ? (
-                                    <img src={`./portrait/${potentialPartner.portraitId}j.png`} alt={language === 'de' ? 'Potenzieller Partner' : 'Potential Partner'} className="w-full h-full object-cover" />
+                                    <img src={`https://www.schnoxcore.com/media/portraits/${potentialPartner.portraitId}j.png`} alt={language === 'de' ? 'Potenzieller Partner' : 'Potential Partner'} className="w-full h-full object-cover" />
                                 ) : (
                                     <span className="text-3xl">{potentialPartner.gender === 'weiblich' ? '♀' : '♂'}</span>
                                 )}

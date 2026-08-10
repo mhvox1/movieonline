@@ -1697,19 +1697,50 @@ const AppContent: React.FC = () => {
   
   
   useEffect(() => {
-    if (hasInteracted && audioRef.current) {
-        audioRef.current.play().catch(error => {
-            console.warn("Hintergrundmusik konnte nicht automatisch gestartet werden:", error);
-        });
+    const unlockAudio = () => {
+      setHasInteracted(true);
+    };
+
+    window.addEventListener('pointerdown', unlockAudio, { once: true, capture: true });
+    window.addEventListener('keydown', unlockAudio, { once: true, capture: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', unlockAudio, true);
+      window.removeEventListener('keydown', unlockAudio, true);
+    };
+  }, []);
+
+  const tryStartBackgroundMusic = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const effectiveVolume = isMuted ? 0 : (masterVolume / 10) * (musicVolume / 10);
+    audio.volume = effectiveVolume;
+
+    if (!hasInteracted || effectiveVolume <= 0) {
+      return;
     }
-  }, [hasInteracted]);
+
+    audio.play().catch(error => {
+      console.warn('Hintergrundmusik konnte nicht automatisch gestartet werden:', error);
+    });
+  }, [hasInteracted, isMuted, masterVolume, musicVolume]);
 
   useEffect(() => {
-      if (audioRef.current) {
-          const effectiveVolume = isMuted ? 0 : (masterVolume / 10) * (musicVolume / 10);
-          audioRef.current.volume = effectiveVolume;
+    tryStartBackgroundMusic();
+  }, [tryStartBackgroundMusic]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      const effectiveVolume = isMuted ? 0 : (masterVolume / 10) * (musicVolume / 10);
+      audioRef.current.volume = effectiveVolume;
+      if (hasInteracted && effectiveVolume > 0 && audioRef.current.paused) {
+        void audioRef.current.play().catch(() => {
+          // Ignore: browser may still block until a trusted user gesture.
+        });
       }
-  }, [musicVolume, masterVolume, isMuted]);
+    }
+  }, [musicVolume, masterVolume, isMuted, hasInteracted]);
 
   useEffect(() => {
     const handleGlobalClick = (event: MouseEvent) => {

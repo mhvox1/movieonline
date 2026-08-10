@@ -40,7 +40,7 @@ const getPrivatePortraitUrl = (baseId: string | undefined | null, birthDate: Dat
         ageSuffix = 'a';
     }
     
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 
 // Helper to apply private transactions and stat changes

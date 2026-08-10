@@ -38,7 +38,7 @@ const getPlayerPortraitUrl = (baseId: string | undefined | null, birthDate: Date
         ageSuffix = 'a';
     }
     
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 
 const PersonalWidget: React.FC<PersonalWidgetProps> = ({ onClick }) => {

@@ -20,13 +20,13 @@ const getUniquePortrait = (gender: 'male' | 'female', usedPortraits: Set<string>
     // Filter out portraits that are already used (by checking if the ID exists in the set)
     const available = pool.filter(id => {
         // Construct the full path to check against usedPortraits which stores full paths
-        const fullPath = `./portrait/${id}.png`;
+        const fullPath = `https://www.schnoxcore.com/media/portraits/${id}.png`;
         return !usedPortraits.has(fullPath);
     });
     
     // Fallback if all 100 are taken (unlikely but safe) -> pick any random
     const selectedId = available.length > 0 ? pickRandom(available) : pickRandom(pool);
-    return `./portrait/${selectedId}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${selectedId}.png`;
 };
 
 // Modified signature to accept usedPortraits set

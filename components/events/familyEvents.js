@@ -37,7 +37,7 @@ const getPrivatePortraitUrl = (baseId, birthDate, gameDate) => {
     else { // age >= 60
         ageSuffix = 'a';
     }
-    return `./portrait/${baseId}${ageSuffix}.png`;
+    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
 };
 // Helper to apply private transactions and stat changes
 const applyPrivateEffect = (data, capitalChange, energyChange, relationshipChange, targetType) => {
