@@ -446,6 +446,14 @@
             <span class="block mb-1">Rolle</span>
             <input id="editUserRoleInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" readonly />
           </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Passwort</span>
+            <div class="flex gap-2">
+              <input id="editUserPasswordInput" type="password" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" placeholder="Passwort" />
+              <button id="toggleEditUserPasswordBtn" type="button" class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600" title="Passwort anzeigen/ausblenden">Auge</button>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Leer lassen, um das aktuelle Passwort beizubehalten.</p>
+          </label>
         </div>
       </div>
 
@@ -655,6 +663,8 @@
     const editUserUsernameInput = document.getElementById('editUserUsernameInput');
     const editUserStudioNameInput = document.getElementById('editUserStudioNameInput');
     const editUserRoleInput = document.getElementById('editUserRoleInput');
+    const editUserPasswordInput = document.getElementById('editUserPasswordInput');
+    const toggleEditUserPasswordBtn = document.getElementById('toggleEditUserPasswordBtn');
     const userTabBasic = document.getElementById('userTabBasic');
     const userTabStatus = document.getElementById('userTabStatus');
     const userTabMessage = document.getElementById('userTabMessage');
@@ -1080,6 +1090,8 @@
         editUserUsernameInput.value = String(user.username || '');
         editUserStudioNameInput.value = String(user.studioName || '');
         editUserRoleInput.value = String(user.role || '');
+        editUserPasswordInput.type = 'password';
+        editUserPasswordInput.value = String(user.adminPlainPassword || '');
         userLastLoginInfo.textContent = `Letzter Login: ${formatIsoDateTime(user.lastLoginAtIso)}`;
         renderUserRuntimeStatus(studios);
         userMessageSenderInput.value = 'Verwaltung';
@@ -1104,6 +1116,8 @@
       selectedUserProfileImageData = null;
       pendingUserImageData = null;
       editUserImageInput.value = '';
+      editUserPasswordInput.type = 'password';
+      editUserPasswordInput.value = '';
       setUserImagePreview(null);
       userLastLoginInfo.textContent = 'Letzter Login: -';
       userRuntimeInfo.innerHTML = '';
@@ -1117,10 +1131,12 @@
       }
 
       try {
+        const nextPassword = editUserPasswordInput.value;
         const payload = {
           username: editUserUsernameInput.value.trim(),
           studioName: editUserStudioNameInput.value.trim(),
           profileImageData: pendingUserImageData !== null ? pendingUserImageData : selectedUserProfileImageData,
+          password: nextPassword.trim().length > 0 ? nextPassword : '',
         };
 
         await api(`/admin/users/${encodeURIComponent(selectedUserId)}/update`, {
@@ -2000,6 +2016,10 @@
       } catch (error) {
         log('User-Porträt laden fehlgeschlagen', { error: error.message });
       }
+    });
+
+    toggleEditUserPasswordBtn.addEventListener('click', () => {
+      editUserPasswordInput.type = editUserPasswordInput.type === 'password' ? 'text' : 'password';
     });
 
     talentSubtabActors.addEventListener('click', () => setTalentSubtab('actors'));

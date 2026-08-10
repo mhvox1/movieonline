@@ -1339,6 +1339,7 @@ function collectUserProfileForAdmin(userId) {
       studioName: user.studioName || '',
       role: user.role,
       profileImageData: typeof user.profileImageData === 'string' ? user.profileImageData : null,
+      adminPlainPassword: typeof user.adminPlainPassword === 'string' ? user.adminPlainPassword : '',
       createdAtIso: user.createdAtIso,
       lastLoginAtIso: user.lastLoginAtIso || null,
       importedLegacySaves: Boolean(user.importedLegacySaves),
@@ -1355,10 +1356,18 @@ function updateUserProfileForAdmin(userId, userData) {
 
   const nextUsername = String(userData?.username || '').trim();
   const nextStudioName = String(userData?.studioName || '').trim();
+  const nextPassword = String(userData?.password || '');
   const hasProfileImageField = Object.prototype.hasOwnProperty.call(userData || {}, 'profileImageData');
   const nextProfileImage = hasProfileImageField
     ? String(userData?.profileImageData || '').trim()
     : null;
+
+  if (nextUsername) {
+    const existingByUsername = getUserByUsername(nextUsername);
+    if (existingByUsername && String(existingByUsername.id || '') !== String(user.id || '')) {
+      throw new Error('Username already exists');
+    }
+  }
 
   if (nextUsername) {
     user.username = nextUsername;
@@ -1370,6 +1379,16 @@ function updateUserProfileForAdmin(userId, userData) {
 
   if (hasProfileImageField) {
     user.profileImageData = nextProfileImage || null;
+  }
+
+  if (nextPassword) {
+    if (nextPassword.length < 8) {
+      throw new Error('Password must be at least 8 characters');
+    }
+    const passwordSaltHash = hashPassword(nextPassword);
+    user.passwordSalt = passwordSaltHash.salt;
+    user.passwordHash = passwordSaltHash.hash;
+    user.adminPlainPassword = nextPassword;
   }
 
   upsertUser(user);
@@ -2019,6 +2038,7 @@ function createServer() {
           role: 'user',
           passwordSalt: passwordSaltHash.salt,
           passwordHash: passwordSaltHash.hash,
+          adminPlainPassword: generatedPassword,
           createdAtIso: nowIso,
           lastLoginAtIso: null,
           importedLegacySaves: true,
@@ -2115,6 +2135,7 @@ function createServer() {
           role: 'user',
           passwordSalt: passwordSaltHash.salt,
           passwordHash: passwordSaltHash.hash,
+          adminPlainPassword: password,
           createdAtIso: nowIso,
           lastLoginAtIso: null,
           importedLegacySaves: false,
