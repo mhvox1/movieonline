@@ -138,6 +138,40 @@ jobs:
         run: |
           set -euo pipefail
 
+          ARCHIVE_PATH="./movie-business-deploy.tgz"
+
+          if [ ! -f "$ARCHIVE_PATH" ]; then
+            echo "Deploy archive not found: $ARCHIVE_PATH" >&2
+            exit 1
+          fi
+
+          # Normalize and validate connection inputs before invoking scp.
+          VPS_USER="$(echo "${VPS_USER:-}" | tr -d '\r' | xargs)"
+          VPS_HOST="$(echo "${VPS_HOST:-}" | tr -d '\r' | xargs)"
+          VPS_PORT="$(echo "${VPS_PORT:-}" | tr -d '\r' | xargs)"
+
+          if [ -z "$VPS_USER" ] || [ -z "$VPS_HOST" ] || [ -z "$VPS_PORT" ]; then
+            echo "Missing one of VPS_USER/VPS_HOST/VPS_PORT after normalization." >&2
+            exit 1
+          fi
+
+          if ! [[ "$VPS_USER" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+            echo "VPS_USER contains invalid characters for SSH username." >&2
+            exit 1
+          fi
+
+          if ! [[ "$VPS_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+            echo "VPS_HOST contains invalid characters for SSH host." >&2
+            exit 1
+          fi
+
+          if ! [[ "$VPS_PORT" =~ ^[0-9]+$ ]]; then
+            echo "VPS_PORT is not numeric: '$VPS_PORT'" >&2
+            exit 1
+          fi
+
+          REMOTE_TARGET="${VPS_USER}@${VPS_HOST}:/tmp/movie-business-deploy.tgz"
+
           SSH_OPTS=(
             -i ~/.ssh/id_vps_deploy
             -p "$VPS_PORT"
@@ -151,7 +185,7 @@ jobs:
           success=0
           for attempt in 1 2 3 4; do
             echo "SCP attempt ${attempt}/4"
-            if scp "${SSH_OPTS[@]}" movie-business-deploy.tgz "$VPS_USER@$VPS_HOST:/tmp/movie-business-deploy.tgz"; then
+            if scp "${SSH_OPTS[@]}" -- "$ARCHIVE_PATH" "$REMOTE_TARGET"; then
               success=1
               break
             fi
