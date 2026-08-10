@@ -2,10 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlayerData, GameSpeed, Language, ScalingMode, SaveFile } from '../types';
 import { settingsBackgroundImage } from './backgrounds/SettingsBackgroundImage';
-import SaveIcon from './icons/SaveIcon';
 import EinstellungenIcon from './icons/EinstellungenIcon';
 import QuitIcon from './icons/QuitIcon';
-import InfoIcon from './icons/InfoIcon';
 import { useGame } from '../contexts/GameContext';
 import GameHeader from './GameHeader';
 import { useTranslation } from '../hooks/useTranslation';
@@ -93,7 +91,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onQuit, gameSpe
   
   const locale = language === 'de' ? 'de-DE' : 'en-US';
 
-  const [activeTab, setActiveTab] = useState<SettingsTab>(playerData ? 'save' : 'options');
+    const [activeTab, setActiveTab] = useState<SettingsTab>('options');
   const [optionsTab, setOptionsTab] = useState<OptionsTab>('spiel');
   const [manualTab, setManualTab] = useState<ManualTab>('production');
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
@@ -546,30 +544,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onQuit, gameSpe
                 <h1 className="text-3xl font-bold font-cinzel text-amber-400">{t.settings.title}</h1>
             </header>
             <nav className="flex-grow p-4 flex flex-col gap-4 overflow-y-auto">
-                {playerData && (
-                    <SettingsButton 
-                        title={t.settings.saveGame}
-                        description={t.settings.saveGame}
-                        icon={<SaveIcon className="h-5 w-5 bg-gray-400 group-hover:bg-black transition-colors" />}
-                        isActive={activeTab === 'save'}
-                        onClick={() => setActiveTab('save')}
-                    />
-                )}
                 <SettingsButton 
                     title={t.settings.options}
                     description={t.settings.options}
                     icon={<EinstellungenIcon className="h-5 w-5 bg-gray-400 group-hover:bg-black transition-colors" />}
                     isActive={activeTab === 'options'}
                     onClick={() => setActiveTab('options')}
-                />
-                
-                {/* Handbuch Button moved to Sidebar */}
-                <SettingsButton 
-                    title={t.settings.manualTab}
-                    description={t.settings.manualTab}
-                    icon={<InfoIcon className="h-5 w-5 bg-gray-400 group-hover:bg-black transition-colors" />}
-                    isActive={activeTab === 'manual'}
-                    onClick={() => setActiveTab('manual')}
                 />
                 
                 {/* Quit Button moved to Sidebar */}
