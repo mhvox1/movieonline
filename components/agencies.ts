@@ -1,0 +1,68 @@
+import { TalentAgency } from '../types';
+
+export const ALL_AGENCIES: TalentAgency[] = [
+    { 
+        id: 1, 
+        name: '', 
+        description: '',
+        cost: 25000, 
+        scoutingDurationDays: 10,
+        specialization: 'newcomers',
+    },
+    { 
+        id: 2, 
+        name: '', 
+        description: '',
+        cost: 75000, 
+        scoutingDurationDays: 14,
+        specialization: 'genre',
+    },
+    { 
+        id: 6, 
+        name: '', 
+        description: '',
+        cost: 95000, 
+        scoutingDurationDays: 16,
+        specialization: 'arthouse',
+    },
+    { 
+        id: 5, 
+        name: '', 
+        description: '',
+        cost: 120000, 
+        scoutingDurationDays: 18,
+        specialization: 'international',
+    },
+    { 
+        id: 7, 
+        name: '', 
+        description: '',
+        cost: 150000, 
+        scoutingDurationDays: 20,
+        specialization: 'comeback',
+    },
+    { 
+        id: 3, 
+        name: '', 
+        description: '',
+        cost: 200000, 
+        scoutingDurationDays: 21,
+        specialization: 'prestige',
+    },
+     { 
+        id: 8, 
+        name: '', 
+        description: '',
+        cost: 250000, 
+        scoutingDurationDays: 24,
+        specialization: 'action',
+    },
+    { 
+        id: 4, 
+        name: '', 
+        description: '',
+        cost: 500000, 
+        scoutingDurationDays: 28,
+        specialization: 'blockbuster',
+    }
+];

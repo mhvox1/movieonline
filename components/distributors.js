@@ -1,0 +1,23 @@
+import { Genre } from '../types';
+export const ALL_DISTRIBUTORS = [
+    { id: 1, name: 'Arthouse Dreams', tier: 1, flavorText: "Wir suchen nach der Seele des Kinos, nicht nach dem Geld.", genrePreference: Genre.Drama },
+    { id: 2, name: 'Midnight Grindhouse', tier: 1, flavorText: "Blut, Gedärme und Explosionen! Genau unser Ding.", genrePreference: Genre.Horror },
+    { id: 3, name: 'Kino Klassik Verleih', tier: 2, flavorText: "Wir glauben an die Kraft einer guten Geschichte, gut erzählt.", genrePreference: Genre.Drama },
+    { id: 4, name: 'Studio NextGen', tier: 2, flavorText: "Wir bringen frischen Wind auf die Leinwand. Zeig uns, was du hast!", genrePreference: Genre.Comedy },
+    { id: 5, name: 'Silver Screen Partners', tier: 3, flavorText: "Eine solide Produktion verdient einen soliden Partner. Wir sind dieser Partner.", genrePreference: Genre.Crime },
+    { id: 6, name: 'Atlas Distribution', tier: 3, flavorText: "Wir haben die Landkarte. Sie haben den Film. Lassen Sie uns die Welt erobern.", genrePreference: Genre.Adventure },
+    { id: 7, name: 'Majestic Pictures', tier: 4, flavorText: "Wir machen keine Filme, wir machen Ereignisse. Ist Ihr Film ein Ereignis?", genrePreference: Genre.Action },
+    { id: 8, name: 'Starlight Premiere', tier: 4, flavorText: "Jeder Film hat das Potenzial, ein Star zu sein. Wir bringen ihn zum Leuchten.", genrePreference: Genre.Romance },
+    { id: 9, name: 'Quantum Entertainment', tier: 5, flavorText: "Wir denken nicht in Filmen, wir denken in Franchises. Haben Sie das nächste große Ding?", genrePreference: Genre.SciFi },
+    { id: 10, name: 'Globex Film Corporation', tier: 5, flavorText: "Der Markt ist unser Schlachtfeld. Wir gewinnen immer.", genrePreference: Genre.Action },
+    { id: 11, name: 'Lighthouse Pictures', tier: 2, flavorText: "Wir leuchten den Weg für besondere Geschichten.", genrePreference: Genre.Dokumentation },
+    { id: 12, name: 'Crimson Peak Films', tier: 2, flavorText: "Wir fürchten uns nicht vor der Dunkelheit. Zeigen Sie uns Ihre Albträume.", genrePreference: Genre.Thriller },
+    { id: 13, name: 'Golden Pony Pictures', tier: 1, flavorText: "Kleine Filme, großes Herz. Wir unterstützen die Unabhängigen.", genrePreference: Genre.Comedy },
+    { id: 14, name: 'Frontier Film Co.', tier: 3, flavorText: "Für die großen Weiten und die großen Geschichten. Echte Western-Helden gesucht.", genrePreference: Genre.Western },
+    { id: 15, name: 'Metropolis Media', tier: 4, flavorText: "Die Zukunft des Kinos beginnt hier. Wir investieren in Visionen.", genrePreference: Genre.SciFi },
+    { id: 16, name: 'Pantheon Pictures', tier: 5, flavorText: "Wir machen keine Filme. Wir schaffen Legenden.", genrePreference: Genre.Fantasy },
+    { id: 17, name: 'Bluebird Romance', tier: 2, flavorText: "Wir glauben an die große Liebe... und große Einspielergebnisse.", genrePreference: Genre.Romance },
+    { id: 18, name: 'Vanguard War Documentaries', tier: 3, flavorText: "Wir bringen die Realität des Krieges auf die Leinwand. Ungefiltert und ehrlich.", genrePreference: Genre.War },
+    { id: 19, name: 'Harmony Musicals', tier: 3, flavorText: "Die Welt braucht mehr Gesang und Tanz. Haben Sie den nächsten Hit?", genrePreference: Genre.Musical },
+    { id: 20, name: 'Apex Predator Action', tier: 4, flavorText: "Schwache Filme haben bei uns keine Chance. Nur die Stärksten überleben.", genrePreference: Genre.Action },
+];

@@ -1,0 +1,21 @@
+
+export const monthlyReport = {
+  title: 'Monatsbericht: {month} {year}',
+  months: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+  totalIncome: 'Gesamteinnahmen',
+  totalExpenses: 'Gesamtausgaben',
+  netResult: 'Nettoergebnis',
+  income: 'Einnahmen',
+  expenses: 'Ausgaben',
+  noEntries: 'Keine Einträge',
+  productionFixedCosts: 'Produktions-Fixkosten',
+  productionAdditionalCosts: 'Produktions-Zusatzkosten',
+  otherIncome: 'Sonstige Einnahmen',
+  maintenance: 'Unterhalt: {building}',
+  salary: 'Gehalt: {name}',
+  loanPayment: 'Kreditrate: {loanName}',
+  installment: 'Rate für "{filmTitle}"',
+  incomeFrom: 'Einnahmen: {building}',
+  personnelCostsTotal: 'Personalkosten (Gesamt)',
+  studioCostsTotal: 'Studiogelände (Unterhalt & Bau)',
+};

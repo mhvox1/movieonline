@@ -1,0 +1,120 @@
+
+
+export const finanzen = {
+  screen: {
+    title: 'Finanzen',
+    nav: {
+      takeLoan: 'Kredit beantragen',
+      takeLoanDesc: 'Leihen Sie sich Geld für Projekte.',
+      currentLoans: 'Laufende Kredite',
+      currentLoansDesc: 'Sehen Sie Ihre aktuellen Schulden ein.',
+      stockMarket: 'Aktienmarkt',
+      stockMarketDesc: 'Handeln Sie mit Aktien anderer Studios.',
+      portfolio: 'Portfolio',
+      portfolioDesc: 'Verwalten Sie Ihre erworbenen Aktien.',
+      overview: 'Finanzübersicht',
+      overviewDesc: 'Monats- und Jahresbilanzen einsehen.',
+    },
+    backToMain: 'Zurück zum Hauptmenü',
+  },
+  takeLoan: {
+    creditLimitTitle: 'Ihr Kreditrahmen',
+    prestige: 'Prestige',
+    limit: 'Kreditlimit',
+    used: 'Genutzt',
+    available: 'Verfügbar',
+    newLoanTitle: 'Neuen Kredit beantragen',
+    amount: 'Kreditbetrag',
+    term: 'Laufzeit',
+    years: 'Jahre',
+    year: 'Jahr',
+    conditionsTitle: 'Kreditkonditionen',
+    interestRate: 'Zinssatz (effektiv p.a.)',
+    monthlyPayment: 'Monatliche Rate',
+    totalInterest: 'Gesamtzinsen',
+    applyButton: 'Kredit über {amount} beantragen',
+    confirmTitle: 'Kredit aufnehmen?',
+    confirmText: 'Möchten Sie einen Kredit über {amount} mit einer Laufzeit von {term} Jahren zu {rate}% Zinsen aufnehmen?',
+  },
+  currentLoans: {
+    title: 'Laufende Kredite',
+    remainingTerm: 'Restlaufzeit',
+    months: 'Monate',
+    originalAmount: 'Urspr. Betrag:',
+    currentDebt: 'Aktuelle Schuld:',
+    interestRate: 'Zinssatz (p.a.):',
+    monthlyPayment: 'Monatliche Rate:',
+    ofWhichInterest: 'davon Zinsen:',
+    ofWhichPrincipal: 'davon Tilgung:',
+    repayFully: 'Vollständig zurückzahlen',
+    noLoans: 'Sie haben keine laufenden Kredite.',
+    confirmRepayTitle: 'Kredit ablösen?',
+    confirmRepayText: 'Möchten Sie den Kredit "{name}" vorzeitig vollständig zurückzahlen?',
+    penalty: 'Vorfälligkeitsentschädigung (1%):',
+    totalRepay: 'Gesamtsumme:',
+  },
+  stockMarket: {
+    timeRange: 'Zeitraum:',
+    ranges: {
+      '1D': '1 Tag',
+      '1W': '1 Woche',
+      '1M': '1 Monat',
+      '3M': '3 Monate',
+      '6M': '6 Monate',
+      '1Y': '1 Jahr',
+    },
+    noData: 'Keine Daten',
+    industries: {
+      filmProduction: 'Filmproduktion',
+      postProduction: 'Postproduktion',
+      cinemaDistribution: 'Kino & Vertrieb',
+      productionTechnology: 'Produktionstechnik',
+      services: 'Dienstleistungen',
+    },
+    quantity: 'Anzahl:',
+    cost: 'Kosten:',
+    buy: 'Kaufen',
+  },
+  portfolio: {
+    title: 'Mein Portfolio',
+    quantity: 'Anzahl:',
+    avgBuyPrice: 'Ø Kaufpreis:',
+    totalValue: 'Gesamtwert:',
+    profitOrLoss: 'Gewinn / Verlust',
+    revenue: 'Erlös:',
+    sell: 'Verkaufen',
+    noStocks: 'Sie besitzen keine Aktien.',
+  },
+  overview: {
+    monthly: 'Monatsübersicht',
+    yearly: 'Jahresübersicht',
+    month: 'Monat',
+    year: 'Jahr',
+    income: 'Einnahmen',
+    expenses: 'Ausgaben',
+    profit: 'Gewinn/Verlust',
+    details: 'Details',
+    yearTotal: 'Übersicht der letzten 12 Monate',
+    noMonthlyData: 'Noch keine Monatsdaten vorhanden. Spielen Sie weiter, um Daten zu generieren.',
+    noYearlyData: 'Noch keine Jahresdaten vorhanden. Spielen Sie weiter, um Daten zu generieren.',
+    months: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+  },
+  loanOptions: {
+    small_loan: {
+        name: 'Kleinkredit',
+        description: 'Eine schnelle Finanzspritze, um Liquiditätsengpässe zu überbrücken. Hoher Zinssatz.'
+    },
+    project_financing: {
+        name: 'Projektfinanzierung',
+        description: 'Ideal, um die Kosten einer durchschnittlichen Filmproduktion zu decken.'
+    },
+    studio_expansion: {
+        name: 'Studio-Kredit',
+        description: 'Ein großes Darlehen für langfristige Investitionen in Ihr Studiogelände.'
+    },
+    blockbuster_loan: {
+        name: 'Blockbuster-Darlehen',
+        description: 'Finanzieren Sie Ihren nächsten Mega-Blockbuster. Nur für etablierte Studios.'
+    }
+  },
+};

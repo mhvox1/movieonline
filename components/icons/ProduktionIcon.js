@@ -1,0 +1,15 @@
+import { jsx as _jsx } from "react/jsx-runtime";
+const svgString = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9A2.25 2.25 0 004.5 18.75z" /></svg>`;
+const base64Svg = `data:image/svg+xml;base64,${btoa(svgString)}`;
+const ProduktionIcon = ({ className }) => {
+    return (_jsx("div", { className: className, style: {
+            backgroundColor: 'currentColor',
+            maskImage: `url(${base64Svg})`,
+            WebkitMaskImage: `url(${base64Svg})`,
+            maskSize: 'contain',
+            WebkitMaskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            WebkitMaskRepeat: 'no-repeat',
+        }, "aria-hidden": "true" }));
+};
+export default ProduktionIcon;

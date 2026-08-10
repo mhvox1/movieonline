@@ -1,0 +1,1 @@
+export const newspaperBackgroundImage = 'https://i.imgur.com/rC4Gf3m.jpg';

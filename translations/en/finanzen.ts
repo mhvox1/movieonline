@@ -1,0 +1,120 @@
+
+
+export const finanzen = {
+  screen: {
+    title: 'Finances',
+    nav: {
+      takeLoan: 'Take a Loan',
+      takeLoanDesc: 'Borrow money for projects.',
+      currentLoans: 'Current Loans',
+      currentLoansDesc: 'View your current debts.',
+      stockMarket: 'Stock Market',
+      stockMarketDesc: 'Trade stocks of other studios.',
+      portfolio: 'Portfolio',
+      portfolioDesc: 'Manage your acquired stocks.',
+      overview: 'Financial Overview',
+      overviewDesc: 'View monthly and yearly reports.',
+    },
+    backToMain: 'Back to Main Menu',
+  },
+  takeLoan: {
+    creditLimitTitle: 'Your Credit Limit',
+    prestige: 'Prestige',
+    limit: 'Credit Limit',
+    used: 'Used',
+    available: 'Available',
+    newLoanTitle: 'Apply for a New Loan',
+    amount: 'Loan Amount',
+    term: 'Term',
+    years: 'Years',
+    year: 'Year',
+    conditionsTitle: 'Loan Conditions',
+    interestRate: 'Interest Rate (eff. p.a.)',
+    monthlyPayment: 'Monthly Payment',
+    totalInterest: 'Total Interest',
+    applyButton: 'Apply for Loan of {amount}',
+    confirmTitle: 'Take Loan?',
+    confirmText: 'Do you want to take a loan of {amount} with a term of {term} years at {rate}% interest?',
+  },
+  currentLoans: {
+    title: 'Current Loans',
+    remainingTerm: 'Remaining Term',
+    months: 'Months',
+    originalAmount: 'Original Amount:',
+    currentDebt: 'Current Debt:',
+    interestRate: 'Interest Rate (p.a.):',
+    monthlyPayment: 'Monthly Payment:',
+    ofWhichInterest: 'of which Interest:',
+    ofWhichPrincipal: 'of which Principal:',
+    repayFully: 'Repay in Full',
+    noLoans: 'You have no current loans.',
+    confirmRepayTitle: 'Repay Loan?',
+    confirmRepayText: 'Do you want to repay the loan "{name}" early in full?',
+    penalty: 'Prepayment Penalty (1%):',
+    totalRepay: 'Total Amount:',
+  },
+  stockMarket: {
+    timeRange: 'Time Range:',
+    ranges: {
+      '1D': '1 Day',
+      '1W': '1 Week',
+      '1M': '1 Month',
+      '3M': '3 Months',
+      '6M': '6 Months',
+      '1Y': '1 Year',
+    },
+    noData: 'No Data',
+    industries: {
+      filmProduction: 'Movie Production',
+      postProduction: 'Post-Production',
+      cinemaDistribution: 'Cinema & Distribution',
+      productionTechnology: 'Production Technology',
+      services: 'Services',
+    },
+    quantity: 'Quantity:',
+    cost: 'Cost:',
+    buy: 'Buy',
+  },
+  portfolio: {
+    title: 'My Portfolio',
+    quantity: 'Shares:',
+    avgBuyPrice: 'Avg. Buy Price:',
+    totalValue: 'Total Value:',
+    profitOrLoss: 'Profit / Loss',
+    revenue: 'Revenue:',
+    sell: 'Sell',
+    noStocks: 'You do not own any stocks.',
+  },
+  overview: {
+    monthly: 'Monthly Overview',
+    yearly: 'Yearly Overview',
+    month: 'Month',
+    year: 'Year',
+    income: 'Income',
+    expenses: 'Expenses',
+    profit: 'Profit',
+    details: 'Details',
+    yearTotal: 'Overview of the last 12 months',
+    noMonthlyData: 'No monthly data yet. Keep playing to generate data.',
+    noYearlyData: 'No yearly data yet. Keep playing to generate data.',
+    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  },
+  loanOptions: {
+    small_loan: {
+        name: 'Small Loan',
+        description: 'A quick cash injection to cover liquidity shortages. High interest rate.'
+    },
+    project_financing: {
+        name: 'Project Financing',
+        description: 'Ideal for covering the costs of an average movie production.'
+    },
+    studio_expansion: {
+        name: 'Studio Loan',
+        description: 'A large loan for long-term investments in your studio lot.'
+    },
+    blockbuster_loan: {
+        name: 'Blockbuster Loan',
+        description: 'Finance your next mega-blockbuster. For established studios only.'
+    }
+  },
+};

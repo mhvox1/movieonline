@@ -1,0 +1,36 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from 'react';
+import { mainMenuBackgroundImage } from './backgrounds/MainMenuBackgroundImage';
+import { useTranslation } from '../hooks/useTranslation';
+import { useGame } from '../contexts/GameContext';
+// FIX: Accept onNavigate prop from App if passed down, or just assume callbacks
+// The component is likely used inside App.tsx which handles state. 
+// We will assume MainMenu receives onEditor if needed or triggers navigation.
+// BUT since App.tsx passes props, we need to update the prop interface in App.tsx or handle it here via callback.
+// The provided file content shows MainMenu accepts onNewGame, onLoadGame, onSettings.
+// We'll stick to that pattern but check context.
+// Wait, to navigate to Editor, we need a prop or context. The current MainMenu receives functions.
+// We will need to update App.tsx to pass the onEditor handler, but since I am editing MainMenu now,
+// I'll update the interface and assume the parent will provide it. 
+// UPDATE: I will check if onNavigate exists in props from the context of App.tsx which I will also edit.
+// Let's modify MainMenu to accept onEditor.
+const MainMenu = ({ onNewGame, onLoadGame, onSettings, onEditor }) => {
+    const { t } = useTranslation();
+    const { betaInfo, Demo, editorEnabled } = useGame();
+    const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+    const [isExiting, setIsExiting] = useState(false);
+    const handleQuit = () => {
+        setShowQuitConfirm(false);
+        setIsExiting(true);
+        // This will attempt to close the tab/window. It may be blocked by the browser.
+        // The isExiting state serves as a fallback to show a goodbye message.
+        window.close();
+    };
+    if (isExiting) {
+        return (_jsx("div", { className: "w-screen h-screen bg-black flex items-center justify-center", children: _jsx("h1", { className: "text-4xl font-cinzel text-gray-400", children: t.mainMenu.goodbye }) }));
+    }
+    return (_jsxs("div", { className: "w-full h-full bg-cover bg-center relative", style: { backgroundImage: `url(${mainMenuBackgroundImage})` }, children: [_jsxs("div", { className: "w-full h-full flex items-center justify-center bg-black bg-opacity-20 p-8", children: [_jsxs("div", { className: "flex flex-col space-y-4 w-full max-w-xs z-10", children: [_jsx("button", { onClick: onNewGame, className: "bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-amber-400 hover:scale-105 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/20", children: t.mainMenu.newGame }), _jsx("button", { onClick: onLoadGame, className: "bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-amber-400 hover:scale-105 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/20", children: t.mainMenu.loadGame }), _jsx("button", { onClick: onSettings, className: "bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-amber-400 hover:scale-105 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/20", children: t.mainMenu.settings }), editorEnabled && (_jsx("button", { onClick: onEditor, className: "bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-amber-400 hover:scale-105 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/20", children: "Editor" })), _jsx("button", { onClick: () => setShowQuitConfirm(true), className: "bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-amber-400 hover:scale-105 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/20", children: t.mainMenu.quit })] }), Demo ? (_jsxs("div", { className: "absolute top-16 left-1/2 transform -translate-x-1/2 bg-black/90 border-2 border-blue-500/50 p-4 rounded-xl max-w-md text-center shadow-[0_0_40px_rgba(59,130,246,0.3)] backdrop-blur-md z-0", children: [_jsx("h3", { className: "text-blue-400 font-bold font-cinzel text-lg mb-2 tracking-widest border-b border-blue-500/30 pb-2", children: "DEMO VERSION" }), _jsxs("div", { className: "space-y-2 text-gray-300 text-xs", children: [_jsxs("p", { className: "leading-relaxed", children: ["Willkommen in der Welt von ", _jsx("span", { className: "font-bold text-white", children: "Movie Business" }), "!", _jsx("br", {}), "In dieser Demo kannst du dein eigenes Studio vom ", _jsx("span", { className: "text-blue-300 font-bold", children: "01.01.1990" }), " bis zum ", _jsx("span", { className: "text-blue-300 font-bold", children: "31.12.1990" }), " aufbauen und den vollen Umfang der Simulation testen."] }), _jsxs("div", { className: "bg-gray-800/50 p-2 rounded-lg border border-gray-700 my-2 transform hover:scale-105 transition-transform duration-300", children: [_jsx("p", { className: "text-[10px] text-gray-400 uppercase tracking-widest mb-0.5", children: "Vollversion Release" }), _jsx("p", { className: "text-2xl font-black text-amber-500 font-cinzel tracking-wider drop-shadow-md", children: "25.02.2026" }), _jsx("p", { className: "text-[10px] text-white font-bold uppercase mt-0.5 tracking-widest", children: "Auf Steam" })] }), _jsx("p", { className: "text-[10px] italic text-gray-400", children: "Wir freuen uns riesig \u00FCber jedes Feedback, um das Spiel noch besser zu machen! Nutze daf\u00FCr gerne die Funktion im Men\u00FC." }), _jsx("p", { className: "text-sm font-bold text-white pt-1", children: "Viel Spa\u00DF beim Produzieren!" })] })] })) : betaInfo && (
+                    /* Beta Info Box */
+                    _jsxs("div", { className: "absolute top-10 left-1/2 transform -translate-x-1/2 bg-black/80 border border-amber-500/50 p-4 rounded-lg max-w-xl text-center shadow-2xl backdrop-blur-sm z-0", children: [_jsx("h3", { className: "text-amber-400 font-bold font-cinzel text-lg mb-2", children: "BETA VERSION" }), _jsx("p", { className: "text-gray-300 text-sm leading-relaxed", children: t.mainMenu.betaDisclaimer })] }))] }), !Demo && (_jsx("div", { className: "absolute bottom-2 right-4 text-gray-400 text-sm font-mono pointer-events-none select-none", children: t.mainMenu.version })), showQuitConfirm && (_jsx("div", { className: "absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50", children: _jsxs("div", { className: "bg-gray-800 border border-amber-500 rounded-lg shadow-2xl w-full max-w-lg p-8 text-center", children: [_jsx("h2", { className: "text-3xl font-bold font-cinzel text-amber-400 mb-4", children: t.mainMenu.quitConfirmTitle }), _jsx("p", { className: "text-gray-300 text-lg mb-6", children: t.mainMenu.quitConfirmText }), _jsxs("div", { className: "flex justify-center gap-4", children: [_jsx("button", { onClick: () => setShowQuitConfirm(false), className: "bg-gray-600 text-white font-bold py-2 px-8 rounded-sm uppercase tracking-wider hover:bg-gray-500 transition-all", children: t.common.cancel }), _jsx("button", { onClick: handleQuit, className: "bg-red-800 text-white font-bold py-2 px-8 rounded-sm uppercase tracking-wider hover:bg-red-700 transition-all", children: t.mainMenu.quitConfirmYes })] })] }) }))] }));
+};
+export default MainMenu;

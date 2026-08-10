@@ -1,0 +1,1939 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Business Verwaltung</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <main class="max-w-6xl mx-auto p-6">
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">Verwaltung</h1>
+        <p class="text-slate-300 text-sm">Nutzerverwaltung (Admin)</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="logoutBtn" class="px-4 py-2 rounded bg-rose-700 hover:bg-rose-600">Logout</button>
+      </div>
+    </header>
+
+    <section id="loginPanel" class="bg-slate-900 border border-slate-700 rounded p-5 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Admin Login</h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <input id="emailInput" class="bg-slate-800 border border-slate-600 rounded px-3 py-2" placeholder="E-Mail" />
+        <input id="passwordInput" type="password" class="bg-slate-800 border border-slate-600 rounded px-3 py-2" placeholder="Passwort" />
+        <button id="loginBtn" class="px-4 py-2 rounded bg-amber-500 text-black font-bold hover:bg-amber-400">Login</button>
+      </div>
+      <p id="loginInfo" class="text-sm text-slate-300 mt-3"></p>
+    </section>
+
+    <section id="appPanel">
+      <div class="bg-slate-900 border border-slate-700 rounded p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <button id="tabOverview" class="tab-btn px-4 py-2 rounded bg-amber-500 text-black font-semibold">Übersicht</button>
+          <button id="tabUsers" class="tab-btn px-4 py-2 rounded bg-amber-500 text-black font-semibold">User</button>
+          <button id="tabStudios" class="tab-btn px-4 py-2 rounded bg-slate-800 border border-slate-600">Studios</button>
+          <button id="tabFilms" class="tab-btn px-4 py-2 rounded bg-slate-800 border border-slate-600">Filme</button>
+          <button id="tabTalents" class="tab-btn px-4 py-2 rounded bg-slate-800 border border-slate-600">Talente</button>
+          <button id="tabMarketFeedback" class="tab-btn px-4 py-2 rounded bg-slate-800 border border-slate-600">Marktfeedback</button>
+          <button id="refreshAllBtn" class="ml-auto px-3 py-2 rounded bg-sky-700 hover:bg-sky-600">Alle aktualisieren</button>
+        </div>
+
+        <div id="overviewPanel">
+          <div class="grid md:grid-cols-3 gap-3 mb-4">
+            <div class="bg-slate-800/70 border border-slate-700 rounded p-3">
+              <p class="text-xs uppercase tracking-wide text-slate-400">User</p>
+              <p id="metricUsers" class="text-2xl font-bold text-amber-300">-</p>
+            </div>
+            <div class="bg-slate-800/70 border border-slate-700 rounded p-3">
+              <p class="text-xs uppercase tracking-wide text-slate-400">Studios</p>
+              <p id="metricStudios" class="text-2xl font-bold text-amber-300">-</p>
+            </div>
+            <div class="bg-slate-800/70 border border-slate-700 rounded p-3">
+              <p class="text-xs uppercase tracking-wide text-slate-400">Filme (aktuell)</p>
+              <p id="metricFilms" class="text-2xl font-bold text-amber-300">-</p>
+            </div>
+            <div class="bg-slate-800/70 border border-slate-700 rounded p-3">
+              <p class="text-xs uppercase tracking-wide text-slate-400">Talente (gesamt)</p>
+              <p id="metricTalents" class="text-2xl font-bold text-amber-300">-</p>
+            </div>
+            <div class="bg-slate-800/70 border border-slate-700 rounded p-3">
+              <p class="text-xs uppercase tracking-wide text-slate-400">Schauspieler</p>
+              <p id="metricActors" class="text-2xl font-bold text-amber-300">-</p>
+            </div>
+            <div class="bg-slate-800/70 border border-slate-700 rounded p-3">
+              <p class="text-xs uppercase tracking-wide text-slate-400">Regisseure</p>
+              <p id="metricDirectors" class="text-2xl font-bold text-amber-300">-</p>
+            </div>
+          </div>
+
+          <div class="bg-rose-950/30 border border-rose-700 rounded p-4">
+            <p class="text-sm text-rose-200 mb-3">Spiel-Reset: Entfernt alle Studios und setzt Welt-/Marktdaten zurück. User-Konten bleiben bestehen.</p>
+            <button id="resetGameBtn" class="px-4 py-2 rounded bg-rose-700 hover:bg-rose-600 font-semibold">Spiel jetzt resetten</button>
+          </div>
+        </div>
+
+        <div id="usersPanel" class="hidden">
+          <div class="flex items-center gap-2 mb-3">
+            <button id="userSubtabList" class="px-3 py-2 rounded bg-amber-500 text-black font-semibold">User-Liste</button>
+            <button id="userSubtabCreate" class="px-3 py-2 rounded bg-slate-800 border border-slate-600">User anlegen</button>
+          </div>
+
+          <div id="userListPanel">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th class="py-2 pr-3">ID</th>
+                    <th class="py-2 pr-3">E-Mail</th>
+                    <th class="py-2 pr-3">Username</th>
+                    <th class="py-2 pr-3">Rolle</th>
+                    <th class="py-2 pr-3">Studioname</th>
+                    <th class="py-2 pr-3">Aktionen</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="userCreatePanel" class="hidden max-w-lg bg-slate-800 border border-slate-700 rounded-lg p-4">
+            <h3 class="text-lg font-semibold mb-3">Neuen User anlegen</h3>
+            <div class="grid gap-3">
+              <input id="createUsernameInput" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Username" />
+              <input id="createStudioNameInput" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Studioname" />
+              <input id="createImageInput" type="file" accept="image/*" class="bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+              <img id="createImagePreview" class="hidden w-24 h-24 object-cover rounded border border-slate-600" alt="Vorschau" />
+            </div>
+            <div class="mt-4 flex justify-end">
+              <button id="submitCreateUserBtn" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">User erstellen</button>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mt-3">Tipp: Klicke auf eine User-Zeile zum Bearbeiten.</p>
+        </div>
+
+        <div id="studiosPanel" class="hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-slate-400 border-b border-slate-700">
+                <tr>
+                  <th class="py-2 pr-3">Studio-ID</th>
+                  <th class="py-2 pr-3">Name</th>
+                  <th class="py-2 pr-3">Owner-ID</th>
+                  <th class="py-2 pr-3">Kapital</th>
+                  <th class="py-2 pr-3">Aktive Projekte</th>
+                  <th class="py-2 pr-3">Fertige Filme</th>
+                  <th class="py-2 pr-3">Ingame-Zeit</th>
+                </tr>
+              </thead>
+              <tbody id="studiosTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="filmsPanel" class="hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-slate-400 border-b border-slate-700">
+                <tr>
+                  <th class="py-2 pr-3">Film-ID</th>
+                  <th class="py-2 pr-3">Titel</th>
+                  <th class="py-2 pr-3">Studio</th>
+                  <th class="py-2 pr-3">Genre</th>
+                  <th class="py-2 pr-3">Qualität</th>
+                  <th class="py-2 pr-3">Quelle</th>
+                  <th class="py-2 pr-3">Release</th>
+                </tr>
+              </thead>
+              <tbody id="filmsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="talentsPanel" class="hidden">
+          <div class="flex items-center gap-2 mb-3">
+            <button id="talentSubtabActors" class="px-3 py-2 rounded bg-amber-500 text-black font-semibold">Schauspieler</button>
+            <button id="talentSubtabDirectors" class="px-3 py-2 rounded bg-slate-800 border border-slate-600">Regisseure</button>
+          </div>
+
+          <div id="talentActorsPanel">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th class="py-2 pr-3">ID</th>
+                    <th class="py-2 pr-3">Name</th>
+                    <th class="py-2 pr-3">Geschlecht</th>
+                    <th class="py-2 pr-3">Skill</th>
+                    <th class="py-2 pr-3">Potential</th>
+                    <th class="py-2 pr-3">Bekanntheit</th>
+                    <th class="py-2 pr-3">Studio</th>
+                  </tr>
+                </thead>
+                <tbody id="actorsTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="talentDirectorsPanel" class="hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th class="py-2 pr-3">ID</th>
+                    <th class="py-2 pr-3">Name</th>
+                    <th class="py-2 pr-3">Geschlecht</th>
+                    <th class="py-2 pr-3">Skill</th>
+                    <th class="py-2 pr-3">Potential</th>
+                    <th class="py-2 pr-3">Bekanntheit</th>
+                    <th class="py-2 pr-3">Studio</th>
+                  </tr>
+                </thead>
+                <tbody id="directorsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="marketFeedbackPanel" class="hidden">
+          <div class="grid md:grid-cols-2 gap-3 mb-4">
+            <label class="text-sm text-slate-300">
+              <span class="block mb-1">Studio</span>
+              <select id="marketFeedbackStudioSelect" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2"></select>
+            </label>
+            <div class="flex items-end">
+              <button id="refreshMarketFeedbackBtn" class="px-4 py-2 rounded bg-sky-700 hover:bg-sky-600">Marktfeedback aktualisieren</button>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/60 border border-slate-700 rounded p-3 mb-4">
+            <p class="text-xs text-amber-300 mb-2 uppercase tracking-wide">Aktiver Markttrend</p>
+            <div class="grid md:grid-cols-4 gap-3">
+              <label class="text-sm text-slate-300">
+                <span class="block mb-1">Typ</span>
+                <select id="marketTrendTypeInput" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2">
+                  <option value="none">Kein aktiver Trend</option>
+                  <option value="bull">Bull</option>
+                  <option value="bear">Bear</option>
+                </select>
+              </label>
+              <label class="text-sm text-slate-300">
+                <span class="block mb-1">Dauer</span>
+                <input id="marketTrendDurationInput" type="number" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+              </label>
+              <label class="text-sm text-slate-300">
+                <span class="block mb-1">Min-Faktor</span>
+                <input id="marketTrendMinFactorInput" type="number" step="0.01" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+              </label>
+              <label class="text-sm text-slate-300">
+                <span class="block mb-1">Max-Faktor</span>
+                <input id="marketTrendMaxFactorInput" type="number" step="0.01" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+              </label>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-slate-400 border-b border-slate-700">
+                <tr>
+                  <th class="py-2 pr-3">Genre</th>
+                  <th class="py-2 pr-3">Popularität</th>
+                  <th class="py-2 pr-3">Momentum</th>
+                  <th class="py-2 pr-3">Peak-Dauer</th>
+                </tr>
+              </thead>
+              <tbody id="marketFeedbackTable"></tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 flex justify-end">
+            <button id="saveMarketFeedbackBtn" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Marktfeedback speichern</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-700 rounded p-5">
+        <h3 class="text-lg font-semibold mb-3">Log</h3>
+        <pre id="log" class="bg-black/50 border border-slate-700 rounded p-3 h-64 overflow-auto text-xs"></pre>
+      </div>
+    </section>
+  </main>
+
+  <div id="editTalentModal" class="hidden fixed inset-0 bg-black/70 items-center justify-center z-50 p-4">
+    <div class="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-lg p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold">Talent bearbeiten</h3>
+        <button id="closeEditTalentModalBtn" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Schließen</button>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-3 mb-4">
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Name</span>
+          <input id="editTalentNameInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Geschlecht</span>
+          <input id="editTalentGenderInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Skill</span>
+          <input id="editTalentSkillInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Potential</span>
+          <input id="editTalentPotentialInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Bekanntheit</span>
+          <input id="editTalentBekanntheitInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Geburtsdatum</span>
+          <input id="editTalentBirthDateInput" type="date" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+      </div>
+
+      <div class="bg-slate-800/60 border border-slate-700 rounded p-3 mb-4">
+        <p class="text-xs text-amber-300 mb-2 uppercase tracking-wide">Genres und Eigenschaften</p>
+        <div class="grid md:grid-cols-3 gap-3 mb-3">
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Lieblingsgenre 1</span>
+            <select id="editTalentFavGenre1Input" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2"></select>
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Lieblingsgenre 2</span>
+            <select id="editTalentFavGenre2Input" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2"></select>
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Hass-Genre</span>
+            <select id="editTalentHatedGenreInput" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2"></select>
+          </label>
+        </div>
+        <label class="text-sm text-slate-300 block">
+          <span class="block mb-1">Traits (Komma-getrennt)</span>
+          <input id="editTalentTraitsInput" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="z.B. Diva, Teamplayer" />
+        </label>
+      </div>
+
+      <div class="bg-slate-800/60 border border-slate-700 rounded p-3 mb-4">
+        <p class="text-xs text-amber-300 mb-2 uppercase tracking-wide">Weitere Werte</p>
+        <div class="grid md:grid-cols-3 gap-3">
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Kosten</span>
+            <input id="editTalentCostInput" type="number" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Loyalität (0-100)</span>
+            <input id="editTalentLoyaltyInput" type="number" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Moral (0-100)</span>
+            <input id="editTalentMoralInput" type="number" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Erfahrung</span>
+            <input id="editTalentExperienceInput" type="number" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">SpeedModifier (Regie)</span>
+            <input id="editTalentSpeedModifierInput" type="number" step="0.01" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="flex items-center gap-2 text-sm text-slate-300 px-2">
+            <input id="editTalentDiscoveredInput" type="checkbox" class="accent-amber-500" /> Entdeckt
+          </label>
+          <label class="flex items-center gap-2 text-sm text-slate-300 px-2">
+            <input id="editTalentFavoriteInput" type="checkbox" class="accent-amber-500" /> Favorit
+          </label>
+          <label class="flex items-center gap-2 text-sm text-slate-300 px-2">
+            <input id="editTalentFamilyInput" type="checkbox" class="accent-amber-500" /> Familienmitglied
+          </label>
+          <label class="flex items-center gap-2 text-sm text-slate-300 px-2">
+            <input id="editTalentCustomInput" type="checkbox" class="accent-amber-500" /> Custom-Talent
+          </label>
+        </div>
+      </div>
+
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="cancelEditTalentBtn" class="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600">Abbrechen</button>
+        <button id="saveEditTalentBtn" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Änderungen speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editStudioModal" class="hidden fixed inset-0 bg-black/70 items-center justify-center z-50 p-4">
+    <div class="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-lg p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold">Studio bearbeiten</h3>
+        <button id="closeEditStudioModalBtn" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Schließen</button>
+      </div>
+
+      <p id="editStudioSourceInfo" class="text-xs text-amber-300 mb-3"></p>
+
+      <div class="grid md:grid-cols-2 gap-3 mb-4">
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Studio Name</span>
+          <input id="editStudioNameInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Owner-ID</span>
+          <input id="editStudioOwnerInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" readonly />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Kapital</span>
+          <input id="editStudioCapitalInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Ingame Jahr</span>
+          <input id="editStudioYearInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Ingame Monat</span>
+          <input id="editStudioMonthInput" type="number" min="1" max="12" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+      </div>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="cancelEditStudioBtn" class="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600">Abbrechen</button>
+        <button id="saveEditStudioBtn" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Änderungen speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editUserModal" class="hidden fixed inset-0 bg-black/70 items-center justify-center z-50 p-4">
+    <div class="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-lg p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold">User bearbeiten</h3>
+        <button id="closeEditUserModalBtn" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Schließen</button>
+      </div>
+
+      <div class="flex gap-2 border-b border-slate-700 mb-4 pb-2">
+        <button id="userTabBasic" class="px-3 py-2 rounded bg-amber-500 text-black font-semibold">Grunddaten</button>
+        <button id="userTabStatus" class="px-3 py-2 rounded bg-slate-800 border border-slate-600">Userstatus</button>
+        <button id="userTabMessage" class="px-3 py-2 rounded bg-slate-800 border border-slate-600">Nachricht senden</button>
+      </div>
+
+      <div id="userBasicPanel" class="grid md:grid-cols-3 gap-4 mb-4">
+        <div class="md:col-span-1">
+          <p class="text-xs text-amber-300 mb-2 uppercase tracking-wide">Porträt</p>
+          <img id="editUserImagePreview" class="w-28 h-28 object-cover rounded border border-slate-600 bg-slate-800" alt="User-Porträt" />
+          <input id="editUserImageInput" type="file" accept="image/*" class="mt-3 w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm" />
+        </div>
+        <div class="md:col-span-2 grid gap-3">
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">E-Mail</span>
+            <input id="editUserEmailInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" readonly />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Username</span>
+            <input id="editUserUsernameInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Studioname</span>
+            <input id="editUserStudioNameInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Rolle</span>
+            <input id="editUserRoleInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" readonly />
+          </label>
+        </div>
+      </div>
+
+      <div id="userStatusPanel" class="hidden bg-slate-800/60 border border-slate-700 rounded p-3 mb-4">
+        <p class="text-xs text-amber-300 mb-2 uppercase tracking-wide">User Status</p>
+        <p id="userLastLoginInfo" class="text-xs text-slate-300 mb-2">Letzter Login: -</p>
+        <div id="userRuntimeInfo" class="grid gap-2 max-h-96 overflow-y-auto pr-1"></div>
+      </div>
+
+      <div id="userMessagePanel" class="hidden bg-slate-800/60 border border-slate-700 rounded p-3 mb-4">
+        <p class="text-xs text-amber-300 mb-2 uppercase tracking-wide">Ingame Nachricht senden</p>
+        <div class="grid md:grid-cols-2 gap-3 mb-3">
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Absender</span>
+            <input id="userMessageSenderInput" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" value="Verwaltung" />
+          </label>
+          <label class="text-sm text-slate-300">
+            <span class="block mb-1">Betreff</span>
+            <input id="userMessageSubjectInput" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Betreff" />
+          </label>
+        </div>
+        <label class="text-sm text-slate-300 block mb-3">
+          <span class="block mb-1">Nachricht</span>
+          <textarea id="userMessageBodyInput" rows="4" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2" placeholder="Text für die Ingame-Nachricht"></textarea>
+        </label>
+        <div class="flex justify-end">
+          <button id="sendUserMessageBtn" class="px-4 py-2 rounded bg-indigo-700 hover:bg-indigo-600">Nachricht senden</button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="cancelEditUserBtn" class="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600">Abbrechen</button>
+        <button id="saveEditUserBtn" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">User speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editFilmModal" class="hidden fixed inset-0 bg-black/70 items-center justify-center z-50 p-4">
+    <div class="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-lg p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold">Film bearbeiten</h3>
+        <button id="closeEditFilmModalBtn" class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Schließen</button>
+      </div>
+
+      <p id="editFilmSourceInfo" class="text-xs text-amber-300 mb-3"></p>
+
+      <div class="grid md:grid-cols-2 gap-3 mb-4">
+        <label class="text-sm text-slate-300 md:col-span-2">
+          <span class="block mb-1">Titel</span>
+          <input id="editFilmTitleInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Studio</span>
+          <input id="editFilmStudioInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" readonly />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Genre</span>
+          <input id="editFilmGenreInput" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Qualität</span>
+          <input id="editFilmQualityInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Hype / Zuschauer</span>
+          <input id="editFilmHypeInput" type="number" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+        <label class="text-sm text-slate-300">
+          <span class="block mb-1">Release-Datum</span>
+          <input id="editFilmReleaseInput" type="date" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2" />
+        </label>
+      </div>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="cancelEditFilmBtn" class="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600">Abbrechen</button>
+        <button id="saveEditFilmBtn" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Änderungen speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:8787';
+    const TOKEN_KEY = 'mb_auth_token';
+    const ADMIN_EMAIL = 'maik.springer@mein.gmx';
+
+    const loginPanel = document.getElementById('loginPanel');
+    const appPanel = document.getElementById('appPanel');
+    const logNode = document.getElementById('log');
+    const usersTable = document.getElementById('usersTable');
+    const studiosTable = document.getElementById('studiosTable');
+    const filmsTable = document.getElementById('filmsTable');
+    const actorsTable = document.getElementById('actorsTable');
+    const directorsTable = document.getElementById('directorsTable');
+    const loginInfo = document.getElementById('loginInfo');
+
+    const overviewPanel = document.getElementById('overviewPanel');
+    const usersPanel = document.getElementById('usersPanel');
+    const studiosPanel = document.getElementById('studiosPanel');
+    const filmsPanel = document.getElementById('filmsPanel');
+    const talentsPanel = document.getElementById('talentsPanel');
+    const marketFeedbackPanel = document.getElementById('marketFeedbackPanel');
+    const tabOverview = document.getElementById('tabOverview');
+    const tabUsers = document.getElementById('tabUsers');
+    const tabStudios = document.getElementById('tabStudios');
+    const tabFilms = document.getElementById('tabFilms');
+    const tabTalents = document.getElementById('tabTalents');
+    const tabMarketFeedback = document.getElementById('tabMarketFeedback');
+    const metricUsers = document.getElementById('metricUsers');
+    const metricStudios = document.getElementById('metricStudios');
+    const metricFilms = document.getElementById('metricFilms');
+    const metricTalents = document.getElementById('metricTalents');
+    const metricActors = document.getElementById('metricActors');
+    const metricDirectors = document.getElementById('metricDirectors');
+    const resetGameBtn = document.getElementById('resetGameBtn');
+    const userSubtabList = document.getElementById('userSubtabList');
+    const userSubtabCreate = document.getElementById('userSubtabCreate');
+    const userListPanel = document.getElementById('userListPanel');
+    const userCreatePanel = document.getElementById('userCreatePanel');
+    const submitCreateUserBtn = document.getElementById('submitCreateUserBtn');
+    const createUsernameInput = document.getElementById('createUsernameInput');
+    const createStudioNameInput = document.getElementById('createStudioNameInput');
+    const createImageInput = document.getElementById('createImageInput');
+    const createImagePreview = document.getElementById('createImagePreview');
+    const talentSubtabActors = document.getElementById('talentSubtabActors');
+    const talentSubtabDirectors = document.getElementById('talentSubtabDirectors');
+    const talentActorsPanel = document.getElementById('talentActorsPanel');
+    const talentDirectorsPanel = document.getElementById('talentDirectorsPanel');
+    const editTalentModal = document.getElementById('editTalentModal');
+    const closeEditTalentModalBtn = document.getElementById('closeEditTalentModalBtn');
+    const cancelEditTalentBtn = document.getElementById('cancelEditTalentBtn');
+    const saveEditTalentBtn = document.getElementById('saveEditTalentBtn');
+    const editTalentNameInput = document.getElementById('editTalentNameInput');
+    const editTalentGenderInput = document.getElementById('editTalentGenderInput');
+    const editTalentSkillInput = document.getElementById('editTalentSkillInput');
+    const editTalentPotentialInput = document.getElementById('editTalentPotentialInput');
+    const editTalentBekanntheitInput = document.getElementById('editTalentBekanntheitInput');
+    const editTalentFavGenre1Input = document.getElementById('editTalentFavGenre1Input');
+    const editTalentFavGenre2Input = document.getElementById('editTalentFavGenre2Input');
+    const editTalentHatedGenreInput = document.getElementById('editTalentHatedGenreInput');
+    const editTalentTraitsInput = document.getElementById('editTalentTraitsInput');
+    const editTalentCostInput = document.getElementById('editTalentCostInput');
+    const editTalentLoyaltyInput = document.getElementById('editTalentLoyaltyInput');
+    const editTalentMoralInput = document.getElementById('editTalentMoralInput');
+    const editTalentExperienceInput = document.getElementById('editTalentExperienceInput');
+    const editTalentSpeedModifierInput = document.getElementById('editTalentSpeedModifierInput');
+    const editTalentDiscoveredInput = document.getElementById('editTalentDiscoveredInput');
+    const editTalentFavoriteInput = document.getElementById('editTalentFavoriteInput');
+    const editTalentFamilyInput = document.getElementById('editTalentFamilyInput');
+    const editTalentCustomInput = document.getElementById('editTalentCustomInput');
+    const editTalentBirthDateInput = document.getElementById('editTalentBirthDateInput');
+    const editStudioModal = document.getElementById('editStudioModal');
+    const closeEditStudioModalBtn = document.getElementById('closeEditStudioModalBtn');
+    const cancelEditStudioBtn = document.getElementById('cancelEditStudioBtn');
+    const saveEditStudioBtn = document.getElementById('saveEditStudioBtn');
+    const editStudioSourceInfo = document.getElementById('editStudioSourceInfo');
+    const editStudioNameInput = document.getElementById('editStudioNameInput');
+    const editStudioOwnerInput = document.getElementById('editStudioOwnerInput');
+    const editStudioCapitalInput = document.getElementById('editStudioCapitalInput');
+    const editStudioYearInput = document.getElementById('editStudioYearInput');
+    const editStudioMonthInput = document.getElementById('editStudioMonthInput');
+    const editFilmModal = document.getElementById('editFilmModal');
+    const closeEditFilmModalBtn = document.getElementById('closeEditFilmModalBtn');
+    const cancelEditFilmBtn = document.getElementById('cancelEditFilmBtn');
+    const saveEditFilmBtn = document.getElementById('saveEditFilmBtn');
+    const editFilmSourceInfo = document.getElementById('editFilmSourceInfo');
+    const editFilmTitleInput = document.getElementById('editFilmTitleInput');
+    const editFilmStudioInput = document.getElementById('editFilmStudioInput');
+    const editFilmGenreInput = document.getElementById('editFilmGenreInput');
+    const editFilmQualityInput = document.getElementById('editFilmQualityInput');
+    const editFilmHypeInput = document.getElementById('editFilmHypeInput');
+    const editFilmReleaseInput = document.getElementById('editFilmReleaseInput');
+    const editUserModal = document.getElementById('editUserModal');
+    const closeEditUserModalBtn = document.getElementById('closeEditUserModalBtn');
+    const cancelEditUserBtn = document.getElementById('cancelEditUserBtn');
+    const saveEditUserBtn = document.getElementById('saveEditUserBtn');
+    const editUserImagePreview = document.getElementById('editUserImagePreview');
+    const editUserImageInput = document.getElementById('editUserImageInput');
+    const editUserEmailInput = document.getElementById('editUserEmailInput');
+    const editUserUsernameInput = document.getElementById('editUserUsernameInput');
+    const editUserStudioNameInput = document.getElementById('editUserStudioNameInput');
+    const editUserRoleInput = document.getElementById('editUserRoleInput');
+    const userTabBasic = document.getElementById('userTabBasic');
+    const userTabStatus = document.getElementById('userTabStatus');
+    const userTabMessage = document.getElementById('userTabMessage');
+    const userBasicPanel = document.getElementById('userBasicPanel');
+    const userStatusPanel = document.getElementById('userStatusPanel');
+    const userMessagePanel = document.getElementById('userMessagePanel');
+    const userLastLoginInfo = document.getElementById('userLastLoginInfo');
+    const userRuntimeInfo = document.getElementById('userRuntimeInfo');
+    const userMessageSenderInput = document.getElementById('userMessageSenderInput');
+    const userMessageSubjectInput = document.getElementById('userMessageSubjectInput');
+    const userMessageBodyInput = document.getElementById('userMessageBodyInput');
+    const sendUserMessageBtn = document.getElementById('sendUserMessageBtn');
+    const marketFeedbackStudioSelect = document.getElementById('marketFeedbackStudioSelect');
+    const refreshMarketFeedbackBtn = document.getElementById('refreshMarketFeedbackBtn');
+    const marketFeedbackTable = document.getElementById('marketFeedbackTable');
+    const saveMarketFeedbackBtn = document.getElementById('saveMarketFeedbackBtn');
+    const marketTrendTypeInput = document.getElementById('marketTrendTypeInput');
+    const marketTrendDurationInput = document.getElementById('marketTrendDurationInput');
+    const marketTrendMinFactorInput = document.getElementById('marketTrendMinFactorInput');
+    const marketTrendMaxFactorInput = document.getElementById('marketTrendMaxFactorInput');
+
+    let selectedTalentType = null;
+    let selectedTalentKey = '';
+    let selectedTalentData = null;
+    let selectedStudioRef = null;
+    let selectedStudioData = null;
+    let selectedFilmRef = null;
+    let selectedFilmData = null;
+    let selectedUserId = '';
+    let selectedUserProfileImageData = null;
+    let pendingUserImageData = null;
+    let marketFeedbackItems = [];
+
+    const GENRES = [
+      'Action', 'Abenteuer', 'Western', 'Sci-Fi', 'Fantasy', 'Drama', 'Romanze', 'Komödie',
+      'Musical', 'Horror', 'Thriller', 'Krimi', 'Dokumentation', 'Kriegsfilm'
+    ];
+    const tableSortState = {};
+
+    function fillGenreSelect(selectNode, value) {
+      selectNode.innerHTML = '';
+      const empty = document.createElement('option');
+      empty.value = '';
+      empty.textContent = '-';
+      selectNode.appendChild(empty);
+
+      GENRES.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        selectNode.appendChild(option);
+      });
+
+      selectNode.value = value || '';
+    }
+
+    function toDateInputValue(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toISOString().slice(0, 10);
+    }
+
+    function fromDateInputValue(value) {
+      if (!value) return null;
+      return new Date(`${value}T00:00:00.000Z`).toISOString();
+    }
+
+    function parseDeDateToTimestamp(value) {
+      const match = String(value || '').trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+      if (!match) return null;
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      const year = Number(match[3]);
+      const timestamp = Date.UTC(year, month - 1, day);
+      return Number.isFinite(timestamp) ? timestamp : null;
+    }
+
+    function parseMonthYearToComparable(value) {
+      const match = String(value || '').trim().match(/^(\d{1,2})\/(\d{2,4})$/);
+      if (!match) return null;
+      const month = Number(match[1]);
+      const year = Number(match[2]);
+      if (!Number.isFinite(month) || !Number.isFinite(year)) return null;
+      return (year * 100) + month;
+    }
+
+    function parseLocalizedNumber(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return null;
+      const normalized = raw.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+      if (!normalized || normalized === '-' || normalized === '.' || normalized === '-.') return null;
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function getCellSortValue(row, columnIndex) {
+      const cell = row.children[columnIndex];
+      if (!cell) return '';
+
+      const text = String(cell.textContent || '').trim();
+      if (!text || text === '-') return '';
+
+      const dateTs = parseDeDateToTimestamp(text);
+      if (dateTs !== null) return dateTs;
+
+      const monthYear = parseMonthYearToComparable(text);
+      if (monthYear !== null) return monthYear;
+
+      const numeric = parseLocalizedNumber(text);
+      if (numeric !== null) return numeric;
+
+      return text.toLowerCase();
+    }
+
+    function compareSortValues(a, b) {
+      const aEmpty = a === '' || a === null || a === undefined;
+      const bEmpty = b === '' || b === null || b === undefined;
+      if (aEmpty && bEmpty) return 0;
+      if (aEmpty) return 1;
+      if (bEmpty) return -1;
+
+      const aType = typeof a;
+      const bType = typeof b;
+      if (aType === 'number' && bType === 'number') {
+        return a - b;
+      }
+      return String(a).localeCompare(String(b), 'de');
+    }
+
+    function updateSortHeaderIndicators(headers, activeColumn, ascending) {
+      headers.forEach((th, index) => {
+        const baseLabel = th.dataset.baseLabel || String(th.textContent || '').replace(/\s[▲▼]$/, '').trim();
+        th.dataset.baseLabel = baseLabel;
+        th.textContent = index === activeColumn
+          ? `${baseLabel} ${ascending ? '▲' : '▼'}`
+          : baseLabel;
+      });
+    }
+
+    function sortTableByColumn(tbody, headers, tableKey, columnIndex) {
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      if (rows.length <= 1) {
+        updateSortHeaderIndicators(headers, columnIndex, true);
+        tableSortState[tableKey] = { columnIndex, ascending: true };
+        return;
+      }
+
+      const previous = tableSortState[tableKey] || { columnIndex: -1, ascending: true };
+      const ascending = previous.columnIndex === columnIndex ? !previous.ascending : true;
+
+      rows.sort((rowA, rowB) => {
+        const valueA = getCellSortValue(rowA, columnIndex);
+        const valueB = getCellSortValue(rowB, columnIndex);
+        const compared = compareSortValues(valueA, valueB);
+        return ascending ? compared : -compared;
+      });
+
+      rows.forEach(row => tbody.appendChild(row));
+      tableSortState[tableKey] = { columnIndex, ascending };
+      updateSortHeaderIndicators(headers, columnIndex, ascending);
+    }
+
+    function enableSortableTableByBodyId(tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      const table = tbody.closest('table');
+      if (!table) return;
+
+      const headers = Array.from(table.querySelectorAll('thead th'));
+      headers.forEach((th, columnIndex) => {
+        if (!th.dataset.baseLabel) {
+          th.dataset.baseLabel = String(th.textContent || '').trim();
+        }
+        if (!th.dataset.sortBound) {
+          th.classList.add('cursor-pointer', 'select-none');
+          th.title = 'Sortieren';
+          th.addEventListener('click', () => sortTableByColumn(tbody, headers, tbodyId, columnIndex));
+          th.dataset.sortBound = '1';
+        }
+      });
+    }
+
+    function log(message, data) {
+      const line = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logNode.textContent = `${line}\n${data ? JSON.stringify(data, null, 2) : ''}\n\n${logNode.textContent}`;
+    }
+
+    function getToken() {
+      return localStorage.getItem(TOKEN_KEY) || '';
+    }
+
+    function resetCreateUserForm() {
+      createUsernameInput.value = '';
+      createStudioNameInput.value = '';
+      createImageInput.value = '';
+      createImagePreview.src = '';
+      createImagePreview.classList.add('hidden');
+    }
+
+    function setUserImagePreview(dataUrl) {
+      if (dataUrl) {
+        editUserImagePreview.src = dataUrl;
+      } else {
+        editUserImagePreview.src = '';
+      }
+    }
+
+    function setUserModalTab(name) {
+      const isBasic = name === 'basic';
+      const isStatus = name === 'status';
+      const isMessage = name === 'message';
+
+      userBasicPanel.classList.toggle('hidden', !isBasic);
+      userStatusPanel.classList.toggle('hidden', !isStatus);
+      userMessagePanel.classList.toggle('hidden', !isMessage);
+
+      userTabBasic.className = isBasic
+        ? 'px-3 py-2 rounded bg-amber-500 text-black font-semibold'
+        : 'px-3 py-2 rounded bg-slate-800 border border-slate-600';
+      userTabStatus.className = isStatus
+        ? 'px-3 py-2 rounded bg-amber-500 text-black font-semibold'
+        : 'px-3 py-2 rounded bg-slate-800 border border-slate-600';
+      userTabMessage.className = isMessage
+        ? 'px-3 py-2 rounded bg-amber-500 text-black font-semibold'
+        : 'px-3 py-2 rounded bg-slate-800 border border-slate-600';
+    }
+
+    function formatIsoDateTime(value) {
+      if (!value) return '-';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return '-';
+      return parsed.toLocaleString('de-DE');
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function prettifyBuildingType(value) {
+      const key = String(value || '').trim();
+      if (!key) return '-';
+
+      const labels = {
+        Burogebaude: 'Bürogebäude',
+        Autorenbuero: 'Autorenbüro',
+        CastingOffice: 'Casting-Office',
+        MarketingDepartment: 'Marketingabteilung',
+        ResearchLab: 'Forschungslabor',
+        Planungsbuero: 'Planungsbüro',
+        Studio: 'Studio',
+        Studio1: 'Studio 1',
+        Studio2: 'Studio 2',
+        Studio3: 'Studio 3',
+        Bauhof: 'Bauhof',
+        Kino: 'Kino',
+        Restaurant: 'Restaurant',
+        Filmmuseum: 'Filmmuseum',
+        Backlot: 'Backlot',
+        Postproduktionshaus: 'Postproduktionshaus',
+        Sicherheitszentrale: 'Sicherheitszentrale',
+        KostuemUndMaskenatelier: 'Kostüm- und Maskenatelier',
+        Betriebskita: 'Betriebskita',
+        Studiohotel: 'Studiohotel',
+        Eventhalle: 'Eventhalle',
+        Fanshop: 'Fanshop',
+      };
+
+      if (labels[key]) return labels[key];
+      return key.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
+    function renderUserRuntimeStatus(studios) {
+      userRuntimeInfo.innerHTML = '';
+      if (!Array.isArray(studios) || studios.length === 0) {
+        userRuntimeInfo.innerHTML = '<p class="text-xs text-slate-400">Keine Studio-Statusdaten gefunden.</p>';
+        return;
+      }
+
+      const entries = studios.map(studio => {
+        const status = studio?.status || {};
+        const ingameDate = studio?.gameDate ? formatIsoDateTime(studio.gameDate) : `${studio?.ingameMonth || '-'} / ${studio?.ingameYear || '-'}`;
+        const runningProjects = Array.isArray(status.runningProjects) ? status.runningProjects : [];
+        const runningConstructions = Array.isArray(status.runningConstructions) ? status.runningConstructions : [];
+        const builtBuildings = Array.isArray(status.builtBuildings) ? status.builtBuildings : [];
+        const research = status.research && typeof status.research === 'object' ? status.research : null;
+        const planning = status.planning && typeof status.planning === 'object' ? status.planning : null;
+
+        const runningProjectsHtml = runningProjects.length > 0
+          ? `<div class="space-y-1">${runningProjects.map(project => `
+              <div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+                <p class="text-xs text-white font-semibold">${escapeHtml(project.title || '-')}</p>
+                <p class="text-[11px] text-slate-300">Phase: ${escapeHtml(project.phase || '-')} | Genre: ${escapeHtml(project.genre || '-')}</p>
+                <p class="text-[11px] text-slate-400">Produktion Ende: ${escapeHtml(formatIsoDateTime(project.productionEndDate))} | Post Ende: ${escapeHtml(formatIsoDateTime(project.postProductionEndDate))}</p>
+              </div>`).join('')}</div>`
+          : '<p class="text-xs text-slate-400">Keine laufenden Projekte</p>';
+
+        const runningConstructionsHtml = runningConstructions.length > 0
+          ? `<div class="space-y-1">${runningConstructions.map(entry => `
+              <div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+                <p class="text-xs text-white font-semibold">${escapeHtml(prettifyBuildingType(entry.type || '-'))}</p>
+                <p class="text-[11px] text-slate-400">Fertigstellung: ${escapeHtml(formatIsoDateTime(entry.endDate))}</p>
+              </div>`).join('')}</div>`
+          : '<p class="text-xs text-slate-400">Aktuell kein Bauprojekt aktiv</p>';
+
+        const builtBuildingsHtml = builtBuildings.length > 0
+          ? `<div class="flex flex-wrap gap-1">${builtBuildings.map(entry => `
+              <span class="text-[11px] bg-slate-800 border border-slate-700 text-slate-200 px-2 py-1 rounded">${escapeHtml(prettifyBuildingType(entry.type || '-'))} Lvl ${Number(entry.level || 0)}</span>`).join('')}</div>`
+          : '<p class="text-xs text-slate-400">Noch keine Gebäude gebaut</p>';
+
+        const researchHtml = research
+          ? `<div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+              <p class="text-xs text-white font-semibold">${escapeHtml(research.techId || '-')}</p>
+              <p class="text-[11px] text-slate-300">Fortschritt: ${Number(research.progressPoints || 0)} / ${Number(research.requiredPoints || 0)}</p>
+              <p class="text-[11px] text-slate-400">Ende: ${escapeHtml(formatIsoDateTime(research.endDate))}</p>
+            </div>`
+          : '<p class="text-xs text-slate-400">Keine aktive Forschung</p>';
+
+        const planningHtml = planning
+          ? `<div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+              <p class="text-xs text-white font-semibold">${escapeHtml(planning.title || '-')}</p>
+              <p class="text-[11px] text-slate-300">Typ: ${escapeHtml(planning.projectType || '-')} | Phase: ${escapeHtml(planning.phase || '-')}</p>
+              <p class="text-[11px] text-slate-300">Genre: ${escapeHtml(planning.genre || '-')}</p>
+              <p class="text-[11px] text-slate-400">Script: ${escapeHtml(planning.scriptTitle || '-')} | Script-Ende: ${escapeHtml(formatIsoDateTime(planning.scriptEndDate))}</p>
+            </div>`
+          : '<p class="text-xs text-slate-400">Keine aktive Projektplanung</p>';
+
+        return `
+          <div class="border border-slate-700 rounded-md p-3 bg-slate-900/70">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <p class="text-sm text-amber-300 font-semibold">${escapeHtml(studio.studioName || studio.id || 'Studio')}</p>
+              <p class="text-[11px] text-slate-400">Spielzeit: ${escapeHtml(ingameDate)}</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-2 mb-3">
+              <div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Kapital</p>
+                <p class="text-sm text-emerald-300 font-semibold">${Number(status.capital || 0).toLocaleString('de-DE')}</p>
+              </div>
+              <div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Ruf</p>
+                <p class="text-sm text-cyan-300 font-semibold">${Number(status.reputation || 0)}</p>
+              </div>
+              <div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Projekte</p>
+                <p class="text-sm text-white font-semibold">${Number(status.activeProjectsCount || 0)} aktiv</p>
+              </div>
+              <div class="rounded bg-slate-800/70 border border-slate-700 px-2 py-1">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Postkorb</p>
+                <p class="text-sm text-white font-semibold">${Number(status.unreadMessagesCount || 0)} / ${Number(status.messagesCount || 0)}</p>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <p class="text-xs text-amber-200 uppercase tracking-wide mb-1">Laufende Projekte</p>
+                ${runningProjectsHtml}
+              </div>
+              <div>
+                <p class="text-xs text-amber-200 uppercase tracking-wide mb-1">Bau aktuell</p>
+                ${runningConstructionsHtml}
+              </div>
+              <div>
+                <p class="text-xs text-amber-200 uppercase tracking-wide mb-1">Forschung</p>
+                ${researchHtml}
+                <p class="text-[11px] text-slate-400 mt-2">Schreiben: ${escapeHtml(status.activeWritingTitle || '-')}</p>
+              </div>
+              <div>
+                <p class="text-xs text-amber-200 uppercase tracking-wide mb-1">Projektplanung</p>
+                ${planningHtml}
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <p class="text-xs text-amber-200 uppercase tracking-wide mb-1">Gebautes Studio</p>
+              ${builtBuildingsHtml}
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-2 mt-3 text-[11px] text-slate-400">
+              <p>Studio-ID: ${escapeHtml(studio.id || '-')}</p>
+              <p>Abgeschlossene Filme: ${Number(status.completedFilmsCount || 0)}</p>
+              <p>Casting aktiv: ${Number(status.activeCastingsCount || 0)} | Scoutings: ${Number(status.activeTalentScoutingsCount || 0)}</p>
+              <p>Produktionskampagnen: ${Number(status.activeProductionCampaignsCount || 0)}</p>
+              <p>Letzter Sync: ${escapeHtml(formatIsoDateTime(studio.lastProcessedAtIso))}</p>
+              <p>Admin-Update: ${escapeHtml(formatIsoDateTime(studio.adminUpdatedAtIso))}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      userRuntimeInfo.innerHTML = entries.join('');
+    }
+
+    async function openUserEditor(userId) {
+      if (!userId) return;
+      try {
+        const result = await api(`/admin/users/${encodeURIComponent(userId)}/profile`);
+        const user = result?.user || {};
+        const studios = Array.isArray(result?.studios) ? result.studios : [];
+
+        selectedUserId = String(user.id || userId);
+        selectedUserProfileImageData = user.profileImageData || null;
+        pendingUserImageData = null;
+
+        editUserEmailInput.value = String(user.email || '');
+        editUserUsernameInput.value = String(user.username || '');
+        editUserStudioNameInput.value = String(user.studioName || '');
+        editUserRoleInput.value = String(user.role || '');
+        userLastLoginInfo.textContent = `Letzter Login: ${formatIsoDateTime(user.lastLoginAtIso)}`;
+        renderUserRuntimeStatus(studios);
+        userMessageSenderInput.value = 'Verwaltung';
+        userMessageSubjectInput.value = '';
+        userMessageBodyInput.value = '';
+        editUserImageInput.value = '';
+        setUserImagePreview(selectedUserProfileImageData);
+        setUserModalTab('basic');
+
+        editUserModal.classList.remove('hidden');
+        editUserModal.classList.add('flex');
+      } catch (error) {
+        log('User-Profil laden fehlgeschlagen', { error: error.message, userId });
+        alert('User-Editor konnte nicht geladen werden. Bitte Backend neu starten und erneut versuchen.');
+      }
+    }
+
+    function closeUserEditor() {
+      editUserModal.classList.add('hidden');
+      editUserModal.classList.remove('flex');
+      selectedUserId = '';
+      selectedUserProfileImageData = null;
+      pendingUserImageData = null;
+      editUserImageInput.value = '';
+      setUserImagePreview(null);
+      userLastLoginInfo.textContent = 'Letzter Login: -';
+      userRuntimeInfo.innerHTML = '';
+      setUserModalTab('basic');
+    }
+
+    async function saveUserEditor() {
+      if (!selectedUserId) {
+        log('User speichern fehlgeschlagen', { error: 'Kein User ausgewählt' });
+        return;
+      }
+
+      try {
+        const payload = {
+          username: editUserUsernameInput.value.trim(),
+          studioName: editUserStudioNameInput.value.trim(),
+          profileImageData: pendingUserImageData !== null ? pendingUserImageData : selectedUserProfileImageData,
+        };
+
+        await api(`/admin/users/${encodeURIComponent(selectedUserId)}/update`, {
+          method: 'POST',
+          body: JSON.stringify({ userData: payload }),
+        });
+
+        log('User gespeichert', { userId: selectedUserId, username: payload.username });
+        closeUserEditor();
+        await refreshUsers();
+      } catch (error) {
+        log('User speichern fehlgeschlagen', { error: error.message, userId: selectedUserId });
+      }
+    }
+
+    async function sendIngameUserMessage() {
+      if (!selectedUserId) {
+        log('Ingame Nachricht fehlgeschlagen', { error: 'Kein User ausgewählt' });
+        return;
+      }
+
+      const sender = userMessageSenderInput.value.trim() || 'Verwaltung';
+      const subject = userMessageSubjectInput.value.trim();
+      const body = userMessageBodyInput.value.trim();
+      if (!subject || !body) {
+        log('Ingame Nachricht fehlgeschlagen', { error: 'Betreff und Nachricht sind Pflichtfelder' });
+        return;
+      }
+
+      try {
+        await api(`/admin/users/${encodeURIComponent(selectedUserId)}/message`, {
+          method: 'POST',
+          body: JSON.stringify({
+            message: { sender, subject, body },
+          }),
+        });
+
+        log('Ingame Nachricht gesendet', { userId: selectedUserId, subject });
+        userMessageSubjectInput.value = '';
+        userMessageBodyInput.value = '';
+      } catch (error) {
+        log('Ingame Nachricht fehlgeschlagen', { error: error.message, userId: selectedUserId });
+      }
+    }
+
+    function setUserSubtab(name) {
+      const showList = name === 'list';
+      userListPanel.classList.toggle('hidden', !showList);
+      userCreatePanel.classList.toggle('hidden', showList);
+
+      userSubtabList.className = showList
+        ? 'px-3 py-2 rounded bg-amber-500 text-black font-semibold'
+        : 'px-3 py-2 rounded bg-slate-800 border border-slate-600';
+
+      userSubtabCreate.className = showList
+        ? 'px-3 py-2 rounded bg-slate-800 border border-slate-600'
+        : 'px-3 py-2 rounded bg-amber-500 text-black font-semibold';
+
+      if (!showList) {
+        createUsernameInput.focus();
+      }
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Bild konnte nicht gelesen werden'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function resizeImageDataUrl(sourceDataUrl, maxSize = 512, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const w = img.width;
+          const h = img.height;
+          if (!w || !h) {
+            resolve(sourceDataUrl);
+            return;
+          }
+
+          const scale = Math.min(1, maxSize / Math.max(w, h));
+          const targetW = Math.max(1, Math.round(w * scale));
+          const targetH = Math.max(1, Math.round(h * scale));
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(sourceDataUrl);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => reject(new Error('Bild konnte nicht verarbeitet werden'));
+        img.src = sourceDataUrl;
+      });
+    }
+
+    async function api(path, options = {}) {
+      const token = getToken();
+      const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const response = await fetch(`${API}${path}`, Object.assign({}, options, { headers }));
+      const json = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(json.error || `HTTP ${response.status}`);
+      }
+      return json;
+    }
+
+    async function login() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      if (!email || !password) {
+        loginInfo.textContent = 'Bitte E-Mail und Passwort eingeben.';
+        return;
+      }
+      try {
+        const result = await api('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        localStorage.setItem(TOKEN_KEY, result.token);
+        loginInfo.textContent = `Eingeloggt als ${result.user.username}`;
+        await initAdmin();
+      } catch (error) {
+        loginInfo.textContent = `Login fehlgeschlagen: ${error.message}`;
+      }
+    }
+
+    async function initAdmin() {
+      try {
+        const me = await api('/auth/me');
+        const email = String(me.user?.email || '').toLowerCase();
+        const isAdminByRole = String(me.user?.role || '') === 'admin';
+        if (!me.user || (!isAdminByRole && email !== ADMIN_EMAIL)) {
+          throw new Error('Kein Adminkonto');
+        }
+        loginPanel.classList.add('hidden');
+        await refreshAll();
+      } catch (error) {
+        loginPanel.classList.remove('hidden');
+        log('Admin-Init fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    function setActiveTab(name) {
+      overviewPanel.classList.toggle('hidden', name !== 'overview');
+      usersPanel.classList.toggle('hidden', name !== 'users');
+      studiosPanel.classList.toggle('hidden', name !== 'studios');
+      filmsPanel.classList.toggle('hidden', name !== 'films');
+      talentsPanel.classList.toggle('hidden', name !== 'talents');
+      marketFeedbackPanel.classList.toggle('hidden', name !== 'marketFeedback');
+
+      [tabOverview, tabUsers, tabStudios, tabFilms, tabTalents, tabMarketFeedback].forEach(btn => {
+        btn.className = 'tab-btn px-4 py-2 rounded bg-slate-800 border border-slate-600';
+      });
+
+      const activeBtn = name === 'overview'
+        ? tabOverview
+        : name === 'users'
+          ? tabUsers
+        : name === 'studios'
+          ? tabStudios
+          : name === 'films'
+            ? tabFilms
+            : name === 'talents'
+              ? tabTalents
+              : tabMarketFeedback;
+      activeBtn.className = 'tab-btn px-4 py-2 rounded bg-amber-500 text-black font-semibold';
+
+      if (name === 'users') {
+        setUserSubtab('list');
+      }
+    }
+
+    async function refreshOverview() {
+      try {
+        const result = await api('/admin/overview');
+        const overview = result?.overview || {};
+        metricUsers.textContent = String(Number(overview.usersCount || 0));
+        metricStudios.textContent = String(Number(overview.studiosCount || 0));
+        metricFilms.textContent = String(Number(overview.filmsCount || 0));
+        metricTalents.textContent = String(Number(overview.talentsCount || 0));
+        metricActors.textContent = String(Number(overview.actorsCount || 0));
+        metricDirectors.textContent = String(Number(overview.directorsCount || 0));
+      } catch (error) {
+        log('Übersicht laden fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function resetGameData() {
+      const ok = confirm('Spiel wirklich resetten? Alle Studios sowie Welt-/Marktdaten werden gelöscht. User-Konten bleiben bestehen.');
+      if (!ok) return;
+
+      try {
+        const result = await api('/admin/game/reset', { method: 'POST' });
+        log('Spiel erfolgreich resettet', result);
+        await refreshAll();
+        setActiveTab('overview');
+      } catch (error) {
+        log('Spiel-Reset fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    function renderMarketFeedbackEditor() {
+      const selectedStudioId = String(marketFeedbackStudioSelect.value || '');
+      const selected = marketFeedbackItems.find(item => String(item.studioId || '') === selectedStudioId) || null;
+
+      marketFeedbackTable.innerHTML = '';
+      if (!selected) {
+        marketTrendTypeInput.value = 'none';
+        marketTrendDurationInput.value = '';
+        marketTrendMinFactorInput.value = '';
+        marketTrendMaxFactorInput.value = '';
+        return;
+      }
+
+      const trend = selected.marketTrend && typeof selected.marketTrend === 'object' ? selected.marketTrend : null;
+      marketTrendTypeInput.value = trend?.type || 'none';
+      marketTrendDurationInput.value = trend ? String(Number(trend.duration || 0)) : '';
+      marketTrendMinFactorInput.value = trend ? String(Number(trend.minFactor || 0)) : '';
+      marketTrendMaxFactorInput.value = trend ? String(Number(trend.maxFactor || 0)) : '';
+
+      const rows = Array.isArray(selected.genreTrends) ? selected.genreTrends : [];
+      rows.forEach(entry => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800';
+        tr.dataset.genre = String(entry.genre || '');
+        tr.innerHTML = `
+          <td class="py-2 pr-3 font-semibold text-amber-200">${entry.genre || '-'}</td>
+          <td class="py-2 pr-3"><input data-field="popularity" type="number" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1" value="${Number(entry.popularity || 0)}" /></td>
+          <td class="py-2 pr-3"><input data-field="momentum" type="number" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1" value="${Number(entry.momentum || 0)}" /></td>
+          <td class="py-2 pr-3"><input data-field="peakDuration" type="number" step="1" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1" value="${Number(entry.peakDuration || 0)}" /></td>
+        `;
+        marketFeedbackTable.appendChild(tr);
+      });
+    }
+
+    function fillMarketFeedbackStudioSelect() {
+      const previous = String(marketFeedbackStudioSelect.value || '');
+      marketFeedbackStudioSelect.innerHTML = '';
+
+      if (marketFeedbackItems.length === 0) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Keine Studios verfügbar';
+        marketFeedbackStudioSelect.appendChild(option);
+        renderMarketFeedbackEditor();
+        return;
+      }
+
+      marketFeedbackItems.forEach(item => {
+        const option = document.createElement('option');
+        option.value = String(item.studioId || '');
+        option.textContent = `${item.studioName || item.studioId} (${item.ingameMonth || 0}/${item.ingameYear || 0})`;
+        marketFeedbackStudioSelect.appendChild(option);
+      });
+
+      const hasPrevious = marketFeedbackItems.some(item => String(item.studioId || '') === previous);
+      marketFeedbackStudioSelect.value = hasPrevious ? previous : String(marketFeedbackItems[0].studioId || '');
+      renderMarketFeedbackEditor();
+    }
+
+    function setTalentSubtab(name) {
+      const showActors = name === 'actors';
+      talentActorsPanel.classList.toggle('hidden', !showActors);
+      talentDirectorsPanel.classList.toggle('hidden', showActors);
+
+      talentSubtabActors.className = showActors
+        ? 'px-3 py-2 rounded bg-amber-500 text-black font-semibold'
+        : 'px-3 py-2 rounded bg-slate-800 border border-slate-600';
+
+      talentSubtabDirectors.className = showActors
+        ? 'px-3 py-2 rounded bg-slate-800 border border-slate-600'
+        : 'px-3 py-2 rounded bg-amber-500 text-black font-semibold';
+    }
+
+    function openTalentEditor(type, talent) {
+      selectedTalentType = type;
+      selectedTalentKey = String(talent?.talentKey || '');
+      selectedTalentData = talent?.talentData && typeof talent.talentData === 'object' ? { ...talent.talentData } : {};
+
+      const favoriteGenres = Array.isArray(selectedTalentData.favoriteGenres) ? selectedTalentData.favoriteGenres : [];
+      const traits = Array.isArray(selectedTalentData.traits) ? selectedTalentData.traits : [];
+
+      editTalentNameInput.value = String(selectedTalentData.name || talent?.name || '');
+      editTalentGenderInput.value = String(selectedTalentData.gender || talent?.gender || '');
+      editTalentSkillInput.value = String(Number(selectedTalentData.skill ?? talent?.skill ?? 0));
+      editTalentPotentialInput.value = String(Number(selectedTalentData.potential ?? talent?.potential ?? 0));
+      editTalentBekanntheitInput.value = String(Number(selectedTalentData.bekanntheit ?? talent?.bekanntheit ?? 0));
+      fillGenreSelect(editTalentFavGenre1Input, favoriteGenres[0] || '');
+      fillGenreSelect(editTalentFavGenre2Input, favoriteGenres[1] || '');
+      fillGenreSelect(editTalentHatedGenreInput, selectedTalentData.hatedGenre || '');
+      editTalentTraitsInput.value = traits.join(',');
+      editTalentCostInput.value = String(Number(selectedTalentData.cost ?? 0));
+      editTalentLoyaltyInput.value = String(Number(selectedTalentData.loyalty ?? 0));
+      editTalentMoralInput.value = String(Number(selectedTalentData.moral ?? 0));
+      editTalentExperienceInput.value = String(Number(selectedTalentData.experience ?? 0));
+      editTalentSpeedModifierInput.value = selectedTalentData.speedModifier !== undefined ? String(Number(selectedTalentData.speedModifier)) : '';
+      editTalentDiscoveredInput.checked = Boolean(selectedTalentData.isDiscovered);
+      editTalentFavoriteInput.checked = Boolean(selectedTalentData.isFavorite);
+      editTalentFamilyInput.checked = Boolean(selectedTalentData.isFamilyMember);
+      editTalentCustomInput.checked = Boolean(selectedTalentData.isCustom);
+      editTalentBirthDateInput.value = toDateInputValue(selectedTalentData.birthDate);
+
+      editTalentModal.classList.remove('hidden');
+      editTalentModal.classList.add('flex');
+    }
+
+    function closeTalentEditor() {
+      editTalentModal.classList.add('hidden');
+      editTalentModal.classList.remove('flex');
+      selectedTalentType = null;
+      selectedTalentKey = '';
+      selectedTalentData = null;
+    }
+
+    function openStudioEditor(studio) {
+      selectedStudioRef = studio?.studioRef && typeof studio.studioRef === 'object' ? { ...studio.studioRef } : null;
+      selectedStudioData = studio && typeof studio === 'object' ? { ...studio } : null;
+
+      editStudioSourceInfo.textContent = `Quelle: ${studio?.source || '-'}`;
+      editStudioNameInput.value = String(studio?.studioName || '');
+      editStudioOwnerInput.value = String(studio?.ownerId || '');
+      editStudioCapitalInput.value = String(Number(studio?.capital ?? 0));
+      editStudioYearInput.value = String(Number(studio?.ingameYear ?? 0));
+      editStudioMonthInput.value = String(Number(studio?.ingameMonth ?? 1));
+
+      const isCompetitor = String(studio?.source || '') === 'competitor';
+      editStudioCapitalInput.disabled = isCompetitor;
+      editStudioYearInput.disabled = isCompetitor;
+      editStudioMonthInput.disabled = isCompetitor;
+
+      editStudioModal.classList.remove('hidden');
+      editStudioModal.classList.add('flex');
+    }
+
+    function closeStudioEditor() {
+      editStudioModal.classList.add('hidden');
+      editStudioModal.classList.remove('flex');
+      selectedStudioRef = null;
+      selectedStudioData = null;
+    }
+
+    async function saveStudioEditor() {
+      if (!selectedStudioRef) {
+        log('Studio speichern fehlgeschlagen', { error: 'Kein Studio ausgewählt' });
+        return;
+      }
+
+      try {
+        const payload = {
+          studioName: editStudioNameInput.value.trim(),
+          capital: Number(editStudioCapitalInput.value || 0),
+          ingameYear: Number(editStudioYearInput.value || 0),
+          ingameMonth: Number(editStudioMonthInput.value || 1),
+        };
+
+        await api('/admin/studios/update', {
+          method: 'POST',
+          body: JSON.stringify({
+            studioRef: selectedStudioRef,
+            studioData: payload,
+          }),
+        });
+
+        log('Studio gespeichert', { studioName: payload.studioName, type: selectedStudioRef.type });
+        closeStudioEditor();
+        await refreshStudios();
+        await refreshFilms();
+      } catch (error) {
+        log('Studio speichern fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    function openFilmEditor(film) {
+      selectedFilmRef = film?.filmRef && typeof film.filmRef === 'object' ? { ...film.filmRef } : null;
+      selectedFilmData = film && typeof film === 'object' ? { ...film } : null;
+
+      editFilmSourceInfo.textContent = `Quelle: ${film?.source || '-'}`;
+      editFilmTitleInput.value = String(film?.title || '');
+      editFilmStudioInput.value = String(film?.studioName || film?.studioId || '');
+      editFilmGenreInput.value = String(film?.genre || '');
+      editFilmQualityInput.value = String(Number(film?.quality ?? 0));
+      editFilmHypeInput.value = String(Number(film?.hype ?? 0));
+      editFilmReleaseInput.value = toDateInputValue(film?.releaseDateIso || null);
+
+      editFilmModal.classList.remove('hidden');
+      editFilmModal.classList.add('flex');
+    }
+
+    function closeFilmEditor() {
+      editFilmModal.classList.add('hidden');
+      editFilmModal.classList.remove('flex');
+      selectedFilmRef = null;
+      selectedFilmData = null;
+    }
+
+    async function saveFilmEditor() {
+      if (!selectedFilmRef) {
+        log('Film speichern fehlgeschlagen', { error: 'Kein Film ausgewählt' });
+        return;
+      }
+
+      try {
+        const payload = {
+          title: editFilmTitleInput.value.trim(),
+          genre: editFilmGenreInput.value.trim(),
+          quality: Number(editFilmQualityInput.value || 0),
+          hype: Number(editFilmHypeInput.value || 0),
+          releaseDateIso: fromDateInputValue(editFilmReleaseInput.value),
+          previousTitle: String(selectedFilmData?.title || '').trim(),
+          previousReleaseDateIso: selectedFilmData?.releaseDateIso || null,
+        };
+
+        await api('/admin/films/update', {
+          method: 'POST',
+          body: JSON.stringify({
+            filmRef: selectedFilmRef,
+            filmData: payload,
+          }),
+        });
+
+        log('Film gespeichert', { title: payload.title, type: selectedFilmRef.type });
+        closeFilmEditor();
+        await refreshFilms();
+      } catch (error) {
+        log('Film speichern fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function saveTalentEditor() {
+      if (!selectedTalentType || !selectedTalentKey) {
+        log('Talent speichern fehlgeschlagen', { error: 'Kein Talent ausgewählt' });
+        return;
+      }
+
+      try {
+        const parsed = { ...(selectedTalentData || {}) };
+
+        parsed.name = editTalentNameInput.value.trim();
+        parsed.gender = editTalentGenderInput.value.trim();
+        parsed.skill = Number(editTalentSkillInput.value || 0);
+        parsed.potential = Number(editTalentPotentialInput.value || 0);
+        parsed.bekanntheit = Number(editTalentBekanntheitInput.value || 0);
+        parsed.favoriteGenres = [editTalentFavGenre1Input.value, editTalentFavGenre2Input.value].filter(Boolean);
+        parsed.hatedGenre = editTalentHatedGenreInput.value || '';
+        parsed.traits = editTalentTraitsInput.value
+          .split(',')
+          .map(item => item.trim())
+          .filter(Boolean);
+        parsed.cost = Number(editTalentCostInput.value || 0);
+        parsed.loyalty = Number(editTalentLoyaltyInput.value || 0);
+        parsed.moral = Number(editTalentMoralInput.value || 0);
+        parsed.experience = Number(editTalentExperienceInput.value || 0);
+        parsed.isDiscovered = Boolean(editTalentDiscoveredInput.checked);
+        parsed.isFavorite = Boolean(editTalentFavoriteInput.checked);
+        parsed.isFamilyMember = Boolean(editTalentFamilyInput.checked);
+        parsed.isCustom = Boolean(editTalentCustomInput.checked);
+        parsed.birthDate = fromDateInputValue(editTalentBirthDateInput.value);
+        if (selectedTalentType === 'director') {
+          parsed.speedModifier = Number(editTalentSpeedModifierInput.value || 1);
+        }
+
+        await api('/admin/talents/update', {
+          method: 'POST',
+          body: JSON.stringify({
+            type: selectedTalentType,
+            talentKey: selectedTalentKey,
+            talentData: parsed,
+          }),
+        });
+
+        log('Talent gespeichert', { type: selectedTalentType, talentKey: selectedTalentKey });
+        closeTalentEditor();
+        await refreshTalents();
+      } catch (error) {
+        log('Talent speichern fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function refreshUsers() {
+      try {
+        const result = await api('/admin/users');
+        usersTable.innerHTML = '';
+        result.users.forEach(user => {
+          const isPrimaryAdmin = String(user.email || '').toLowerCase() === ADMIN_EMAIL;
+          const nextRole = user.role === 'admin' ? 'user' : 'admin';
+          const roleButtonLabel = user.role === 'admin' ? 'Zu User' : 'Zu Admin';
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-xs text-slate-300">${user.id}</td>
+            <td class="py-2 pr-3">${user.email}</td>
+            <td class="py-2 pr-3">${user.username}</td>
+            <td class="py-2 pr-3">${user.role}</td>
+            <td class="py-2 pr-3">${user.studioName || '-'}</td>
+            <td class="py-2 pr-3 flex gap-2">
+              <button class="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600" data-edit="${user.id}">Bearbeiten</button>
+              <button class="px-2 py-1 rounded bg-indigo-700 hover:bg-indigo-600" data-export="${user.id}">Export</button>
+              <button class="px-2 py-1 rounded bg-amber-700 hover:bg-amber-600 ${isPrimaryAdmin ? 'opacity-60 cursor-not-allowed' : ''}" data-toggle-role="${user.id}" data-next-role="${nextRole}" ${isPrimaryAdmin ? 'disabled' : ''}>${roleButtonLabel}</button>
+              <button class="px-2 py-1 rounded bg-rose-700 hover:bg-rose-600" data-delete="${user.id}">Delete</button>
+            </td>
+          `;
+          tr.addEventListener('click', (event) => {
+            if (event.target && event.target.closest('button')) return;
+            openUserEditor(user.id);
+          });
+          usersTable.appendChild(tr);
+        });
+        usersTable.querySelectorAll('[data-edit]').forEach(btn => {
+          btn.addEventListener('click', () => openUserEditor(btn.getAttribute('data-edit')));
+        });
+        usersTable.querySelectorAll('[data-export]').forEach(btn => {
+          btn.addEventListener('click', () => exportUser(btn.getAttribute('data-export')));
+        });
+        usersTable.querySelectorAll('[data-delete]').forEach(btn => {
+          btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete')));
+        });
+        usersTable.querySelectorAll('[data-toggle-role]').forEach(btn => {
+          btn.addEventListener('click', () => changeUserRole(btn.getAttribute('data-toggle-role'), btn.getAttribute('data-next-role')));
+        });
+      } catch (error) {
+        log('Nutzerliste fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function changeUserRole(userId, role) {
+      if (!userId || !role) return;
+      try {
+        await api(`/admin/users/${encodeURIComponent(userId)}/role`, {
+          method: 'POST',
+          body: JSON.stringify({ role }),
+        });
+        log('Nutzerrolle aktualisiert', { userId, role });
+        await refreshUsers();
+      } catch (error) {
+        log('Nutzerrolle ändern fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function refreshStudios() {
+      try {
+        const result = await api('/admin/studios');
+        studiosTable.innerHTML = '';
+        result.studios.forEach(studio => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-xs text-slate-300">${studio.id}</td>
+            <td class="py-2 pr-3">${studio.studioName || '-'}</td>
+            <td class="py-2 pr-3 text-xs">${studio.ownerId || '-'}</td>
+            <td class="py-2 pr-3">${Number(studio.capital || 0).toLocaleString('de-DE')}</td>
+            <td class="py-2 pr-3">${studio.activeProjectsCount || 0}</td>
+            <td class="py-2 pr-3">${studio.completedFilmsCount || 0}</td>
+            <td class="py-2 pr-3">${studio.ingameMonth || 0}/${studio.ingameYear || 0}</td>
+          `;
+          tr.addEventListener('click', () => openStudioEditor(studio));
+          studiosTable.appendChild(tr);
+        });
+      } catch (error) {
+        log('Studioliste fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function refreshFilms() {
+      try {
+        const result = await api('/admin/films');
+        filmsTable.innerHTML = '';
+        result.films.forEach(film => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-xs text-slate-300">${film.id}</td>
+            <td class="py-2 pr-3">${film.title || '-'}</td>
+            <td class="py-2 pr-3">${film.studioName || film.studioId || '-'}</td>
+            <td class="py-2 pr-3">${film.genre || '-'}</td>
+            <td class="py-2 pr-3">${film.quality || 0}</td>
+            <td class="py-2 pr-3 text-xs text-amber-300">${film.source || '-'}</td>
+            <td class="py-2 pr-3">${film.releaseDateIso ? new Date(film.releaseDateIso).toLocaleDateString('de-DE') : '-'}</td>
+          `;
+          tr.addEventListener('click', () => openFilmEditor(film));
+          filmsTable.appendChild(tr);
+        });
+      } catch (error) {
+        log('Filmliste fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function refreshTalents() {
+      try {
+        const result = await api('/admin/talents');
+
+        actorsTable.innerHTML = '';
+        (result.actors || []).forEach(actor => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-xs text-slate-300">${actor.id}</td>
+            <td class="py-2 pr-3">${actor.name || '-'}</td>
+            <td class="py-2 pr-3">${actor.gender || '-'}</td>
+            <td class="py-2 pr-3">${actor.skill || 0}</td>
+            <td class="py-2 pr-3">${actor.potential || 0}</td>
+            <td class="py-2 pr-3">${actor.bekanntheit || 0}</td>
+            <td class="py-2 pr-3">${actor.studioName || actor.studioId || '-'}</td>
+          `;
+          tr.addEventListener('click', () => openTalentEditor('actor', actor));
+          actorsTable.appendChild(tr);
+        });
+
+        directorsTable.innerHTML = '';
+        (result.directors || []).forEach(director => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800 cursor-pointer hover:bg-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-xs text-slate-300">${director.id}</td>
+            <td class="py-2 pr-3">${director.name || '-'}</td>
+            <td class="py-2 pr-3">${director.gender || '-'}</td>
+            <td class="py-2 pr-3">${director.skill || 0}</td>
+            <td class="py-2 pr-3">${director.potential || 0}</td>
+            <td class="py-2 pr-3">${director.bekanntheit || 0}</td>
+            <td class="py-2 pr-3">${director.studioName || director.studioId || '-'}</td>
+          `;
+          tr.addEventListener('click', () => openTalentEditor('director', director));
+          directorsTable.appendChild(tr);
+        });
+      } catch (error) {
+        log('Talentliste fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function refreshMarketFeedback() {
+      try {
+        const result = await api('/admin/market-feedback');
+        marketFeedbackItems = Array.isArray(result.items) ? result.items : [];
+        fillMarketFeedbackStudioSelect();
+      } catch (error) {
+        log('Marktfeedback laden fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function saveMarketFeedback() {
+      const selectedStudioId = String(marketFeedbackStudioSelect.value || '');
+      const selected = marketFeedbackItems.find(item => String(item.studioId || '') === selectedStudioId) || null;
+      if (!selected || !selected.studioRef) {
+        log('Marktfeedback speichern fehlgeschlagen', { error: 'Kein Studio ausgewählt' });
+        return;
+      }
+
+      const rows = Array.from(marketFeedbackTable.querySelectorAll('tr[data-genre]'));
+      const genreTrends = rows.map(row => {
+        const genre = String(row.dataset.genre || '');
+        const popularityInput = row.querySelector('input[data-field="popularity"]');
+        const momentumInput = row.querySelector('input[data-field="momentum"]');
+        const peakDurationInput = row.querySelector('input[data-field="peakDuration"]');
+
+        return {
+          genre,
+          popularity: Number(popularityInput?.value || 0),
+          momentum: Number(momentumInput?.value || 0),
+          peakDuration: Number(peakDurationInput?.value || 0),
+        };
+      });
+
+      const trendType = String(marketTrendTypeInput.value || 'none');
+      const marketTrend = trendType === 'bull' || trendType === 'bear'
+        ? {
+            type: trendType,
+            duration: Number(marketTrendDurationInput.value || 0),
+            minFactor: Number(marketTrendMinFactorInput.value || 0),
+            maxFactor: Number(marketTrendMaxFactorInput.value || 0),
+          }
+        : null;
+
+      try {
+        await api('/admin/market-feedback/update', {
+          method: 'POST',
+          body: JSON.stringify({
+            studioRef: selected.studioRef,
+            marketFeedback: {
+              genreTrends,
+              marketTrend,
+            },
+          }),
+        });
+        log('Marktfeedback gespeichert', { studioId: selectedStudioId });
+        await refreshMarketFeedback();
+      } catch (error) {
+        log('Marktfeedback speichern fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function refreshAll() {
+      await refreshOverview();
+      await refreshUsers();
+      await refreshStudios();
+      await refreshFilms();
+      await refreshTalents();
+      await refreshMarketFeedback();
+    }
+
+    async function createUser() {
+      const username = createUsernameInput.value.trim();
+      const studioName = createStudioNameInput.value.trim();
+      const file = createImageInput.files && createImageInput.files[0] ? createImageInput.files[0] : null;
+
+      if (!username || !studioName) {
+        log('User anlegen fehlgeschlagen', { error: 'Username und Studioname sind Pflichtfelder' });
+        return;
+      }
+
+      try {
+        let imageData = '';
+        if (file) {
+          const originalData = await fileToDataUrl(file);
+          imageData = await resizeImageDataUrl(originalData);
+        }
+        const result = await api('/admin/users/create', {
+          method: 'POST',
+          body: JSON.stringify({ username, studioName, imageData }),
+        });
+
+        log('User angelegt', {
+          userId: result.user?.id,
+          username: result.user?.username,
+          email: result.login?.email,
+          tempPassword: result.login?.tempPassword,
+        });
+
+        resetCreateUserForm();
+        setUserSubtab('list');
+        await refreshUsers();
+      } catch (error) {
+        log('User anlegen fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function exportUser(userId) {
+      try {
+        const result = await api(`/admin/users/${encodeURIComponent(userId)}/backup`);
+        const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `user-backup-${userId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        log('Backup exportiert', { userId });
+      } catch (error) {
+        log('Backup export fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm(`Nutzer ${userId} wirklich löschen?`)) return;
+      try {
+        await api(`/admin/users/${encodeURIComponent(userId)}`, { method: 'DELETE' });
+        log('Nutzer gelöscht', { userId });
+        await refreshUsers();
+      } catch (error) {
+        log('Nutzer löschen fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function logout() {
+      try {
+        await api('/auth/logout', { method: 'POST' });
+      } catch {
+        // ignore logout errors
+      }
+      localStorage.removeItem(TOKEN_KEY);
+      loginPanel.classList.remove('hidden');
+      loginInfo.textContent = 'Abgemeldet.';
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('refreshAllBtn').addEventListener('click', refreshAll);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    tabOverview.addEventListener('click', () => setActiveTab('overview'));
+    tabUsers.addEventListener('click', () => setActiveTab('users'));
+    tabStudios.addEventListener('click', () => setActiveTab('studios'));
+    tabFilms.addEventListener('click', () => setActiveTab('films'));
+    tabTalents.addEventListener('click', () => setActiveTab('talents'));
+    tabMarketFeedback.addEventListener('click', () => setActiveTab('marketFeedback'));
+    resetGameBtn.addEventListener('click', resetGameData);
+    userSubtabList.addEventListener('click', () => setUserSubtab('list'));
+    userSubtabCreate.addEventListener('click', () => setUserSubtab('create'));
+    submitCreateUserBtn.addEventListener('click', createUser);
+    marketFeedbackStudioSelect.addEventListener('change', renderMarketFeedbackEditor);
+    refreshMarketFeedbackBtn.addEventListener('click', refreshMarketFeedback);
+    saveMarketFeedbackBtn.addEventListener('click', saveMarketFeedback);
+
+    createImageInput.addEventListener('change', async () => {
+      const file = createImageInput.files && createImageInput.files[0] ? createImageInput.files[0] : null;
+      if (!file) {
+        createImagePreview.src = '';
+        createImagePreview.classList.add('hidden');
+        return;
+      }
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        createImagePreview.src = dataUrl;
+        createImagePreview.classList.remove('hidden');
+      } catch (error) {
+        log('Bildvorschau fehlgeschlagen', { error: error.message });
+      }
+    });
+
+    editUserImageInput.addEventListener('change', async () => {
+      const file = editUserImageInput.files && editUserImageInput.files[0] ? editUserImageInput.files[0] : null;
+      if (!file) {
+        pendingUserImageData = null;
+        setUserImagePreview(selectedUserProfileImageData);
+        return;
+      }
+      try {
+        const originalData = await fileToDataUrl(file);
+        const resizedData = await resizeImageDataUrl(originalData);
+        pendingUserImageData = resizedData;
+        setUserImagePreview(resizedData);
+      } catch (error) {
+        log('User-Porträt laden fehlgeschlagen', { error: error.message });
+      }
+    });
+
+    talentSubtabActors.addEventListener('click', () => setTalentSubtab('actors'));
+    talentSubtabDirectors.addEventListener('click', () => setTalentSubtab('directors'));
+    closeEditTalentModalBtn.addEventListener('click', closeTalentEditor);
+    cancelEditTalentBtn.addEventListener('click', closeTalentEditor);
+    saveEditTalentBtn.addEventListener('click', saveTalentEditor);
+    closeEditStudioModalBtn.addEventListener('click', closeStudioEditor);
+    cancelEditStudioBtn.addEventListener('click', closeStudioEditor);
+    saveEditStudioBtn.addEventListener('click', saveStudioEditor);
+    closeEditFilmModalBtn.addEventListener('click', closeFilmEditor);
+    cancelEditFilmBtn.addEventListener('click', closeFilmEditor);
+    saveEditFilmBtn.addEventListener('click', saveFilmEditor);
+    closeEditUserModalBtn.addEventListener('click', closeUserEditor);
+    cancelEditUserBtn.addEventListener('click', closeUserEditor);
+    saveEditUserBtn.addEventListener('click', saveUserEditor);
+    sendUserMessageBtn.addEventListener('click', sendIngameUserMessage);
+    userTabBasic.addEventListener('click', () => setUserModalTab('basic'));
+    userTabStatus.addEventListener('click', () => setUserModalTab('status'));
+    userTabMessage.addEventListener('click', () => setUserModalTab('message'));
+
+    enableSortableTableByBodyId('usersTable');
+    enableSortableTableByBodyId('studiosTable');
+    enableSortableTableByBodyId('filmsTable');
+    enableSortableTableByBodyId('actorsTable');
+    enableSortableTableByBodyId('directorsTable');
+
+    setUserSubtab('list');
+    setTalentSubtab('actors');
+    setActiveTab('overview');
+    initAdmin();
+  </script>
+</body>
+</html>
