@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ScreenTransitionProps {
   children: React.ReactNode;
@@ -9,6 +9,11 @@ const ScreenTransition: React.FC<ScreenTransitionProps> = ({ children, childKey 
   const [displayChild, setDisplayChild] = useState(children);
   const [displayKey, setDisplayKey] = useState(childKey);
   const [isFading, setIsFading] = useState(true);
+  const latestChildrenRef = useRef(children);
+
+  useEffect(() => {
+    latestChildrenRef.current = children;
+  }, [children]);
 
   // Effect for initial page load fade-in
   useEffect(() => {
@@ -16,26 +21,27 @@ const ScreenTransition: React.FC<ScreenTransitionProps> = ({ children, childKey 
     return () => clearTimeout(timer);
   }, []);
 
-  // Effect for screen changes and prop updates
+  // Only react to key changes here. Including `children` resets the timer
+  // during frequent re-renders and can leave the app stuck at opacity-0.
   useEffect(() => {
-    // If the key for the new children is different from the key of what's currently displayed
     if (displayKey !== childKey) {
       setIsFading(true); // Start fading out
       const timer = setTimeout(() => {
-        // After fading out, update the child and key, then fade in
         setDisplayKey(childKey);
-        setDisplayChild(children);
+        setDisplayChild(latestChildrenRef.current);
         setIsFading(false);
-      }, 300); // This duration must match the CSS fade-out time
+      }, 300);
 
       return () => clearTimeout(timer);
-    } else {
-      // If the key is the same, the screen component might have received new props.
-      // Update the displayed child directly without a transition to reflect the new state.
-      // This fixes the issue of the date not updating on the MainScreen.
+    }
+  }, [childKey, displayKey]);
+
+  // Update current screen content when only props/state changed (same screen key).
+  useEffect(() => {
+    if (displayKey === childKey) {
       setDisplayChild(children);
     }
-  }, [childKey, children]);
+  }, [children, childKey, displayKey]);
 
   return (
     <div className={`w-full h-full transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
