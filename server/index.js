@@ -1508,10 +1508,13 @@ function createServer() {
 
     if (req.method === 'GET' && url.pathname === '/server-time') {
       const now = new Date();
+      const worldState = readWorldState();
       sendJson(res, 200, {
         nowIso: now.toISOString(),
         ingameMonthIndex: getIngameMonthIndex(now),
         ingameDateIso: getCurrentIngameDate(now).toISOString(),
+        resetStartDateIso: worldState?.resetStartDateIso || null,
+        resetAtIso: worldState?.resetAtIso || null,
         rule: '1 real UTC day = 1 ingame month',
       });
       return;
