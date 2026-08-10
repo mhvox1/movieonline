@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { GameSpeed } from '../types';
 import { useGame } from '../contexts/GameContext';
-import { PROPERTY_IMAGES } from './images/propertyImages';
+import { privatlebenBackgroundImage } from './backgrounds/PrivatlebenBackgroundImage';
 import PrivatlebenIcon from './icons/PrivatlebenIcon';
 import AssetsIcon from './icons/AssetsIcon';
 import FamilyIcon from './icons/FamilyIcon';
@@ -96,7 +96,7 @@ const PrivatlebenScreen: React.FC<PrivatlebenScreenProps> = ({ onBack, gameSpeed
   return (
     <div
       className="w-full h-full bg-cover bg-center flex flex-col"
-      style={{ backgroundImage: `url(${PROPERTY_IMAGES['prop_rental']})` }} // Default BG, layout covers it
+      style={{ backgroundImage: `url(${privatlebenBackgroundImage})` }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div> {/* Dark overlay for readability */}
       

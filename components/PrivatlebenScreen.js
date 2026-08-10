@@ -1,7 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
 import { useGame } from '../contexts/GameContext';
-import { PROPERTY_IMAGES } from './images/propertyImages';
+import { privatlebenBackgroundImage } from './backgrounds/PrivatlebenBackgroundImage';
 import PrivatlebenIcon from './icons/PrivatlebenIcon';
 import AssetsIcon from './icons/AssetsIcon';
 import FamilyIcon from './icons/FamilyIcon';
@@ -50,7 +50,7 @@ const PrivatlebenScreen = ({ onBack, gameSpeed, setGameSpeed }) => {
         { id: 'family', icon: _jsx(FamilyIcon, { className: "w-5 h-5 bg-gray-400 group-hover:bg-black" }) },
         { id: 'education', icon: _jsx(EducationIcon, { className: "w-5 h-5 bg-gray-400 group-hover:bg-black" }) }
     ];
-    return (_jsxs("div", { className: "w-full h-full bg-cover bg-center flex flex-col", style: { backgroundImage: `url(${PROPERTY_IMAGES['prop_rental']})` }, children: [_jsx("div", { className: "absolute inset-0 bg-black/60 backdrop-blur-sm z-0" }), " ", _jsxs("div", { className: "relative z-10 w-full h-full flex flex-col", children: [_jsx(GameHeader, { gameSpeed: gameSpeed, setGameSpeed: setGameSpeed, disabled: true }), _jsxs("div", { className: "flex-grow w-full flex flex-row overflow-hidden", children: [_jsxs("aside", { className: "w-80 flex-shrink-0 bg-black bg-opacity-50 border-r border-gray-700 flex flex-col z-20", children: [_jsx("header", { className: "p-6 text-center border-b border-gray-700", children: _jsx("h1", { className: "text-3xl font-bold font-cinzel text-amber-400", children: t.privatelife.screen.title }) }), _jsx("nav", { className: "flex-grow p-4 flex flex-col gap-4 overflow-y-auto", children: navItems.map(item => {
+    return (_jsxs("div", { className: "w-full h-full bg-cover bg-center flex flex-col", style: { backgroundImage: `url(${privatlebenBackgroundImage})` }, children: [_jsx("div", { className: "absolute inset-0 bg-black/60 backdrop-blur-sm z-0" }), " ", _jsxs("div", { className: "relative z-10 w-full h-full flex flex-col", children: [_jsx(GameHeader, { gameSpeed: gameSpeed, setGameSpeed: setGameSpeed, disabled: true }), _jsxs("div", { className: "flex-grow w-full flex flex-row overflow-hidden", children: [_jsxs("aside", { className: "w-80 flex-shrink-0 bg-black bg-opacity-50 border-r border-gray-700 flex flex-col z-20", children: [_jsx("header", { className: "p-6 text-center border-b border-gray-700", children: _jsx("h1", { className: "text-3xl font-bold font-cinzel text-amber-400", children: t.privatelife.screen.title }) }), _jsx("nav", { className: "flex-grow p-4 flex flex-col gap-4 overflow-y-auto", children: navItems.map(item => {
                                             const titleKey = item.id;
                                             const descKey = `${item.id}Desc`;
                                             return (_jsx(SidebarButton, { title: t.privatelife.screen.nav[titleKey], description: t.privatelife.screen.nav[descKey], icon: item.icon, isActive: activeTab === item.id, onClick: () => setActiveTab(item.id) }, item.id));
