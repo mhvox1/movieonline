@@ -256,7 +256,7 @@ jobs:
           sudo systemctl enable nginx || true
           sudo systemctl start nginx || true
           sudo systemctl reload nginx
-REMOTE
+          REMOTE
           }
 
           success=0
