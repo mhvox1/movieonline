@@ -1275,7 +1275,19 @@ const AppContent: React.FC = () => {
 
     // ... (rest of start game logic remains unchanged)
     // No changes needed here as default deal data is created at runtime
-    const gameStartDate = calculateCurrentRealtimeGameDate();
+    let gameStartDate = calculateCurrentRealtimeGameDate();
+    try {
+      const serverTime = await apiRequest('/server-time', { method: 'GET' }, '');
+      const serverIngameDateIso = String(serverTime?.ingameDateIso || '').trim();
+      if (serverIngameDateIso) {
+        const parsedServerDate = new Date(serverIngameDateIso);
+        if (!Number.isNaN(parsedServerDate.getTime())) {
+          gameStartDate = parsedServerDate;
+        }
+      }
+    } catch {
+      // Fallback to local realtime model when server-time is temporarily unavailable.
+    }
     const nextEventDate = new Date(gameStartDate);
     
     // Check for Test Mode to trigger early event

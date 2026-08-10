@@ -1106,9 +1106,7 @@ function collectOverviewForAdmin() {
 }
 
 function createResetStartDate(now = new Date()) {
-  const resetStart = new Date(now);
-  resetStart.setFullYear(1990);
-  return resetStart;
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
 }
 
 function getLatestResetStartDateIso() {
@@ -1126,14 +1124,14 @@ function getLatestResetStartDateIso() {
   return parsed.toISOString();
 }
 
-function applyResetStartDateToState(state, resetStartDateIso) {
-  if (!state || typeof state !== 'object' || Array.isArray(state) || !resetStartDateIso) {
+function applyCalculatedIngameDateToState(state, ingameDateIso) {
+  if (!state || typeof state !== 'object' || Array.isArray(state) || !ingameDateIso) {
     return state;
   }
 
   return {
     ...state,
-    gameDate: resetStartDateIso,
+    gameDate: ingameDateIso,
   };
 }
 
@@ -2287,11 +2285,9 @@ function createServer() {
           }
 
           const now = new Date();
-          const resetStartDateIso = getLatestResetStartDateIso();
-          const resetStartDate = resetStartDateIso ? new Date(resetStartDateIso) : null;
-          const ingameDate = resetStartDate || getCurrentIngameDate(now);
+          const ingameDate = getCurrentIngameDate(now);
           const initialStateRaw = body.initialState || { capital: 500000 };
-          const initialState = applyResetStartDateToState(initialStateRaw, resetStartDateIso);
+          const initialState = applyCalculatedIngameDateToState(initialStateRaw, ingameDate.toISOString());
           const validationErrors = validateStudioState(initialState);
           if (validationErrors.length > 0) {
             sendJson(res, 400, { error: 'Invalid initial state', details: validationErrors });
