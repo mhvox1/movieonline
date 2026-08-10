@@ -40,13 +40,57 @@ jobs:
             package-lock.json \
             ecosystem.config.cjs
 
+      - name: Detect reachable SSH port
+        id: ssh_port
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          set -e
+
+          if [ -z "$VPS_HOST" ]; then
+            echo "VPS_HOST secret is missing" >&2
+            exit 1
+          fi
+
+          CANDIDATES="${VPS_PORT},22"
+          SELECTED=""
+
+          IFS=',' read -ra PORTS <<< "$CANDIDATES"
+          for RAW_PORT in "${PORTS[@]}"; do
+            PORT="$(echo "$RAW_PORT" | xargs)"
+            if [ -z "$PORT" ]; then
+              continue
+            fi
+
+            if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+              echo "Skipping non-numeric SSH port candidate: $PORT"
+              continue
+            fi
+
+            echo "Checking TCP reachability for $VPS_HOST:$PORT"
+            if timeout 8 bash -lc "</dev/tcp/$VPS_HOST/$PORT" 2>/dev/null; then
+              SELECTED="$PORT"
+              echo "Reachable SSH port found: $PORT"
+              break
+            fi
+          done
+
+          if [ -z "$SELECTED" ]; then
+            echo "No reachable SSH port found for host $VPS_HOST (checked: $CANDIDATES)." >&2
+            echo "Please verify VPS_PORT secret and Hostinger firewall/UFW rules for GitHub Actions runner access." >&2
+            exit 1
+          fi
+
+          echo "port=$SELECTED" >> "$GITHUB_OUTPUT"
+
       - name: Copy archive to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          port: ${{ steps.ssh_port.outputs.port }}
           timeout: 120s
           command_timeout: 10m
           debug: true
@@ -59,7 +103,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          port: ${{ steps.ssh_port.outputs.port }}
           timeout: 120s
           command_timeout: 15m
           debug: true
