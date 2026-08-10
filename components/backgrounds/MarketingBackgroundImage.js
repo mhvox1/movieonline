@@ -1,1 +1,1 @@
-export const marketingBackgroundImage = './background/Vermarktung.png';
+export const marketingBackgroundImage = 'https://www.schnoxcore.com/media/background/Vermarktung.png';

@@ -1,1 +1,1 @@
-export const privatlebenBackgroundImage = './background/Privatleben.png';
+export const privatlebenBackgroundImage = 'https://www.schnoxcore.com/media/background/Privatleben.png';

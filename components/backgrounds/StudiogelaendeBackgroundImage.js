@@ -1,1 +1,1 @@
-export const studiogelaendeBackgroundImage = './background/Studiogelaende.png';
+export const studiogelaendeBackgroundImage = 'https://www.schnoxcore.com/media/background/Studiogelaende.png';

@@ -1,1 +1,1 @@
-export const hochzeitBackgroundImage = './background/Hochzeit.png';
+export const hochzeitBackgroundImage = 'https://www.schnoxcore.com/media/background/Hochzeit.png';

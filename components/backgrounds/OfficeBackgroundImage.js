@@ -1,1 +1,1 @@
-export const officeBackgroundImage = './background/Office.png';
+export const officeBackgroundImage = 'https://www.schnoxcore.com/media/background/Office.png';

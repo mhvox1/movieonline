@@ -1,1 +1,1 @@
-export const birthBackgroundImage = './background/Kinderzimmer.png';
+export const birthBackgroundImage = 'https://www.schnoxcore.com/media/background/Kinderzimmer.png';

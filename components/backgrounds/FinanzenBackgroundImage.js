@@ -1,1 +1,1 @@
-export const finanzenBackgroundImage = './background/Finanzen.png';
+export const finanzenBackgroundImage = 'https://www.schnoxcore.com/media/background/Finanzen.png';

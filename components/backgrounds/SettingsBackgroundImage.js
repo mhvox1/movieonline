@@ -1,1 +1,1 @@
-export const settingsBackgroundImage = './background/Option.png';
+export const settingsBackgroundImage = 'https://www.schnoxcore.com/media/background/Option.png';
