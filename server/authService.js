@@ -91,16 +91,16 @@ function validateRegisterPayload(payload) {
 }
 
 function validateLoginPayload(payload) {
-  const email = normalizeEmail(payload.email);
+  const identifier = String(payload?.identifier || payload?.username || payload?.email || '').trim();
   const password = String(payload.password || '');
   const errors = [];
-  if (!email || !email.includes('@')) {
-    errors.push('A valid email is required');
+  if (!identifier || identifier.length < 3) {
+    errors.push('A valid username or email is required');
   }
   if (!password) {
     errors.push('Password is required');
   }
-  return { errors, normalized: { email, password } };
+  return { errors, normalized: { identifier, password } };
 }
 
 module.exports = {

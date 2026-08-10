@@ -27,7 +27,7 @@ const { readWorldState, writeWorldState } = require('./worldStateStore');
 const { createListing, buyListing, getMarketOverview } = require('./marketService');
 const { DB_FILE: MARKET_DB_FILE } = require('./marketStore');
 const { scheduleFilmRelease } = require('./releaseService');
-const { listUsers, getUserById, getUserByEmail, upsertUser, removeUser, DB_FILE: USER_DB_FILE } = require('./userStore');
+const { listUsers, getUserById, getUserByEmail, getUserByUsername, upsertUser, removeUser, DB_FILE: USER_DB_FILE } = require('./userStore');
 const { createSession, getSession, removeSession, pruneExpiredSessions } = require('./sessionStore');
 const {
   hashPassword,
@@ -1574,7 +1574,11 @@ function createServer() {
           return;
         }
 
-        const user = getUserByEmail(normalized.email);
+        const identifier = String(normalized.identifier || '').trim();
+        const isEmailIdentifier = identifier.includes('@');
+        const user = isEmailIdentifier
+          ? getUserByEmail(identifier)
+          : (getUserByUsername(identifier) || getUserByEmail(identifier));
         if (!user || !verifyPassword(normalized.password, user.passwordSalt, user.passwordHash)) {
           sendJson(res, 401, { error: 'Invalid credentials' });
           return;

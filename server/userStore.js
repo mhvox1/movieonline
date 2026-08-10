@@ -48,6 +48,13 @@ function getUserByEmail(email) {
   return users.find(user => String(user.email || '').toLowerCase() === normalized) || null;
 }
 
+function getUserByUsername(username) {
+  const normalized = String(username || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const users = listUsers();
+  return users.find(user => String(user.username || '').trim().toLowerCase() === normalized) || null;
+}
+
 function upsertUser(user) {
   const db = readDb();
   db.users[String(user.id)] = user;
@@ -71,6 +78,7 @@ module.exports = {
   listUsers,
   getUserById,
   getUserByEmail,
+  getUserByUsername,
   upsertUser,
   removeUser,
 };

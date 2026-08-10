@@ -662,11 +662,11 @@ const AppContent: React.FC = () => {
     };
   }, [apiRequest, authToken, hasPlayerData, setPlayerData]);
 
-  const handleLogin = useCallback(async ({ email, password }: { email: string; password: string }) => {
+  const handleLogin = useCallback(async ({ username, password }: { username: string; password: string }) => {
     try {
       const result = await apiRequest('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier: username, password }),
       }, '');
 
       const token = String(result.token || '');

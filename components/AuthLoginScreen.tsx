@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { newGameBackgroundImage } from './backgrounds/NewGameBackgroundImage';
 
 interface AuthLoginScreenProps {
-  onLogin: (payload: { email: string; password: string }) => Promise<{ ok: boolean; error?: string }>;
+  onLogin: (payload: { username: string; password: string }) => Promise<{ ok: boolean; error?: string }>;
   onStartRegistration: () => void;
 }
 
 const AuthLoginScreen: React.FC<AuthLoginScreenProps> = ({ onLogin, onStartRegistration }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ const AuthLoginScreen: React.FC<AuthLoginScreenProps> = ({ onLogin, onStartRegis
   const handleLogin = async () => {
     setLoading(true);
     setError('');
-    const result = await onLogin({ email: email.trim(), password });
+    const result = await onLogin({ username: username.trim(), password });
     setLoading(false);
     if (!result.ok) {
       setError(result.error || 'Login fehlgeschlagen');
@@ -36,12 +36,12 @@ const AuthLoginScreen: React.FC<AuthLoginScreenProps> = ({ onLogin, onStartRegis
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">E-Mail</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Nutzername</label>
               <input
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 className="w-full bg-gray-900 border border-gray-600 rounded-md py-2 px-3 text-white focus:ring-2 focus:ring-amber-500 outline-none"
-                placeholder="name@example.com"
+                placeholder="dein Nutzername"
               />
             </div>
             <div>
