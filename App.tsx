@@ -132,6 +132,7 @@ type AuthUser = {
   username: string;
   role: string;
   studioName?: string | null;
+  profileImageData?: string | null;
   preferredSkills?: UserPreferredSkills | null;
 };
 
@@ -163,7 +164,7 @@ const calculateCurrentRealtimeGameDate = (referenceDate: Date = new Date()): Dat
 
 const AppContent: React.FC = () => {
   const { playerData, setPlayerData, masterVolume, musicVolume, isMuted, playSfx, isRightClickToMainScreenEnabled, jumpToNewsOnMessage, pauseOnMessage, isF12ReloadEnabled, language, scalingMode, activeDataPackage, customPackages } = useGame();
-  useOnlineSync(playerData);
+  const onlineSyncState = useOnlineSync(playerData);
   useDateLoop({ setPlayerData });
   const [gameState, setGameState] = useState<GameState>(GameState.MainMenu);
   const [gameSpeed, setGameSpeed] = useState<GameSpeed>(GameSpeed.NORMAL);
@@ -359,7 +360,7 @@ const AppContent: React.FC = () => {
       return;
     }
 
-    const studioId = localStorage.getItem(LOCAL_STUDIO_ID_KEY) || '';
+    const studioId = String(onlineSyncState?.studioId || localStorage.getItem(LOCAL_STUDIO_ID_KEY) || '').trim();
     if (!studioId) {
       return;
     }
@@ -683,7 +684,7 @@ const AppContent: React.FC = () => {
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [apiRequest, authToken, hasPlayerData, setPlayerData]);
+  }, [apiRequest, authToken, hasPlayerData, onlineSyncState?.studioId, setPlayerData]);
 
   const handleLogin = useCallback(async ({ username, password }: { username: string; password: string }) => {
     try {
@@ -914,6 +915,13 @@ const AppContent: React.FC = () => {
              const gender = parsedData.gender || 'männlich';
              const pool = gender === 'männlich' ? ALL_MALE_PORTRAITS : ALL_FEMALE_PORTRAITS;
              playerPortraitId = pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        const authProfileImageData = typeof authUser?.profileImageData === 'string'
+          ? authUser.profileImageData.trim()
+          : '';
+        if (authProfileImageData) {
+          playerPortraitId = authProfileImageData;
         }
 
         const hydrateProject = (proj: any): ProjectData | null => {
@@ -1235,7 +1243,7 @@ const AppContent: React.FC = () => {
     setHasInteracted(true);
     setPlayerData(hydratePlayerData(data));
     setGameState(GameState.MainScreen);
-  }, [setPlayerData, t]);
+  }, [authUser, setPlayerData, t]);
 
   const handleStartGame = useCallback(async (data: {
     username: string;
@@ -1627,13 +1635,17 @@ const AppContent: React.FC = () => {
 
         const studioName = String(authUser.studioName || '').trim() || `${authUser.username} Studios`;
         const preferredSkills = authUser.preferredSkills || null;
+        const authProfileImageData = typeof authUser.profileImageData === 'string'
+          ? authUser.profileImageData.trim()
+          : '';
+
         await handleStartGame({
           username: authUser.username,
           studioName,
           gender: 'männlich',
           birthDay: 1,
           birthMonth: 0,
-          playerPortraitId: 'm1',
+          playerPortraitId: authProfileImageData || 'm1',
           negotiationSkill: clampSkillValue(preferredSkills?.negotiationSkill, 20),
           charisma: clampSkillValue(preferredSkills?.charisma, 20),
           financialSense: clampSkillValue(preferredSkills?.financialSense, 20),
@@ -1659,6 +1671,29 @@ const AppContent: React.FC = () => {
       setGameState(GameState.MainScreen);
     }
   }, [authUser, playerData, gameState]);
+
+  useEffect(() => {
+    const authProfileImageData = typeof authUser?.profileImageData === 'string'
+      ? authUser.profileImageData.trim()
+      : '';
+
+    if (!authProfileImageData || !playerData) {
+      return;
+    }
+
+    if (playerData.playerPortraitId === authProfileImageData) {
+      return;
+    }
+
+    setPlayerData(prev => {
+      if (!prev) return prev;
+      if (prev.playerPortraitId === authProfileImageData) return prev;
+      return {
+        ...prev,
+        playerPortraitId: authProfileImageData,
+      };
+    });
+  }, [authUser, playerData, setPlayerData]);
   
   
   useEffect(() => {

@@ -5,6 +5,7 @@ import { useTranslation } from "./useTranslation";
 import { getTalentPortraitUrl } from "../components/TalentDossierModal";
 const getPlayerPortrait = (portraitId, birthDate, gameDate) => {
   if (!portraitId || !birthDate) return void 0;
+  if (portraitId.startsWith('data:')) return portraitId;
   const age = gameDate.getFullYear() - new Date(birthDate).getFullYear();
   let suffix = "k";
   if (age >= 16 && age <= 34) suffix = "j";

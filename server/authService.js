@@ -66,6 +66,7 @@ function sanitizeUserForClient(user) {
     createdAtIso: user.createdAtIso,
     lastLoginAtIso: user.lastLoginAtIso || null,
     studioName: user.studioName || null,
+    profileImageData: typeof user.profileImageData === 'string' ? user.profileImageData : null,
     importedLegacySaves: Boolean(user.importedLegacySaves),
     preferredSkills,
   };

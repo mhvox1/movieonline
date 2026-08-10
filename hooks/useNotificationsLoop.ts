@@ -20,6 +20,7 @@ interface UseNotificationsLoopProps {
 // Helper to calculate age suffix for player manually if needed
 const getPlayerPortrait = (portraitId: string | undefined, birthDate: Date | undefined, gameDate: Date) => {
     if (!portraitId || !birthDate) return undefined;
+    if (portraitId.startsWith('data:')) return portraitId;
     const age = gameDate.getFullYear() - new Date(birthDate).getFullYear();
     let suffix = 'k';
     if (age >= 16 && age <= 34) suffix = 'j';
