@@ -20,9 +20,6 @@ export const useDateLoop = ({ setPlayerData }: UseDateLoopProps) => {
   const { t, language } = useTranslation();
     const REALTIME_UPDATE_STEP_MS = 1000;
 
-        const GLOBAL_REAL_START = new Date(Date.UTC(2026, 0, 1, 0, 0, 0, 0));
-        const GLOBAL_INGAME_START = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
-
     const getDaysInMonth = (date: Date) =>
         new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
 
@@ -30,20 +27,17 @@ export const useDateLoop = ({ setPlayerData }: UseDateLoopProps) => {
         return Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / (24 * 60 * 60 * 1000));
     };
 
-        const calculateGlobalRealtimeGameDate = (referenceDate: Date = new Date()): Date => {
-            const elapsedRealMs = Math.max(0, referenceDate.getTime() - GLOBAL_REAL_START.getTime());
-            const elapsedRealDays = elapsedRealMs / (24 * 60 * 60 * 1000);
-            const fullMonthsElapsed = Math.floor(elapsedRealDays);
-            const monthFraction = elapsedRealDays - fullMonthsElapsed;
+    const calculateNextRealtimeGameDate = (currentGameDate: Date, elapsedRealMs: number): Date => {
+        const clampedElapsedMs = Math.max(0, elapsedRealMs);
+        if (clampedElapsedMs <= 0) {
+            return new Date(currentGameDate);
+        }
 
-            const current = new Date(GLOBAL_INGAME_START);
-            current.setUTCMonth(current.getUTCMonth() + fullMonthsElapsed);
-
-            const daysInCurrentMonth = getDaysInMonth(current);
-            const dayOffsetFloat = monthFraction * daysInCurrentMonth;
-            current.setTime(current.getTime() + dayOffsetFloat * 24 * 60 * 60 * 1000);
-            return current;
-        };
+        // Real-time rule: 1 real day = 1 in-game month.
+        const daysInCurrentIngameMonth = getDaysInMonth(currentGameDate);
+        const ingameMsToAdvance = clampedElapsedMs * daysInCurrentIngameMonth;
+        return new Date(currentGameDate.getTime() + ingameMsToAdvance);
+    };
 
     useEffect(() => {
     const gameTick = (timestamp: number) => {
@@ -59,7 +53,7 @@ export const useDateLoop = ({ setPlayerData }: UseDateLoopProps) => {
                     if (!currentData) return currentData;
 
                     const previousDate = new Date(currentData.gameDate);
-                    const newDate = calculateGlobalRealtimeGameDate(new Date());
+                    const newDate = calculateNextRealtimeGameDate(previousDate, REALTIME_UPDATE_STEP_MS);
 
                     const daysPassed = getUtcDayNumber(newDate) - getUtcDayNumber(previousDate);
 
