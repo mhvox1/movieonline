@@ -1725,6 +1725,17 @@ const AppContent: React.FC = () => {
   }, [onNavigate]);
 
   const renderScreen = () => {
+    const mainMenuScreen = (
+      <MainMenu
+        onNewGame={handleNewGame}
+        onLoadGame={handleLoadGame}
+        onSettings={handleSettings}
+        onEditor={handleEditor}
+        onLogout={handleLogout}
+        isAuthenticated={Boolean(authUser)}
+      />
+    );
+
     if (authLoading) {
       return (
         <div className="w-full h-full flex items-center justify-center bg-black text-white text-xl font-bold">
@@ -1743,13 +1754,13 @@ const AppContent: React.FC = () => {
       case GameState.LoadGame:
         return <LoadGameScreen onConfirmLoad={handleConfirmLoad} onBack={handleBackToMenu} />;
       case GameState.MainScreen:
-        return playerData ? <MainScreen onNavigate={onNavigate} onShowProject={handleShowProjectProgress} gameSpeed={gameSpeed} setGameSpeed={handleSetGameSpeed} systemPause={systemPause} systemResume={systemResume} onNavigateToOfficeTab={handleNavigateToOfficeTab} onNavigateToMarketingTab={handleNavigateToMarketingTab} onNavigateToFinanzenTab={handleNavigateToFinanzenTab} onNavigateToStudiogelaendeBuilding={handleNavigateToStudiogelaendeBuilding} onNavigateToProjectsView={handleNavigateToProjectsView} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <MainScreen onNavigate={onNavigate} onShowProject={handleShowProjectProgress} gameSpeed={gameSpeed} setGameSpeed={handleSetGameSpeed} systemPause={systemPause} systemResume={systemResume} onNavigateToOfficeTab={handleNavigateToOfficeTab} onNavigateToMarketingTab={handleNavigateToMarketingTab} onNavigateToFinanzenTab={handleNavigateToFinanzenTab} onNavigateToStudiogelaendeBuilding={handleNavigateToStudiogelaendeBuilding} onNavigateToProjectsView={handleNavigateToProjectsView} /> : mainMenuScreen;
       case GameState.Projects:
-        return playerData ? <NewProjectScreen_Phase1 onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} setGameState={setGameState} initialView={targetProjectsView} initialFilmTitle={targetFilmTitle} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <NewProjectScreen_Phase1 onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} setGameState={setGameState} initialView={targetProjectsView} initialFilmTitle={targetFilmTitle} /> : mainMenuScreen;
       case GameState.CompletedProject:
         const projectToShow = playerData?.completedFilms.find(f => f.workingTitle === targetFilmTitle) || playerData?.currentProject;
         
-        if (!playerData) return <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        if (!playerData) return mainMenuScreen;
         
         return projectToShow 
             ? <CompletedProjectScreen 
@@ -1761,23 +1772,23 @@ const AppContent: React.FC = () => {
             : <MainScreen onNavigate={onNavigate} onShowProject={handleShowProjectProgress} gameSpeed={gameSpeed} setGameSpeed={handleSetGameSpeed} systemPause={systemPause} systemResume={systemResume} onNavigateToOfficeTab={handleNavigateToOfficeTab} onNavigateToMarketingTab={handleNavigateToMarketingTab} onNavigateToFinanzenTab={handleNavigateToFinanzenTab} onNavigateToStudiogelaendeBuilding={handleNavigateToStudiogelaendeBuilding} onNavigateToProjectsView={handleNavigateToProjectsView} />;
 
       case GameState.Office:
-        return playerData ? <OfficeScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialTab={targetOfficeTab} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <OfficeScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialTab={targetOfficeTab} /> : mainMenuScreen;
       case GameState.Research:
-        return playerData ? <ResearchScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <ResearchScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} /> : mainMenuScreen;
       case GameState.Studiogelaende:
-        return playerData ? <StudiogelaendeScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialBuilding={targetStudiogelaendeBuilding} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <StudiogelaendeScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialBuilding={targetStudiogelaendeBuilding} /> : mainMenuScreen;
       case GameState.Finanzen:
-        return playerData ? <FinanzenScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialTab={targetFinanzenTab} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <FinanzenScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialTab={targetFinanzenTab} /> : mainMenuScreen;
       case GameState.Marketing:
-        return playerData ? <MarketingScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialTab={targetMarketingTab} initialFilmTitle={targetFilmTitle} initialDistributionTab={targetMarketingDistributionTab} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <MarketingScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} initialTab={targetMarketingTab} initialFilmTitle={targetFilmTitle} initialDistributionTab={targetMarketingDistributionTab} /> : mainMenuScreen;
       case GameState.Settings:
-        return <SettingsScreen onBack={playerData ? handleBackToMainScreen : handleBackToMenu} onQuit={authUser ? handleBackToMenu : handleLogout} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />;
+        return <SettingsScreen onBack={playerData ? handleBackToMainScreen : handleBackToMenu} onQuit={handleLogout} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />;
       case GameState.Privatleben:
-        return playerData ? <PrivatlebenScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} /> : <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return playerData ? <PrivatlebenScreen onBack={handleBackToMainScreen} gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} /> : mainMenuScreen;
       case GameState.Editor:
           return <EditorScreen onBack={handleBackToMenu} />;
       default:
-        return <MainMenu onNewGame={handleNewGame} onLoadGame={handleLoadGame} onSettings={handleSettings} onEditor={handleEditor} />;
+        return mainMenuScreen;
     }
   };
 

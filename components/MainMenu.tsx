@@ -10,6 +10,8 @@ interface MainMenuProps {
   onLoadGame: () => void;
   onSettings: () => void;
   onEditor?: () => void; // Optional editor callback
+  onLogout?: () => void;
+  isAuthenticated?: boolean;
 }
 
 // FIX: Accept onNavigate prop from App if passed down, or just assume callbacks
@@ -25,7 +27,7 @@ interface MainMenuProps {
 
 // Let's modify MainMenu to accept onEditor.
 
-const MainMenu: React.FC<MainMenuProps & { onEditor: () => void }> = ({ onNewGame, onLoadGame, onSettings, onEditor }) => {
+const MainMenu: React.FC<MainMenuProps & { onEditor: () => void }> = ({ onNewGame, onLoadGame, onSettings, onEditor, onLogout, isAuthenticated = false }) => {
   const { t } = useTranslation();
   const { betaInfo, Demo, editorEnabled } = useGame();
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
@@ -74,6 +76,15 @@ const MainMenu: React.FC<MainMenuProps & { onEditor: () => void }> = ({ onNewGam
           >
             {t.mainMenu.settings}
           </button>
+
+          {isAuthenticated && onLogout && (
+            <button
+              onClick={onLogout}
+              className="bg-slate-700 text-white font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-slate-600 hover:scale-105 transition-all duration-300 ease-in-out shadow-lg"
+            >
+              Logout
+            </button>
+          )}
           
           {editorEnabled && (
                <button
