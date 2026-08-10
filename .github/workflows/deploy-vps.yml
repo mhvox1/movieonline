@@ -170,7 +170,7 @@ jobs:
             exit 1
           fi
 
-          REMOTE_TARGET="${VPS_USER}@${VPS_HOST}:/tmp/movie-business-deploy.tgz"
+          REMOTE_TARGET="${VPS_USER}@${VPS_HOST}:movie-business-deploy.tgz"
 
           SSH_OPTS=(
             -i ~/.ssh/id_vps_deploy
@@ -224,6 +224,13 @@ jobs:
               APP_DIR="$VPS_APP_DIR" FRONTEND_DOMAIN="$VPS_FRONTEND_DOMAIN" API_DOMAIN="$VPS_API_DOMAIN" \
               'bash -s' <<'REMOTE'
           set -e
+          ARCHIVE_PATH="$HOME/movie-business-deploy.tgz"
+
+          if [ ! -f "$ARCHIVE_PATH" ]; then
+            echo "Deploy archive not found on server: $ARCHIVE_PATH" >&2
+            exit 1
+          fi
+
           sudo mkdir -p "$APP_DIR"
           sudo chown -R $USER:$USER "$APP_DIR"
           cd "$APP_DIR"
@@ -235,7 +242,8 @@ jobs:
             sudo apt-get install -y nodejs
           fi
 
-          tar -xzf /tmp/movie-business-deploy.tgz -C "$APP_DIR"
+          tar -xzf "$ARCHIVE_PATH" -C "$APP_DIR"
+          rm -f "$ARCHIVE_PATH"
 
           npm ci --omit=dev
 
