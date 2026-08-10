@@ -41,7 +41,9 @@ const {
 
 const PORT = Number(process.env.PORT || 8787);
 const VERWALTUNG_FILE = path.join(__dirname, '..', 'public', 'Verwaltung.html');
-const ADMIN_EMAIL = 'maik.springer@mein.gmx';
+const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || 'maik.springer@mein.gmx').trim().toLowerCase();
+const ADMIN_FALLBACK_EMAIL = String(process.env.ADMIN_FALLBACK_EMAIL || 'admin@moviebusiness.local').trim().toLowerCase();
+const ADMIN_BOOTSTRAP_PASSWORD = String(process.env.ADMIN_BOOTSTRAP_PASSWORD || 'admin1234');
 const MAX_JSON_BODY_BYTES = 10 * 1024 * 1024;
 
 function normalizeEmail(value) {
@@ -291,23 +293,50 @@ function sendHtml(res, statusCode, html) {
 }
 
 function ensureAdminSeed() {
-  const users = listUsers();
-  if (users.length > 0) {
-    return;
-  }
-  const passwordSaltHash = hashPassword('admin1234');
   const nowIso = new Date().toISOString();
-  upsertUser({
-    id: generateId('usr'),
-    email: 'admin@moviebusiness.local',
-    username: 'Admin',
-    studioName: 'Admin Studio',
-    role: 'admin',
-    passwordSalt: passwordSaltHash.salt,
-    passwordHash: passwordSaltHash.hash,
-    createdAtIso: nowIso,
-    lastLoginAtIso: null,
-    importedLegacySaves: false,
+  const bootstrapTargets = [
+    {
+      email: ADMIN_FALLBACK_EMAIL,
+      username: 'Admin',
+      studioName: 'Admin Studio',
+    },
+    {
+      email: ADMIN_EMAIL,
+      username: 'Primary Admin',
+      studioName: 'Movie Business HQ',
+    },
+  ];
+
+  const seen = new Set();
+  bootstrapTargets.forEach(target => {
+    const email = normalizeEmail(target.email);
+    if (!email || seen.has(email)) {
+      return;
+    }
+    seen.add(email);
+
+    const existing = getUserByEmail(email);
+    if (existing) {
+      if (existing.role !== 'admin') {
+        existing.role = 'admin';
+        upsertUser(existing);
+      }
+      return;
+    }
+
+    const passwordSaltHash = hashPassword(ADMIN_BOOTSTRAP_PASSWORD);
+    upsertUser({
+      id: generateId('usr'),
+      email,
+      username: target.username,
+      studioName: target.studioName,
+      role: 'admin',
+      passwordSalt: passwordSaltHash.salt,
+      passwordHash: passwordSaltHash.hash,
+      createdAtIso: nowIso,
+      lastLoginAtIso: null,
+      importedLegacySaves: false,
+    });
   });
 }
 
