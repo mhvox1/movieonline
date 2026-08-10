@@ -87,6 +87,77 @@ const LOCAL_STUDIO_ID_KEY = 'movie_business_online_studio_id_v1';
 const LAST_SEEN_RESET_ANCHOR_KEY = 'movie_business_last_reset_anchor_v1';
 const normalizeApiBaseUrl = (value: string): string => String(value || '').trim().replace(/\/$/, '');
 
+const safeSessionGet = (key: string): string => {
+  try {
+    return sessionStorage.getItem(key) || '';
+  } catch {
+    return '';
+  }
+};
+
+const safeSessionSet = (key: string, value: string): void => {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {
+    // Ignore storage write failures.
+  }
+};
+
+const safeSessionRemove = (key: string): void => {
+  try {
+    sessionStorage.removeItem(key);
+  } catch {
+    // Ignore storage delete failures.
+  }
+};
+
+const getStoredAuthToken = (): string => {
+  if (typeof window === 'undefined') return '';
+
+  const sessionToken = safeSessionGet(AUTH_TOKEN_KEY).trim();
+  if (sessionToken) return sessionToken;
+
+  const legacyToken = String(localStorage.getItem(AUTH_TOKEN_KEY) || '').trim();
+  if (legacyToken) {
+    safeSessionSet(AUTH_TOKEN_KEY, legacyToken);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+  }
+
+  return legacyToken;
+};
+
+const setStoredAuthToken = (token: string): void => {
+  const normalized = String(token || '').trim();
+  if (!normalized) return;
+  safeSessionSet(AUTH_TOKEN_KEY, normalized);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+};
+
+const clearStoredAuthToken = (): void => {
+  safeSessionRemove(AUTH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+};
+
+const getStoredStudioId = (): string => {
+  if (typeof window === 'undefined') return '';
+
+  const sessionStudioId = safeSessionGet(LOCAL_STUDIO_ID_KEY).trim();
+  if (sessionStudioId) return sessionStudioId;
+
+  const legacyStudioId = String(localStorage.getItem(LOCAL_STUDIO_ID_KEY) || '').trim();
+  if (legacyStudioId) {
+    safeSessionSet(LOCAL_STUDIO_ID_KEY, legacyStudioId);
+    localStorage.removeItem(LOCAL_STUDIO_ID_KEY);
+  }
+
+  return legacyStudioId;
+};
+
+const clearStoredStudioId = (): void => {
+  safeSessionRemove(LOCAL_STUDIO_ID_KEY);
+  localStorage.removeItem(LOCAL_STUDIO_ID_KEY);
+};
+
 const resolveApiBaseUrl = (): string => {
   const envUrl = (import.meta as any)?.env?.VITE_ONLINE_CORE_URL;
   if (typeof envUrl === 'string' && envUrl.trim().length > 0) {
@@ -183,7 +254,7 @@ const AppContent: React.FC = () => {
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [authToken, setAuthToken] = useState<string>(() => localStorage.getItem(AUTH_TOKEN_KEY) || '');
+  const [authToken, setAuthToken] = useState<string>(() => getStoredAuthToken());
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [pendingRegistration, setPendingRegistration] = useState(false);
@@ -232,7 +303,7 @@ const AppContent: React.FC = () => {
       const result = await apiRequest('/auth/me', { method: 'GET' }, token);
       setAuthUser(result.user || null);
     } catch {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
+      clearStoredAuthToken();
       setAuthToken('');
       setAuthUser(null);
     } finally {
@@ -360,7 +431,7 @@ const AppContent: React.FC = () => {
       return;
     }
 
-    const studioId = String(onlineSyncState?.studioId || localStorage.getItem(LOCAL_STUDIO_ID_KEY) || '').trim();
+    const studioId = String(onlineSyncState?.studioId || getStoredStudioId() || '').trim();
     if (!studioId) {
       return;
     }
@@ -698,7 +769,7 @@ const AppContent: React.FC = () => {
         return { ok: false, error: 'Ungueltige Serverantwort' };
       }
 
-      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      setStoredAuthToken(token);
       setAuthToken(token);
       setAuthUser(result.user);
       setPendingRegistration(false);
@@ -715,7 +786,8 @@ const AppContent: React.FC = () => {
     } catch {
       // ignore logout errors
     }
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    clearStoredAuthToken();
+    clearStoredStudioId();
     setAuthToken('');
     setAuthUser(null);
     setPendingRegistration(false);
@@ -1288,7 +1360,7 @@ const AppContent: React.FC = () => {
           return;
         }
 
-        localStorage.setItem(AUTH_TOKEN_KEY, token);
+        setStoredAuthToken(token);
         setAuthToken(token);
         setAuthUser(registerResult.user);
         effectiveUsername = String(registerResult.user.username || effectiveUsername).trim();
@@ -1615,14 +1687,19 @@ const AppContent: React.FC = () => {
         if (serverResetAnchor && serverResetAnchor !== seenResetAnchor) {
           await persistSaveFiles([]);
           localStorage.removeItem(SAVE_KEY);
-          localStorage.removeItem(LOCAL_STUDIO_ID_KEY);
+          clearStoredStudioId();
           localStorage.setItem(LAST_SEEN_RESET_ANCHOR_KEY, serverResetAnchor);
         }
 
         const saves = await loadSaveFiles();
         if (cancelled) return;
 
-        const candidates = saves.filter(save => save.data);
+        const authUsername = String(authUser.username || '').trim().toLowerCase();
+        const candidates = saves.filter(save => {
+          if (!save.data) return false;
+          const savePlayerName = String((save.data as any)?.playerName || '').trim().toLowerCase();
+          return Boolean(savePlayerName) && savePlayerName === authUsername;
+        });
         if (candidates.length > 0) {
           candidates.sort((a, b) => {
             const aTime = Date.parse(a.timestamp || '') || 0;

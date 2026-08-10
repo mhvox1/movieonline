@@ -19,6 +19,37 @@ export interface OnlineSyncState {
 const LOCAL_STUDIO_ID_KEY = 'movie_business_online_studio_id_v1';
 const AUTH_TOKEN_KEY = 'mb_auth_token';
 
+const safeSessionGet = (key: string): string => {
+  try {
+    return sessionStorage.getItem(key) || '';
+  } catch {
+    return '';
+  }
+};
+
+const safeSessionSet = (key: string, value: string): void => {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {
+    // Ignore storage write failures.
+  }
+};
+
+const getSessionBackedValue = (key: string): string => {
+  if (typeof window === 'undefined') return '';
+
+  const sessionValue = safeSessionGet(key).trim();
+  if (sessionValue) return sessionValue;
+
+  const legacyValue = String(localStorage.getItem(key) || '').trim();
+  if (legacyValue) {
+    safeSessionSet(key, legacyValue);
+    localStorage.removeItem(key);
+  }
+
+  return legacyValue;
+};
+
 const initialState: OnlineSyncState = {
   phase: 'idle',
   studioId: null,
@@ -70,7 +101,7 @@ const getApiBaseUrl = (): string => {
 };
 
 const ensureStudioId = (playerData: PlayerData): string => {
-  const existing = localStorage.getItem(LOCAL_STUDIO_ID_KEY);
+  const existing = getSessionBackedValue(LOCAL_STUDIO_ID_KEY);
   if (existing && existing.trim().length > 0) {
     return existing;
   }
@@ -78,12 +109,13 @@ const ensureStudioId = (playerData: PlayerData): string => {
   const base = `${slugify(playerData.studioName)}-${slugify(playerData.playerName)}`;
   const randomSuffix = Math.random().toString(36).slice(2, 8);
   const generated = `${base || 'studio'}-${randomSuffix}`;
-  localStorage.setItem(LOCAL_STUDIO_ID_KEY, generated);
+  safeSessionSet(LOCAL_STUDIO_ID_KEY, generated);
+  localStorage.removeItem(LOCAL_STUDIO_ID_KEY);
   return generated;
 };
 
 const getAuthHeaders = (): Record<string, string> => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  const token = getSessionBackedValue(AUTH_TOKEN_KEY);
   if (!token) {
     return { 'Content-Type': 'application/json' };
   }
@@ -177,7 +209,8 @@ export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState =>
           const resolvedStudioId = await bootstrapStudio(apiBaseUrl, studioId, playerData);
           if (resolvedStudioId && resolvedStudioId !== studioId) {
             studioId = resolvedStudioId;
-            localStorage.setItem(LOCAL_STUDIO_ID_KEY, resolvedStudioId);
+            safeSessionSet(LOCAL_STUDIO_ID_KEY, resolvedStudioId);
+            localStorage.removeItem(LOCAL_STUDIO_ID_KEY);
           }
           bootstrapDoneRef.current = true;
         }
