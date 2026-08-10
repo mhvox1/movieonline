@@ -623,6 +623,100 @@ function collectFilmsForAdmin(studios) {
     });
 }
 
+function buildLiveGlobalChartsFallback(studios, referenceDate = new Date()) {
+  const now = referenceDate instanceof Date && !Number.isNaN(referenceDate.getTime())
+    ? referenceDate
+    : new Date();
+  const ingameDate = getCurrentIngameDate(now);
+  const fallbackMonthKey = `${ingameDate.getUTCFullYear()}-${String(ingameDate.getUTCMonth() + 1).padStart(2, '0')}`;
+  const chartEntries = [];
+
+  const pushEntry = (entry) => {
+    if (!entry || !entry.title || !entry.studioName) return;
+    const viewers = Number(entry.viewers || 0);
+    if (!Number.isFinite(viewers) || viewers <= 0) return;
+    chartEntries.push({
+      title: String(entry.title),
+      studioId: String(entry.studioId || ''),
+      studioName: String(entry.studioName || ''),
+      genre: String(entry.genre || 'Drama'),
+      chartQuality: Number(entry.chartQuality || 0),
+      viewers,
+      revenue: Number(entry.revenue || 0),
+      phase: 'cinema',
+      monthKey: fallbackMonthKey,
+      weeksInCharts: Number(entry.weeksInCharts || 0),
+      totalViewers: Number(entry.totalViewers || viewers),
+    });
+  };
+
+  studios.forEach(studio => {
+    const competitors = Array.isArray(studio.state?.competitors) ? studio.state.competitors : [];
+    competitors.forEach((competitor, competitorIndex) => {
+      const competitorFilms = Array.isArray(competitor?.completedFilms) ? competitor.completedFilms : [];
+      competitorFilms.forEach((film, filmIndex) => {
+        pushEntry({
+          title: String(film?.title || `Konkurrenzfilm ${filmIndex + 1}`),
+          studioId: String(competitor?.id || `competitor_${competitorIndex}`),
+          studioName: String(competitor?.name || film?.studioName || 'Konkurrenzstudio'),
+          genre: String(film?.genre || 'Drama'),
+          chartQuality: Number(film?.chartQuality || film?.quality || 0),
+          viewers: Number(film?.viewers || 0),
+          weeksInCharts: Number(film?.weeksInCharts || 0),
+          totalViewers: Number(film?.totalViewers || film?.viewers || 0),
+        });
+      });
+    });
+
+    const completedFilms = Array.isArray(studio.state?.completedFilms) ? studio.state.completedFilms : [];
+    completedFilms.forEach((film, index) => {
+      const cinema = film?.cinemaRelease;
+      const isCinemaActive = String(cinema?.status || '') === 'active' || String(film?.activeDeal?.currentPhase || '') === 'cinema';
+      if (!isCinemaActive || !cinema?.releaseDate) return;
+
+      const releaseDate = new Date(cinema.releaseDate);
+      if (Number.isNaN(releaseDate.getTime())) return;
+
+      const chartAppearanceDate = new Date(releaseDate);
+      chartAppearanceDate.setDate(chartAppearanceDate.getDate() + 7);
+
+      const currentGameDate = new Date(studio.state?.gameDate || Date.now());
+      currentGameDate.setHours(0, 0, 0, 0);
+      chartAppearanceDate.setHours(0, 0, 0, 0);
+      if (currentGameDate < chartAppearanceDate) return;
+
+      pushEntry({
+        title: String(film?.workingTitle || `Film ${index + 1}`),
+        studioId: String(studio.id || ''),
+        studioName: String(studio.studioName || ''),
+        genre: String(film?.genre || 'Drama'),
+        chartQuality: Number(cinema?.chartQuality || film?.finalQuality || 0),
+        viewers: Number(cinema?.viewers || 0),
+        weeksInCharts: Number(cinema?.weeksInCharts || 0),
+        totalViewers: Number(cinema?.totalViewers || cinema?.viewers || 0),
+      });
+    });
+  });
+
+  chartEntries.sort((a, b) => Number(b.viewers || 0) - Number(a.viewers || 0));
+  const topFilmsTop20 = chartEntries.slice(0, 20);
+  const topFilms = topFilmsTop20.slice(0, 10);
+  const totalViewers = topFilmsTop20.reduce((sum, entry) => sum + Number(entry.viewers || 0), 0);
+
+  return {
+    year: ingameDate.getUTCFullYear(),
+    month: ingameDate.getUTCMonth() + 1,
+    monthKey: fallbackMonthKey,
+    processedAtIso: now.toISOString(),
+    topFilms,
+    topFilmsTop20,
+    totalViewers,
+    totalRevenue: 0,
+    filmCount: chartEntries.length,
+    source: 'live_fallback',
+  };
+}
+
 function collectMarketFeedbackForAdmin(studios) {
   return studios
     .map(studio => {
@@ -2181,7 +2275,15 @@ function createServer() {
 
     if (req.method === 'GET' && url.pathname === '/world/charts/latest') {
       runWorldMarketTick(new Date());
-      sendJson(res, 200, { chart: getLatestChart() });
+      const latestChart = getLatestChart();
+      const hasTop20 = Array.isArray(latestChart?.topFilmsTop20) && latestChart.topFilmsTop20.length > 0;
+      const hasTop10 = Array.isArray(latestChart?.topFilms) && latestChart.topFilms.length > 0;
+
+      const chartPayload = (hasTop20 || hasTop10)
+        ? latestChart
+        : buildLiveGlobalChartsFallback(listStudios(), new Date());
+
+      sendJson(res, 200, { chart: chartPayload });
       return;
     }
 
