@@ -64,7 +64,7 @@ const SkillSlider: React.FC<{
 
 
 const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requiresAccountRegistration = false, currentUsername = '' }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { gameRelease } = useGame();
   
   const [studioName, setStudioName] = useState(gameRelease ? '' : 'Teststudio');
@@ -93,6 +93,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
   
   const usedPoints = useMemo(() => negotiationSkill + charisma + financialSense + filmSense + organizationTalent, [negotiationSkill, charisma, financialSense, filmSense, organizationTalent]);
   const remainingPoints = TOTAL_POINTS - usedPoints;
+  const isRegistrationMode = requiresAccountRegistration;
+  const screenTitle = isRegistrationMode
+    ? (language === 'de' ? 'Registrieren' : 'Register')
+    : t.newGame.title;
+  const confirmButtonLabel = isRegistrationMode
+    ? (language === 'de' ? 'Registrieren' : 'Register')
+    : t.newGame.start;
 
   const months = t.monthlyReport.months;
 
@@ -210,7 +217,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
     >
       <div className="w-full h-full flex items-center justify-center bg-black bg-opacity-0 p-8 overflow-y-auto">
         <div className="bg-gray-900 bg-opacity-80 backdrop-blur-sm p-8 rounded-lg shadow-2xl w-full max-w-3xl border border-gray-700 my-auto">
-          <h2 className="text-4xl font-bold text-center mb-6 font-cinzel text-amber-400">{t.newGame.title}</h2>
+          <h2 className="text-4xl font-bold text-center mb-6 font-cinzel text-amber-400">{screenTitle}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left Column: Personal Data */}
@@ -220,18 +227,6 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                     <h4 className="text-amber-300 font-bold">Account Registrierung</h4>
                     <div>
                       <label className="block text-xs font-medium text-gray-400 mb-1">Nutzername</label>
-                      {!requiresAccountRegistration && (
-                        <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">Nutzername</label>
-                          <input
-                            type="text"
-                            value={currentUsername}
-                            readOnly
-                            className="w-full bg-gray-900 border border-gray-600 rounded-md py-2 px-3 text-gray-300"
-                          />
-                        </div>
-                      )}
-
                       <input
                         type="text"
                         value={registerUsername}
@@ -274,7 +269,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                             gender === 'männlich' ? 'bg-amber-500 text-gray-900 ring-2 ring-amber-300' : 'bg-gray-700 text-white hover:bg-gray-600'
                         }`}
                         >
-                        �"
+                      <span aria-hidden="true">♂</span>
+                      <span className="ml-2 text-base align-middle">{t.newGame.male}</span>
                         </button>
                         <button
                         onClick={() => setGender('weiblich')}
@@ -282,7 +278,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                             gender === 'weiblich' ? 'bg-amber-500 text-gray-900 ring-2 ring-amber-300' : 'bg-gray-700 text-white hover:bg-gray-600'
                         }`}
                         >
-                        �"�
+                      <span aria-hidden="true">♀</span>
+                      <span className="ml-2 text-base align-middle">{t.newGame.female}</span>
                         </button>
                     </div>
                 </div>
@@ -413,7 +410,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ onStart, onBack, requires
                 disabled={remainingPoints !== 0}
                 className="w-full bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-sm text-lg uppercase tracking-wider transform hover:bg-amber-400 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/20 disabled:bg-gray-500 disabled:shadow-none disabled:cursor-not-allowed"
               >
-                {t.newGame.start}
+                {confirmButtonLabel}
               </button>
           </div>
         </div>
