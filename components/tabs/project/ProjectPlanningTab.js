@@ -287,7 +287,7 @@ const ProjectPlanningTab = ({ setGameState, setCurrentView, planningMode, onBack
           salary: 0,
           experience: 0,
           satisfaction: 100,
-          portraitUrl: child.portraitId ? `./kinder/${child.portraitId}.png` : void 0
+          portraitUrl: child.portraitId ? `https://www.schnoxcore.com/media/kinder/${child.portraitId}.png` : void 0
         });
       }
     });

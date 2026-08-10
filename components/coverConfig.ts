@@ -2,7 +2,7 @@
 import { Genre } from '../types';
 
 export const getCoverPath = (genre: Genre, id: number): string => {
-  return `./poster/${genre}/${id}.png`;
+  return `https://www.schnoxcore.com/media/poster/${genre}/${id}.png`;
 };
 
 // Assuming there are at least 30 posters per genre available

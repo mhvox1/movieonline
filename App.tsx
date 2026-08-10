@@ -1880,7 +1880,7 @@ const AppContent: React.FC = () => {
         }}
         className="shadow-2xl bg-black"
       >
-        <audio ref={audioRef} src="./music/background.mp3" loop preload="auto" />
+        <audio ref={audioRef} src="https://www.schnoxcore.com/media/music/background.mp3" loop preload="auto" />
 
         {/* Render Scratchpad ABOVE everything */}
         {playerData && playerData.isScratchpadOpen && <Scratchpad />}

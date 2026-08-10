@@ -168,7 +168,7 @@ export const GameProvider = ({ children }) => {
         if (isMuted || effectsVolume === 0 || masterVolume === 0)
             return;
         // Erstellt ein neues Audio-Element für jeden Klick, um Überlappung zu ermöglichen
-        const audio = new Audio(`./sfx/${soundName}.wav`);
+        const audio = new Audio(`https://www.schnoxcore.com/media/sfx/${soundName}.wav`);
         audio.volume = (effectsVolume / 10) * (masterVolume / 10);
         audio.play().catch(error => console.error("SFX play error:", error));
     };

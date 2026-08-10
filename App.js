@@ -1035,7 +1035,7 @@ const AppContent = () => {
                 transform: `translate(-50%, -50%) scale(${scale.x}, ${scale.y})`,
                 transformOrigin: 'center center',
                 overflow: 'hidden'
-            }, className: "shadow-2xl bg-black", children: [_jsx("audio", { ref: audioRef, src: "./music/background.mp3", loop: true, preload: "auto" }), playerData && _jsx(TutorialOverlay, { gameState: gameState }), playerData && playerData.isScratchpadOpen && _jsx(Scratchpad, {}), _jsx(ScreenTransition, { childKey: gameState, children: renderScreen() })] }) }));
+            }, className: "shadow-2xl bg-black", children: [_jsx("audio", { ref: audioRef, src: "https://www.schnoxcore.com/media/music/background.mp3", loop: true, preload: "auto" }), playerData && _jsx(TutorialOverlay, { gameState: gameState }), playerData && playerData.isScratchpadOpen && _jsx(Scratchpad, {}), _jsx(ScreenTransition, { childKey: gameState, children: renderScreen() })] }) }));
 };
 const App = () => {
     return (_jsx(GameProvider, { children: _jsx(AppContent, {}) }));

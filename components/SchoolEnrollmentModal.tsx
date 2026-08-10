@@ -86,11 +86,11 @@ const getChildPortraitUrl = (portraitId: string | undefined, age: number): strin
     
     // Baby Stage (ID starts with 'b')
     if (portraitId.startsWith('b') && !portraitId.startsWith('baby_')) { 
-        return `./kinder/babys/${portraitId}.png`;
+        return `https://www.schnoxcore.com/media/kinder/babys/${portraitId}.png`;
     }
     // Toddler Stage (ID starts with '1j')
     if (portraitId.startsWith('1j')) {
-        return `./kinder/1jahr/${portraitId}.png`;
+        return `https://www.schnoxcore.com/media/kinder/1jahr/${portraitId}.png`;
     }
     
     let suffix = 'k';

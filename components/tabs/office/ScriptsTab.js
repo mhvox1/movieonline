@@ -54,7 +54,7 @@ const ScriptsTab = () => {
                     salary: 0,
                     experience: 0,
                     satisfaction: 100,
-                    portraitUrl: child.portraitId ? `./kinder/${child.portraitId}.png` : undefined
+                    portraitUrl: child.portraitId ? `https://www.schnoxcore.com/media/kinder/${child.portraitId}.png` : undefined
                 });
             }
         });

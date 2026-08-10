@@ -117,7 +117,7 @@ const BirthModal: React.FC<BirthModalProps> = ({ data, onClose }) => {
         {portraitId && (
             <div className="w-48 h-48 bg-gray-700 rounded-full border-4 border-amber-400 overflow-hidden mb-4 shadow-lg flex-shrink-0">
                 <img 
-                    src={`./kinder/babys/${portraitId}.png`} 
+                    src={`https://www.schnoxcore.com/media/kinder/babys/${portraitId}.png`} 
                     alt="Baby" 
                     className="w-full h-full object-cover" 
                 />

@@ -202,7 +202,7 @@ const LuxuryModal: React.FC<LuxuryModalProps> = ({ good, onClose, onBuy, playerD
     const isOwned = playerData.ownedLuxuryGoods.includes(good.id);
     const canAfford = playerData.privateCapital >= good.cost;
 
-    const backgroundUrl = LUXURY_IMAGES[good.id] || './images/luxury_placeholder.png'; // Fallback
+    const backgroundUrl = LUXURY_IMAGES[good.id] || 'https://www.schnoxcore.com/media/images/luxury_placeholder.png'; // Fallback
     const formatCurrency = (value: number) => new Intl.NumberFormat(t.common.locale, { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value);
 
     const currentIndex = allGoods.findIndex(g => g.id === good.id);
@@ -513,7 +513,7 @@ export const AssetsTab: React.FC = () => {
                                             >
                                                 <div className="w-24 h-16 mr-4 rounded overflow-hidden flex-shrink-0 relative bg-black/40">
                                                     <img 
-                                                        src={LUXURY_IMAGES[good.id] || './images/luxury_placeholder.png'} 
+                                                        src={LUXURY_IMAGES[good.id] || 'https://www.schnoxcore.com/media/images/luxury_placeholder.png'} 
                                                         className="w-full h-full object-cover" 
                                                         alt={transName} 
                                                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Luxus'; }}

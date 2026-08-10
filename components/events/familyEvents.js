@@ -19,10 +19,10 @@ const getPrivatePortraitUrl = (baseId, birthDate, gameDate) => {
     }
     // Special logic for baby/toddler IDs
     if (baseId.startsWith('b') && !baseId.startsWith('baby_')) {
-        return `./kinder/babys/${baseId}.png`;
+        return `https://www.schnoxcore.com/media/kinder/babys/${baseId}.png`;
     }
     if (baseId.startsWith('1j')) {
-        return `./kinder/1jahr/${baseId}.png`;
+        return `https://www.schnoxcore.com/media/kinder/1jahr/${baseId}.png`;
     }
     let ageSuffix;
     if (age <= 15) {
