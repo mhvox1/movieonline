@@ -155,6 +155,13 @@ const clampSkillValue = (value, fallback = 20) => {
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(0, Math.min(100, Math.round(parsed)));
 };
+const normalizeEmployeePortraitUrl = (value) => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (raw.startsWith("data:image")) return raw;
+  const filename = raw.split("/").pop() || raw;
+  return `/portrait/${filename}`;
+};
 const getDaysInMonth = (date) => {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
 };
@@ -894,6 +901,7 @@ const AppContent = () => {
         return {
           ...emp,
           satisfaction: emp.satisfaction ?? 80,
+          portraitUrl: normalizeEmployeePortraitUrl(emp.portraitUrl),
           activeTraining,
           lastTrainingDate,
           lastPraised: emp.lastPraised ? new Date(emp.lastPraised) : void 0

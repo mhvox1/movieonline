@@ -18,8 +18,12 @@ export const getTalentPortraitUrl = (talent, gameDate) => {
     if (talent.portraitUrl.startsWith('data:image')) {
         return talent.portraitUrl;
     }
+    const portraitBaseId = String(talent.portraitUrl || '').trim().split('/').pop()?.replace(/\.(png|jpg|jpeg|webp)$/i, '') || '';
+    if (!portraitBaseId) {
+        return '';
+    }
     if (!talent.birthDate) {
-        return `https://www.schnoxcore.com/media/portraits/${talent.portraitUrl}m.png`; // Fallback default age
+        return `/portrait/${portraitBaseId}m.png`; // Fallback default age
     }
     const birthDate = new Date(talent.birthDate);
     let age = gameDate.getFullYear() - birthDate.getFullYear();
@@ -40,8 +44,8 @@ export const getTalentPortraitUrl = (talent, gameDate) => {
     else { // age >= 60
         ageSuffix = 'a';
     }
-    const baseId = talent.portraitUrl;
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    const baseId = portraitBaseId;
+    return `/portrait/${baseId}${ageSuffix}.png`;
 };
 // Deterministic shuffle logic for Fog of War
 const seededRandom = (seed) => {

@@ -5,6 +5,15 @@ import { EMPLOYEE_MALE_PORTRAITS, EMPLOYEE_FEMALE_PORTRAITS } from './portraits'
 
 const pickRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
+const toLocalEmployeePortraitUrl = (value: string): string => {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    if (raw.startsWith('data:image')) return raw;
+
+    const filename = raw.split('/').pop() || raw;
+    return `/portrait/${filename}`;
+};
+
 const shuffleArray = <T>(array: T[]): T[] => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -17,16 +26,15 @@ const shuffleArray = <T>(array: T[]): T[] => {
 // Helper to get a unique portrait that isn't in the used set
 const getUniquePortrait = (gender: 'male' | 'female', usedPortraits: Set<string>): string => {
     const pool = gender === 'male' ? EMPLOYEE_MALE_PORTRAITS : EMPLOYEE_FEMALE_PORTRAITS;
-    // Filter out portraits that are already used (by checking if the ID exists in the set)
+    // Filter out portraits that are already used (by checking local normalized path)
     const available = pool.filter(id => {
-        // Construct the full path to check against usedPortraits which stores full paths
-        const fullPath = `https://www.schnoxcore.com/media/portraits/${id}.png`;
-        return !usedPortraits.has(fullPath);
+        const localPath = `/portrait/${id}.png`;
+        return !usedPortraits.has(localPath);
     });
     
     // Fallback if all 100 are taken (unlikely but safe) -> pick any random
     const selectedId = available.length > 0 ? pickRandom(available) : pickRandom(pool);
-    return `https://www.schnoxcore.com/media/portraits/${selectedId}.png`;
+    return `/portrait/${selectedId}.png`;
 };
 
 // Modified signature to accept usedPortraits set
@@ -93,7 +101,7 @@ export const generateEmployeeMarket = (hiredIds: number[], reputation: number, a
     // Collect currently used portraits from ALL employees (hired + market so far)
     const usedPortraits = new Set<string>();
     allEmployees.forEach(e => {
-        if (e.portraitUrl) usedPortraits.add(e.portraitUrl);
+        if (e.portraitUrl) usedPortraits.add(toLocalEmployeePortraitUrl(e.portraitUrl));
     });
 
     for (const type of Object.values(EmployeeType)) {
@@ -118,7 +126,7 @@ export const refreshEmployeeMarket = (hiredEmployees: Employee[], reputation: nu
     // Since we wipe the market, we don't care about old market portraits
     const usedPortraits = new Set<string>();
     hiredEmployees.forEach(e => {
-        if (e.portraitUrl) usedPortraits.add(e.portraitUrl);
+        if (e.portraitUrl) usedPortraits.add(toLocalEmployeePortraitUrl(e.portraitUrl));
     });
 
     // Generate fresh employees for every type

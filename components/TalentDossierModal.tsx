@@ -28,9 +28,14 @@ export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): 
     if (talent.portraitUrl.startsWith('data:image')) {
         return talent.portraitUrl;
     }
+
+    const portraitBaseId = String(talent.portraitUrl || '').trim().split('/').pop()?.replace(/\.(png|jpg|jpeg|webp)$/i, '') || '';
+    if (!portraitBaseId) {
+        return '';
+    }
     
     if (!talent.birthDate) {
-         return `https://www.schnoxcore.com/media/portraits/${talent.portraitUrl}m.png`; // Fallback default age
+         return `/portrait/${portraitBaseId}m.png`; // Fallback default age
     }
     
     const birthDate = new Date(talent.birthDate);
@@ -51,9 +56,9 @@ export const getTalentPortraitUrl = (talent: Director | Actor, gameDate: Date): 
         ageSuffix = 'a';
     }
     
-    const baseId = talent.portraitUrl;
+    const baseId = portraitBaseId;
     
-    return `https://www.schnoxcore.com/media/portraits/${baseId}${ageSuffix}.png`;
+    return `/portrait/${baseId}${ageSuffix}.png`;
 };
 
 interface TalentDossierModalProps {
