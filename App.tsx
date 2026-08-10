@@ -240,6 +240,50 @@ const calculateCurrentRealtimeGameDate = (referenceDate: Date = new Date()): Dat
   return current;
 };
 
+class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, message: '' };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return {
+      hasError: true,
+      message: error?.message || 'Unbekannter Fehler',
+    };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('UI runtime error:', error, info);
+  }
+
+  handleReload = () => {
+    window.location.reload();
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-black text-white p-8">
+          <div className="max-w-xl w-full bg-gray-900/90 border border-red-700 rounded-lg p-6 text-center">
+            <h2 className="text-2xl font-cinzel text-red-400 mb-3">Ein Fehler ist aufgetreten</h2>
+            <p className="text-sm text-gray-200 mb-2">Die UI wurde gestoppt, um einen Blackscreen zu verhindern.</p>
+            <p className="text-xs text-red-300 break-words mb-5">{this.state.message}</p>
+            <button
+              onClick={this.handleReload}
+              className="bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-2 px-5 rounded-sm uppercase text-sm"
+            >
+              Neu laden
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const AppContent: React.FC = () => {
   const { playerData, setPlayerData, masterVolume, musicVolume, isMuted, playSfx, isRightClickToMainScreenEnabled, jumpToNewsOnMessage, pauseOnMessage, isF12ReloadEnabled, language, scalingMode, activeDataPackage, customPackages } = useGame();
   const [authToken, setAuthToken] = useState<string>(() => getStoredAuthToken());
@@ -2025,9 +2069,11 @@ const AppContent: React.FC = () => {
         {/* Render Scratchpad ABOVE everything */}
         {playerData && playerData.isScratchpadOpen && <Scratchpad />}
         
-        <ScreenTransition childKey={gameState}>
-          {renderScreen()}
-        </ScreenTransition>
+        <AppErrorBoundary>
+          <ScreenTransition childKey={gameState}>
+            {renderScreen()}
+          </ScreenTransition>
+        </AppErrorBoundary>
       </div>
     </div>
   );
