@@ -90,6 +90,22 @@ jobs:
               sudo apt-get install -y nginx
             fi
 
+            FRONTEND_DOMAIN="${{ secrets.VPS_FRONTEND_DOMAIN }}"
+            if [ -n "$FRONTEND_DOMAIN" ]; then
+              sudo printf '%s\n' \
+                "server {" \
+                "  listen 80;" \
+                "  server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN};" \
+                "  root ${APP_DIR}/dist;" \
+                "  index index.html;" \
+                "" \
+                "  location / {" \
+                "    try_files \$uri \$uri/ /index.html;" \
+                "  }" \
+                "}" | sudo tee /etc/nginx/sites-available/movie-business-frontend >/dev/null
+              sudo ln -sf /etc/nginx/sites-available/movie-business-frontend /etc/nginx/sites-enabled/movie-business-frontend
+            fi
+
             API_DOMAIN="${{ secrets.VPS_API_DOMAIN }}"
             if [ -n "$API_DOMAIN" ]; then
               sudo printf '%s\n' \
@@ -108,6 +124,8 @@ jobs:
                 "}" | sudo tee /etc/nginx/sites-available/movie-business-api >/dev/null
               sudo ln -sf /etc/nginx/sites-available/movie-business-api /etc/nginx/sites-enabled/movie-business-api
             fi
+
+            sudo rm -f /etc/nginx/sites-enabled/default
 
             pm2 startOrReload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs --update-env
             pm2 save
