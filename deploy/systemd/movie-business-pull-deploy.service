@@ -1,0 +1,14 @@
+[Unit]
+Description=Movie Business pull deploy from GitHub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/www/movie-business
+EnvironmentFile=-/etc/default/movie-business-pull
+ExecStart=/var/www/movie-business/scripts/vps-pull-deploy.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target

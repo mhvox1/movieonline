@@ -142,3 +142,46 @@ Option B (manuell)
 
 - SSH Private Key niemals in Chat posten.
 - Secret-Werte nur in GitHub Secrets oder lokal im Terminal eingeben.
+
+10) Alternative ohne GitHub-SSH-Zugriff: Pull-Deploy auf dem VPS
+
+Wenn GitHub Actions den VPS per SSH nicht erreicht (Timeout), kann der VPS das Repo selbst pollen und deployen.
+
+10.1 Einmalig auf dem VPS vorbereiten
+- Repo liegt in:
+  /var/www/movie-business
+- Falls noch nicht vorhanden:
+  sudo mkdir -p /var/www/movie-business
+  sudo chown -R $USER:$USER /var/www/movie-business
+  git clone https://github.com/mhvox1/movieonline.git /var/www/movie-business
+
+10.2 Pull-Deploy-Skripte aktivieren
+- Auf dem VPS:
+  cd /var/www/movie-business
+  chmod +x scripts/vps-pull-deploy.sh
+  chmod +x scripts/install-pull-deploy-timer.sh
+  ./scripts/install-pull-deploy-timer.sh
+
+10.3 Domain-Umgebung setzen
+- Datei bearbeiten:
+  sudo nano /etc/default/movie-business-pull
+- Werte setzen:
+  FRONTEND_DOMAIN=moviebusiness.online
+  API_DOMAIN=api.moviebusiness.online
+  BRANCH=main
+
+10.4 Timer neu laden
+- Auf dem VPS:
+  sudo systemctl daemon-reload
+  sudo systemctl restart movie-business-pull-deploy.timer
+  sudo systemctl start movie-business-pull-deploy.service
+
+10.5 Status/Logs pruefen
+- Timer:
+  systemctl status movie-business-pull-deploy.timer
+- Letzte Deploy-Logs:
+  journalctl -u movie-business-pull-deploy.service -n 200 --no-pager
+
+Hinweis
+- Mit dieser Methode braucht GitHub Actions keinen eingehenden SSH-Zugriff auf deinen VPS.
+- Der VPS holt alle 2 Minuten selbst den neuesten Stand von main und deployed ihn.
