@@ -76,10 +76,29 @@ jobs:
           echo "host=$RAW_HOST" >> "$GITHUB_OUTPUT"
           echo "base_port=$BASE_PORT" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve SSH connect host (prefer IPv4)
+        id: ssh_connect_host
+        env:
+          VPS_HOST: ${{ steps.ssh_target.outputs.host }}
+        run: |
+          set -e
+
+          CONNECT_HOST="$VPS_HOST"
+          IPV4_ADDR="$(getent ahostsv4 "$VPS_HOST" | awk '{print $1}' | head -n 1 || true)"
+
+          if [ -n "$IPV4_ADDR" ]; then
+            CONNECT_HOST="$IPV4_ADDR"
+            echo "Using resolved IPv4 address for SSH/SCP connectivity."
+          else
+            echo "No IPv4 address resolved; using host as provided."
+          fi
+
+          echo "connect_host=$CONNECT_HOST" >> "$GITHUB_OUTPUT"
+
       - name: Detect reachable SSH port
         id: ssh_port
         env:
-          VPS_HOST: ${{ steps.ssh_target.outputs.host }}
+          VPS_HOST: ${{ steps.ssh_connect_host.outputs.connect_host }}
           BASE_PORT: ${{ steps.ssh_target.outputs.base_port }}
         run: |
           set +e
@@ -100,7 +119,7 @@ jobs:
             fi
 
             echo "Checking TCP reachability for $VPS_HOST:$PORT"
-            if nc -z -w 5 "$VPS_HOST" "$PORT" >/dev/null 2>&1 || timeout 8 bash -lc "</dev/tcp/$VPS_HOST/$PORT" 2>/dev/null; then
+            if nc -4 -z -w 5 "$VPS_HOST" "$PORT" >/dev/null 2>&1 || timeout 8 bash -lc "</dev/tcp/$VPS_HOST/$PORT" 2>/dev/null; then
               SELECTED="$PORT"
               echo "Reachable SSH port found: $PORT"
               break
@@ -117,7 +136,8 @@ jobs:
 
       - name: Show resolved SSH target
         run: |
-          echo "Resolved SSH host: ${{ steps.ssh_target.outputs.host }}"
+          echo "Resolved SSH host (raw): ${{ steps.ssh_target.outputs.host }}"
+          echo "Resolved SSH connect host: ${{ steps.ssh_connect_host.outputs.connect_host }}"
           echo "Resolved SSH port: ${{ steps.ssh_port.outputs.port }}"
 
       - name: Prepare SSH key
@@ -132,7 +152,7 @@ jobs:
 
       - name: Copy archive to VPS (with retries)
         env:
-          VPS_HOST: ${{ steps.ssh_target.outputs.host }}
+          VPS_HOST: ${{ steps.ssh_connect_host.outputs.connect_host }}
           VPS_PORT: ${{ steps.ssh_port.outputs.port }}
           VPS_USER: ${{ secrets.VPS_USER }}
         run: |
@@ -173,6 +193,7 @@ jobs:
           REMOTE_TARGET="${VPS_USER}@${VPS_HOST}:movie-business-deploy.tgz"
 
           SSH_OPTS=(
+            -4
             -i ~/.ssh/id_vps_deploy
             -P "$VPS_PORT"
             -o StrictHostKeyChecking=no
@@ -200,7 +221,7 @@ jobs:
 
       - name: Deploy on VPS (with retries)
         env:
-          VPS_HOST: ${{ steps.ssh_target.outputs.host }}
+          VPS_HOST: ${{ steps.ssh_connect_host.outputs.connect_host }}
           VPS_PORT: ${{ steps.ssh_port.outputs.port }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
@@ -210,6 +231,7 @@ jobs:
           set -euo pipefail
 
           SSH_OPTS=(
+            -4
             -i ~/.ssh/id_vps_deploy
             -p "$VPS_PORT"
             -o StrictHostKeyChecking=no
