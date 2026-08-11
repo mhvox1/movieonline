@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ScreenTransitionProps {
   children: React.ReactNode;
@@ -10,32 +10,43 @@ const ScreenTransition: React.FC<ScreenTransitionProps> = ({ children, childKey 
   const [displayKey, setDisplayKey] = useState(childKey);
   const [isFading, setIsFading] = useState(true);
 
+  // Always keep a ref to the latest children so the fade timer can
+  // pick them up without being in the dependency array (which would
+  // restart the timer on every game-loop re-render → black screen).
+  const latestChildrenRef = useRef(children);
+  latestChildrenRef.current = children;
+
   // Effect for initial page load fade-in
   useEffect(() => {
-    const timer = setTimeout(() => setIsFading(false), 50); // Small delay to ensure initial styles are applied
+    const timer = setTimeout(() => setIsFading(false), 50);
     return () => clearTimeout(timer);
   }, []);
 
-  // Effect for screen changes and prop updates
+  // Effect for screen KEY changes only (fade transition).
+  // Intentionally does NOT include `children` in the dependency array so
+  // that rapid game-loop re-renders don't restart the 300 ms timer and
+  // keep the screen stuck at opacity-0 (black screen).
   useEffect(() => {
-    // If the key for the new children is different from the key of what's currently displayed
     if (displayKey !== childKey) {
-      setIsFading(true); // Start fading out
+      setIsFading(true);
       const timer = setTimeout(() => {
-        // After fading out, update the child and key, then fade in
         setDisplayKey(childKey);
-        setDisplayChild(children);
+        setDisplayChild(latestChildrenRef.current);
         setIsFading(false);
-      }, 300); // This duration must match the CSS fade-out time
-
+      }, 300);
       return () => clearTimeout(timer);
-    } else {
-      // If the key is the same, the screen component might have received new props.
-      // Update the displayed child directly without a transition to reflect the new state.
-      // This fixes the issue of the date not updating on the MainScreen.
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [childKey, displayKey]);
+
+  // Separate effect: live prop updates for the SAME screen (no transition).
+  // This keeps the displayed content (e.g. game date, capital) current while
+  // we are already showing that screen.
+  useEffect(() => {
+    if (displayKey === childKey) {
       setDisplayChild(children);
     }
-  }, [childKey, children]);
+  }, [children, childKey, displayKey]);
 
   return (
     <div className={`w-full h-full transition-opacity duration-300 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
