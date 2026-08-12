@@ -42,6 +42,17 @@ const GameHeader = ({ gameSpeed, setGameSpeed, disabled, onNavigateToOfficeTab, 
     const { playerData, setPlayerData } = useGame();
     const { t, language } = useTranslation();
     const locale = language === 'de' ? 'de-DE' : 'en-US';
+    const currentGameDate = playerData ? new Date(playerData.gameDate) : null;
+    const currentGameTimeLabel = currentGameDate
+        ? currentGameDate.toLocaleString(locale, {
+            weekday: 'short',
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        })
+        : '';
     const isTestMode = playerData && playerData.playerName === 'Max Mustermann' && playerData.studioName === 'Teststudio';
     const weeklyCalendarData = useMemo(() => {
         if (!playerData)
@@ -132,7 +143,7 @@ const GameHeader = ({ gameSpeed, setGameSpeed, disabled, onNavigateToOfficeTab, 
                         : 'bg-gray-800 text-amber-400 border-gray-600 hover:bg-gray-700 hover:border-amber-300'}`, title: "Notizen", children: _jsx(NoteIcon, { className: "w-10 h-10" }) }) }), _jsx("div", { className: "flex-grow flex items-center justify-center", children: _jsxs("div", { className: "w-full max-w-6xl grid grid-cols-7 gap-2", children: weeklyCalendarData.map((dayData, index) => {
                         const isToday = index === 0;
                         return (_jsxs("div", { className: `flex flex-col rounded-md p-1.5 h-[75px] transition-colors duration-300 ${isToday ? 'bg-gray-700/80 border border-amber-500' : 'bg-gray-800/60'}`, children: [_jsxs("div", { className: "flex justify-between items-baseline text-xs", children: [_jsx("span", { className: `font-bold ${isToday ? 'text-amber-300' : 'text-gray-400'}`, children: daysOfWeek[index] }), _jsx("span", { className: `font-semibold ${isToday ? 'text-white' : 'text-gray-300'}`, children: dayData.date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }) })] }), _jsx("div", { className: "flex-grow mt-1 space-y-1 overflow-y-auto text-[10px] pr-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent", children: dayData.events.map((event, eventIndex) => (_jsx("div", { className: `px-1 py-0.5 rounded-sm truncate font-semibold ${getEventStyle(event.type)}`, title: event.title, children: event.title }, eventIndex))) })] }, index));
-                        }) }) }), _jsxs("div", { className: "flex-shrink-0 w-auto flex flex-col justify-between items-end mr-[30px]", children: [hasPendingDecision && (_jsx("div", { className: "mb-1 text-right", children: _jsx("span", { className: "text-red-300 text-xs font-bold uppercase tracking-widest", children: t.header.decisionRequired }) }))] })] }));
+                        }) }) }), _jsxs("div", { className: "flex-shrink-0 w-auto flex flex-col justify-between items-end mr-[30px]", children: [_jsx("div", { className: "w-full flex justify-end mb-1", children: _jsxs("div", { className: "rounded-md border border-gray-600 bg-gray-900/70 px-3 py-1.5 text-right shadow-md backdrop-blur-sm", children: [_jsx("p", { className: "text-[10px] uppercase tracking-[0.2em] text-gray-400", children: language === 'de' ? 'Uhrzeit' : 'Time' }), _jsx("p", { className: "text-sm font-semibold text-amber-300 leading-tight", children: currentGameTimeLabel })] }) }), hasPendingDecision && (_jsx("div", { className: "mb-1 text-right", children: _jsx("span", { className: "text-red-300 text-xs font-bold uppercase tracking-widest", children: t.header.decisionRequired }) }))] })] }));
 };
 const isSameDay = (d1, d2) => {
     if (!d2)
