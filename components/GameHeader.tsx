@@ -1,9 +1,12 @@
 import React from 'react';
+import { useMemo } from 'react';
 import { GameSpeed } from '../types';
 import { useGame } from '../contexts/GameContext';
 import StarRating from './StarRating';
 import { useTranslation } from '../hooks/useTranslation';
 import NoteIcon from './icons/NoteIcon';
+import { getMovieAwardDate, MOVIE_AWARD_NAME } from './festivalData';
+import { RESEARCH_TECHS } from './research';
 
 interface GameHeaderProps {
   gameSpeed: GameSpeed;
@@ -18,6 +21,79 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
   const locale = language === 'de' ? 'de-DE' : 'en-US';
 
   const isTestMode = playerData && playerData.playerName === 'Max Mustermann' && playerData.studioName === 'Teststudio';
+
+  const weeklyCalendarData = useMemo(() => {
+    if (!playerData) return [];
+
+    const today = new Date(playerData.gameDate);
+    today.setHours(0, 0, 0, 0);
+
+    const scopeTranslations = {
+      small: language === 'de' ? 'klein' : 'small',
+      medium: language === 'de' ? 'mittel' : 'medium',
+      large: language === 'de' ? 'groß' : 'large',
+    };
+
+    const weekDates: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      weekDates.push(date);
+    }
+
+    const allEvents: { date: Date; type: string; title: string }[] = [];
+    const currentYear = today.getFullYear();
+    allEvents.push({ date: getMovieAwardDate(currentYear), type: MOVIE_AWARD_NAME, title: t.marketing.festivals.title });
+    allEvents.push({ date: getMovieAwardDate(currentYear + 1), type: MOVIE_AWARD_NAME, title: t.marketing.festivals.title });
+
+    if (playerData.currentProject) {
+      const proj = playerData.currentProject;
+      if (proj.scriptEndDate) allEvents.push({ date: new Date(proj.scriptEndDate), type: 'Drehbuch fertig', title: `"${proj.workingTitle}" ${t.header.events.scriptFinished}` });
+      if (proj.castingEndDate) allEvents.push({ date: new Date(proj.castingEndDate), type: 'Casting fertig', title: `"${proj.workingTitle}" ${t.header.events.castingFinished}` });
+      if (proj.productionEndDate) allEvents.push({ date: new Date(proj.productionEndDate), type: 'Produktion fertig', title: `"${proj.workingTitle}" ${t.header.events.productionFinished}` });
+    }
+
+    playerData.completedFilms.forEach(film => {
+      if (film.cinemaRelease?.releaseDate) {
+        allEvents.push({ date: new Date(film.cinemaRelease.releaseDate), type: 'Veröffentlichung', title: `${t.header.events.release}: ${film.workingTitle}` });
+      }
+    });
+
+    if (playerData.activeResearch) {
+      const tech = RESEARCH_TECHS.find(researchTech => researchTech.id === playerData.activeResearch.techId);
+      allEvents.push({ date: new Date(playerData.activeResearch.endDate), type: 'Forschung fertig', title: `${t.header.events.researchFinished}: ${tech ? tech.name : '?'}` });
+    }
+    if (playerData.activeConstruction) {
+      allEvents.push({ date: new Date(playerData.activeConstruction.endDate), type: 'Bau fertig', title: `${t.header.events.constructionFinished}: ${playerData.activeConstruction.buildingType}` });
+    }
+    if (playerData.activeMarketScout) {
+      allEvents.push({ date: new Date(playerData.activeMarketScout.endDate), type: 'Agentursuche fertig', title: t.header.events.marketScoutFinished });
+    }
+    if (playerData.activeTalentScouting) {
+      const scout = playerData.employees.find(employee => employee.id === playerData.activeTalentScouting?.scoutId);
+      allEvents.push({ date: new Date(playerData.activeTalentScouting.endDate), type: 'Talentsuche fertig', title: `${t.header.events.talentScoutFinished}: ${scout ? scout.name.substring(0, 10) : '?'}` });
+    }
+    if (playerData.activeCasting) {
+      allEvents.push({ date: new Date(playerData.activeCasting.endDate), type: 'Casting Ende', title: `${t.header.events.castingEnded}: ${playerData.activeCasting.talentName}` });
+    }
+    if (playerData.activeCastingCampaign) {
+      const scopeText = scopeTranslations[playerData.activeCastingCampaign.scope as keyof typeof scopeTranslations] || playerData.activeCastingCampaign.scope;
+      allEvents.push({ date: new Date(playerData.activeCastingCampaign.endDate), type: 'Casting-Kampagne Ende', title: `${t.header.events.campaignEnded} (${scopeText})` });
+    }
+    if (playerData.weddingDetails) {
+      allEvents.push({ date: new Date(playerData.weddingDetails.date), type: 'Hochzeit', title: t.header.events.wedding });
+    }
+    if (playerData.partnerPregnancy) {
+      allEvents.push({ date: new Date(playerData.partnerPregnancy.dueDate), type: 'Geburtstermin', title: t.header.events.birth });
+    }
+
+    return weekDates.map(date => ({
+      date,
+      events: allEvents.filter(event => isSameDay(date, event.date)),
+    }));
+  }, [playerData, t, language]);
+
+  const daysOfWeek = useMemo(() => weeklyCalendarData.map(day => day.date.toLocaleDateString(locale, { weekday: 'short' })), [weeklyCalendarData, locale]);
 
   const handleCheatCapital = () => {
     if (isTestMode && setPlayerData) {
@@ -76,9 +152,29 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
       </div>
 
       <div className="flex-grow flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-sm uppercase tracking-[0.35em] text-gray-400">Berliner Echtzeit aktiv</p>
-          <p className="mt-2 text-lg font-semibold text-amber-300">Zeitangaben laufen in Stunden.</p>
+        <div className="w-full max-w-6xl grid grid-cols-7 gap-2">
+          {weeklyCalendarData.map((dayData, index) => {
+            const isToday = index === 0;
+
+            return (
+              <div
+                key={dayData.date.toISOString()}
+                className={`flex flex-col rounded-md p-1.5 h-[75px] transition-colors duration-300 ${isToday ? 'bg-gray-700/80 border border-amber-500' : 'bg-gray-800/60'}`}
+              >
+                <div className="flex justify-between items-baseline text-xs">
+                  <span className={`font-bold ${isToday ? 'text-amber-300' : 'text-gray-400'}`}>{daysOfWeek[index]}</span>
+                  <span className={`font-semibold ${isToday ? 'text-white' : 'text-gray-300'}`}>{dayData.date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' })}</span>
+                </div>
+                <div className="flex-grow mt-1 space-y-1 overflow-y-auto text-[10px] pr-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                  {dayData.events.map((event, eventIndex) => (
+                    <div key={eventIndex} className="px-1 py-0.5 rounded-sm truncate font-semibold bg-gray-600 text-white" title={event.title}>
+                      {event.title}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -89,11 +185,19 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
               <span className="text-red-300 text-xs font-bold uppercase tracking-widest">{t.header.decisionRequired}</span>
             </div>
           )}
-          <p className="mt-1 text-sm font-semibold text-right text-amber-300">Echtzeit</p>
         </div>
       </div>
     </header>
   );
+};
+
+const isSameDay = (d1: Date, d2: Date | undefined | string | null) => {
+  if (!d2) return false;
+  const d1Norm = new Date(d1);
+  const d2Norm = new Date(d2);
+  d1Norm.setHours(0, 0, 0, 0);
+  d2Norm.setHours(0, 0, 0, 0);
+  return d1Norm.getTime() === d2Norm.getTime();
 };
 
 export default GameHeader;

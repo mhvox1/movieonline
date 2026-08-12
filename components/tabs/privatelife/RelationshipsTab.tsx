@@ -13,6 +13,7 @@ import StarIcon from '../../icons/StarIcon';
 import HeartIcon from '../../icons/HeartIcon';
 import ArrowLeftIcon from '../../icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../icons/ArrowRightIcon';
+import { msToHours } from '../../../hooks/timeUtils';
 
 // Helper to get random portrait
 const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -194,14 +195,14 @@ export const RelationshipsTab: React.FC = () => {
 
     // Calculate Availability
     const lastSearch = playerData.lastPartnerSearchDate ? new Date(playerData.lastPartnerSearchDate) : null;
-    const daysSinceSearch = lastSearch ? Math.floor((playerData.gameDate.getTime() - lastSearch.getTime()) / (1000 * 3600 * 24)) : 999;
-    const searchAvailable = daysSinceSearch >= 7 || isTestMode;
-    const daysUntilSearch = Math.max(0, 7 - daysSinceSearch);
+    const hoursSinceSearch = lastSearch ? msToHours(playerData.gameDate.getTime() - lastSearch.getTime()) : 999;
+    const searchAvailable = hoursSinceSearch >= 168 || isTestMode;
+    const hoursUntilSearch = Math.max(0, 168 - hoursSinceSearch);
 
     const lastInteraction = playerData.lastRelationshipInteractionDate ? new Date(playerData.lastRelationshipInteractionDate) : null;
-    const daysSinceInteraction = lastInteraction ? Math.floor((new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) / (1000 * 3600 * 24)) : 999;
-    const interactionAvailable = daysSinceInteraction >= 7;
-    const daysUntilInteraction = Math.max(0, 7 - daysSinceInteraction);
+    const hoursSinceInteraction = lastInteraction ? msToHours(new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) : 999;
+    const interactionAvailable = hoursSinceInteraction >= 168;
+    const hoursUntilInteraction = Math.max(0, 168 - hoursSinceInteraction);
 
     const hasPartner = playerData.maritalStatus !== MaritalStatus.Single;
     const isAcquaintance = playerData.maritalStatus === MaritalStatus.Acquaintance;
@@ -664,7 +665,7 @@ export const RelationshipsTab: React.FC = () => {
                                             <p className="text-[10px] text-gray-400 mb-1 leading-tight">{transDesc}</p>
                                             <p className="text-[9px] text-gray-500">Chance: {Math.round(option.successChance * 100)}%</p>
                                         </div>
-                                        {!searchAvailable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${daysUntilSearch} Tage)` : `Wait (${daysUntilSearch} days)`}</div>}
+                                        {!searchAvailable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilSearch} Stunden)` : `Wait (${hoursUntilSearch} hours)`}</div>}
                                     </button>
                                 )})}
                             </div>
@@ -746,7 +747,7 @@ export const RelationshipsTab: React.FC = () => {
                                                 <VitalityStars modifier={interaction.energyModifier} label="V" />
                                             </div>
 
-                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${daysUntilInteraction}d)` : `Wait (${daysUntilInteraction}d)`}</div>}
+                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilInteraction}h)` : `Wait (${hoursUntilInteraction}h)`}</div>}
                                         </button>
                                     );
                                 })}
