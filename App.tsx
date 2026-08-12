@@ -1824,12 +1824,6 @@ const AppContent: React.FC = () => {
   }, [authUser, playerData, gameState, handleConfirmLoad, handleStartGame]);
 
   useEffect(() => {
-    if (authUser && playerData && gameState !== GameState.MainScreen) {
-      setGameState(GameState.MainScreen);
-    }
-  }, [authUser, playerData, gameState]);
-
-  useEffect(() => {
     const authProfileImageData = typeof authUser?.profileImageData === 'string'
       ? authUser.profileImageData.trim()
       : '';
