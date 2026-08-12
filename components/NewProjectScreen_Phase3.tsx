@@ -598,7 +598,7 @@ const NewProjectScreen_Phase3: React.FC<NewProjectScreenPhase3Props> = ({ setGam
                     <div className="text-right">
                         <div className="grid grid-cols-2 gap-x-8 text-lg">
                             <span className="text-gray-300">{t.project.production.estimatedDuration}:</span>
-                            <span className="font-bold text-white">{totalDuration} {t.project.production.days}</span>
+                            <span className="font-bold text-white">{totalDuration * 24} {language === 'de' ? 'Stunden' : 'hours'}</span>
 
                             <span className="text-gray-300">{t.project.production.prevCosts}:</span>
                             <span className="font-bold text-white">{formatCurrency(bisherigeKosten)}</span>

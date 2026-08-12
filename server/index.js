@@ -1239,7 +1239,7 @@ function applyCalculatedIngameDateToState(state, ingameDateIso) {
 
 function resetGameDataForAdmin() {
   const now = new Date();
-  const resetStartDateIso = createResetStartDate(now).toISOString();
+  const resetStartDateIso = getLatestResetStartDateIso() || createResetStartDate(now).toISOString();
   const removedStudios = listStudios().length;
 
   fs.writeFileSync(DB_FILE, JSON.stringify({ studios: {} }, null, 2), 'utf-8');

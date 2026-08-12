@@ -84,7 +84,7 @@ const REALTIME_GAME_START_INGAME = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
 const MS_PER_REAL_DAY = 24 * 60 * 60 * 1000;
 const AUTH_TOKEN_KEY = 'mb_auth_token';
 const LOCAL_STUDIO_ID_KEY = 'movie_business_online_studio_id_v1';
-const LAST_SEEN_RESET_ANCHOR_KEY = 'movie_business_last_reset_anchor_v1';
+const LAST_SEEN_RESET_EVENT_KEY = 'movie_business_last_reset_event_v1';
 const normalizeApiBaseUrl = (value: string): string => String(value || '').trim().replace(/\/$/, '');
 
 const safeSessionGet = (key: string): string => {
@@ -1761,14 +1761,14 @@ const AppContent: React.FC = () => {
         const serverTime = await apiRequest('/server-time', { method: 'GET' }, '');
         if (cancelled) return;
 
-        const serverResetAnchor = String(serverTime?.resetStartDateIso || '').trim();
-        const seenResetAnchor = String(localStorage.getItem(LAST_SEEN_RESET_ANCHOR_KEY) || '').trim();
+        const serverResetEvent = String(serverTime?.resetAtIso || '').trim();
+        const seenResetEvent = String(localStorage.getItem(LAST_SEEN_RESET_EVENT_KEY) || '').trim();
 
-        if (serverResetAnchor && serverResetAnchor !== seenResetAnchor) {
+        if (serverResetEvent && serverResetEvent !== seenResetEvent) {
           await persistSaveFiles([]);
           localStorage.removeItem(SAVE_KEY);
           clearStoredStudioId();
-          localStorage.setItem(LAST_SEEN_RESET_ANCHOR_KEY, serverResetAnchor);
+          localStorage.setItem(LAST_SEEN_RESET_EVENT_KEY, serverResetEvent);
         }
 
         const saves = await loadSaveFiles();

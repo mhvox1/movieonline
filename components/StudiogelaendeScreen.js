@@ -179,8 +179,8 @@ const StudiogelaendeScreen = ({ onBack, gameSpeed, setGameSpeed, initialBuilding
       };
     });
   };
-  const getDaysRemaining = (endDate) => {
-    return Math.max(0, Math.ceil((endDate.getTime() - playerData.gameDate.getTime()) / (1e3 * 3600 * 24)));
+  const getHoursRemaining = (endDate) => {
+    return Math.max(0, Math.ceil((endDate.getTime() - playerData.gameDate.getTime()) / (1e3 * 3600)));
   };
   const getBuildingKey = (type) => {
     return Object.keys(BuildingType).find((key) => BuildingType[key] === type) || "Burogebaude";
@@ -345,7 +345,7 @@ const StudiogelaendeScreen = ({ onBack, gameSpeed, setGameSpeed, initialBuilding
               /* @__PURE__ */ jsx("hr", { className: "border-gray-600 my-6" }),
               isUnderConstruction && constructionEntry ? /* @__PURE__ */ jsxs("div", { className: "text-center p-4 bg-blue-900 rounded-md border border-blue-600", children: [
                 /* @__PURE__ */ jsx("h3", { className: "text-xl font-bold text-white", children: t.studiogelaende.screen.upgrading }),
-                /* @__PURE__ */ jsx("p", { className: "text-blue-300 text-lg", children: t.studiogelaende.screen.daysRemaining.replace("{days}", getDaysRemaining(constructionEntry.endDate).toString()) })
+                /* @__PURE__ */ jsx("p", { className: "text-blue-300 text-lg", children: t.studiogelaende.screen.daysRemaining.replace("{days}", getHoursRemaining(constructionEntry.endDate).toString()) })
               ] }) : nextLevelData ? (() => {
                 const nextLevelTranslations = buildingTranslations.levels[`level${nextLevelData.level}`];
                 return /* @__PURE__ */ jsxs("div", { children: [
@@ -361,9 +361,9 @@ const StudiogelaendeScreen = ({ onBack, gameSpeed, setGameSpeed, initialBuilding
                       /* @__PURE__ */ jsx("span", { children: t.studiogelaende.screen.duration }),
                       " ",
                       /* @__PURE__ */ jsxs("span", { className: "font-bold", children: [
-                        isTestMode ? 1 : nextLevelData.duration,
+                        (isTestMode ? 1 : nextLevelData.duration) * 24,
                         " ",
-                        t.project.production.days
+                        language === "de" ? "Stunden" : "hours"
                       ] })
                     ] }),
                     /* @__PURE__ */ jsxs("div", { className: "flex justify-between", children: [

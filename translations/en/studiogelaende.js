@@ -5,7 +5,7 @@ const studiogelaende = {
     upgrade: "Upgrade",
     cost: "Cost:",
     duration: "Duration:",
-    daysRemaining: "{days} days remaining",
+    daysRemaining: "{days} hours remaining",
     monthlyCost: "Upkeep: {cost}/month",
     level: "Level {level}",
     bonus: "Bonus:",

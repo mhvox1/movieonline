@@ -210,8 +210,8 @@ const StudiogelaendeScreen: React.FC<StudiogelaendeScreenProps> = ({ onBack, gam
     }
 
     const duration = isTestMode ? 1 : nextLevelData.duration;
-    const endDate = new Date(playerData.gameDate);
-    endDate.setDate(endDate.getDate() + duration);
+        const endDate = new Date(playerData.gameDate);
+        endDate.setDate(endDate.getDate() + duration);
 
     const newActiveConstruction: ActiveConstruction = {
         buildingType: selectedBuilding.type,
@@ -243,8 +243,8 @@ const StudiogelaendeScreen: React.FC<StudiogelaendeScreenProps> = ({ onBack, gam
     });
   };
 
-  const getDaysRemaining = (endDate: Date) => {
-      return Math.max(0, Math.ceil((endDate.getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24)));
+  const getHoursRemaining = (endDate: Date) => {
+      return Math.max(0, Math.ceil((endDate.getTime() - playerData.gameDate.getTime()) / (1000 * 3600)));
   }
 
   const getBuildingKey = (type: BuildingType): string => {
@@ -453,7 +453,7 @@ const StudiogelaendeScreen: React.FC<StudiogelaendeScreenProps> = ({ onBack, gam
                                 {isUnderConstruction && constructionEntry ? (
                                     <div className="text-center p-4 bg-blue-900 rounded-md border border-blue-600">
                                         <h3 className="text-xl font-bold text-white">{t.studiogelaende.screen.upgrading}</h3>
-                                        <p className="text-blue-300 text-lg">{t.studiogelaende.screen.daysRemaining.replace('{days}', getDaysRemaining(constructionEntry.endDate).toString())}</p>
+                                        <p className="text-blue-300 text-lg">{t.studiogelaende.screen.daysRemaining.replace('{days}', getHoursRemaining(constructionEntry.endDate).toString())}</p>
                                     </div>
                                 ) : nextLevelData ? (() => {
                                     const nextLevelTranslations = buildingTranslations.levels[`level${nextLevelData.level}`];
@@ -463,7 +463,7 @@ const StudiogelaendeScreen: React.FC<StudiogelaendeScreenProps> = ({ onBack, gam
                                         <p className="text-gray-400 mt-1 text-center">{nextLevelTranslations?.desc || nextLevelData.description}</p>
                                         <div className="mt-4 space-y-2 text-lg">
                                             <div className="flex justify-between"><span>{t.studiogelaende.screen.cost}</span> <span className="font-bold">{formatCurrency(nextLevelData.cost)}</span></div>
-                                            <div className="flex justify-between"><span>{t.studiogelaende.screen.duration}</span> <span className="font-bold">{isTestMode ? 1 : nextLevelData.duration} {t.project.production.days}</span></div>
+                                            <div className="flex justify-between"><span>{t.studiogelaende.screen.duration}</span> <span className="font-bold">{(isTestMode ? 1 : nextLevelData.duration) * 24} {language === 'de' ? 'Stunden' : 'hours'}</span></div>
                                             <div className="flex justify-between"><span>{t.studiogelaende.screen.monthlyCost.replace(': {cost}', ':')}</span> <span className="font-bold">{formatCurrency(nextLevelData.monthlyCost)}</span></div>
                                             <div className="flex justify-between items-start mt-2">
                                                 <span>{t.studiogelaende.screen.bonus}</span>

@@ -5,7 +5,7 @@ const studiogelaende = {
     upgrade: "Ausbauen",
     cost: "Kosten:",
     duration: "Dauer:",
-    daysRemaining: "{days} Tage verbleibend",
+    daysRemaining: "{days} Stunden verbleibend",
     monthlyCost: "Unterhalt: {cost}/Monat",
     level: "Stufe {level}",
     bonus: "Bonus:",

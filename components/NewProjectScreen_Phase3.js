@@ -519,9 +519,9 @@ ${project.contract.stationName}`;
               ":"
             ] }),
             /* @__PURE__ */ jsxs("span", { className: "font-bold text-white", children: [
-              totalDuration,
+              totalDuration * 24,
               " ",
-              t.project.production.days
+              language === "de" ? "Stunden" : "hours"
             ] }),
             /* @__PURE__ */ jsxs("span", { className: "text-gray-300", children: [
               t.project.production.prevCosts,
