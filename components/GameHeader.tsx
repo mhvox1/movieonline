@@ -30,6 +30,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
         minute: '2-digit',
         second: '2-digit',
         fractionalSecondDigits: 3,
+        timeZone: 'UTC',
         hour12: false,
       })
     : '';
@@ -39,7 +40,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
 
     const calendarBaseDate = isTestMode ? new Date(playerData.gameDate) : new Date();
     const today = new Date(calendarBaseDate);
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0);
 
     const scopeTranslations = {
       small: language === 'de' ? 'klein' : 'small',
@@ -50,12 +51,12 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
     const weekDates: Date[] = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(today);
-      date.setDate(today.getDate() + i);
+      date.setUTCDate(today.getUTCDate() + i);
       weekDates.push(date);
     }
 
     const allEvents: { date: Date; type: string; title: string }[] = [];
-    const currentYear = today.getFullYear();
+    const currentYear = today.getUTCFullYear();
     allEvents.push({ date: getMovieAwardDate(currentYear), type: MOVIE_AWARD_NAME, title: t.marketing.festivals.title });
     allEvents.push({ date: getMovieAwardDate(currentYear + 1), type: MOVIE_AWARD_NAME, title: t.marketing.festivals.title });
 
@@ -106,7 +107,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
     }));
   }, [playerData, t, language, isTestMode]);
 
-  const daysOfWeek = useMemo(() => weeklyCalendarData.map(day => day.date.toLocaleDateString(locale, { weekday: 'short' })), [weeklyCalendarData, locale]);
+  const daysOfWeek = useMemo(() => weeklyCalendarData.map(day => day.date.toLocaleDateString(locale, { weekday: 'short', timeZone: 'UTC' })), [weeklyCalendarData, locale]);
 
   const handleCheatCapital = () => {
     if (isTestMode && setPlayerData) {
@@ -176,7 +177,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
               >
                 <div className="flex justify-between items-baseline text-xs">
                   <span className={`font-bold ${isToday ? 'text-amber-300' : 'text-gray-400'}`}>{daysOfWeek[index]}</span>
-                  <span className={`font-semibold ${isToday ? 'text-white' : 'text-gray-300'}`}>{dayData.date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' })}</span>
+                  <span className={`font-semibold ${isToday ? 'text-white' : 'text-gray-300'}`}>{dayData.date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', timeZone: 'UTC' })}</span>
                 </div>
                 <div className="flex-grow mt-1 space-y-1 overflow-y-auto text-[10px] pr-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
                   {dayData.events.map((event, eventIndex) => (
@@ -214,8 +215,8 @@ const isSameDay = (d1: Date, d2: Date | undefined | string | null) => {
   if (!d2) return false;
   const d1Norm = new Date(d1);
   const d2Norm = new Date(d2);
-  d1Norm.setHours(0, 0, 0, 0);
-  d2Norm.setHours(0, 0, 0, 0);
+  d1Norm.setUTCHours(0, 0, 0, 0);
+  d2Norm.setUTCHours(0, 0, 0, 0);
   return d1Norm.getTime() === d2Norm.getTime();
 };
 
