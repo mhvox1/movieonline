@@ -343,7 +343,7 @@ const AppContent: React.FC = () => {
       if (!current) return current;
 
       const localDate = new Date(current.gameDate);
-      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1000) {
+      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1) {
         return current;
       }
 

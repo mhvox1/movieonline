@@ -19,6 +19,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
   const { playerData, setPlayerData } = useGame();
   const { t, language } = useTranslation();
   const locale = language === 'de' ? 'de-DE' : 'en-US';
+  const isTestMode = playerData && playerData.playerName === 'Max Mustermann' && playerData.studioName === 'Teststudio';
   const currentGameDate = playerData ? new Date(playerData.gameDate) : null;
   const currentGameTimeLabel = currentGameDate
     ? currentGameDate.toLocaleString(locale, {
@@ -27,11 +28,11 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
         month: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
+        second: '2-digit',
+        ...(isTestMode ? { fractionalSecondDigits: 3 as const } : {}),
         hour12: false,
       })
     : '';
-
-  const isTestMode = playerData && playerData.playerName === 'Max Mustermann' && playerData.studioName === 'Teststudio';
 
   const weeklyCalendarData = useMemo(() => {
     if (!playerData) return [];

@@ -255,7 +255,7 @@ const AppContent = () => {
     setPlayerData((current) => {
       if (!current) return current;
       const localDate = new Date(current.gameDate);
-      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1e3) {
+      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1) {
         return current;
       }
       return {
