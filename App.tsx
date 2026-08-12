@@ -310,7 +310,6 @@ const AppContent: React.FC = () => {
   const [targetFinanzenTab, setTargetFinanzenTab] = useState<FinanzenTab>('take_loan');
   const [targetStudiogelaendeBuilding, setTargetStudiogelaendeBuilding] = useState<BuildingType>(BuildingType.Autorenbuero);
   const [targetProjectsView, setTargetProjectsView] = useState<CurrentViewType>('project');
-  const [pendingNavigation, setPendingNavigation] = useState<GameState | null>(null);
   const [targetFilmTitle, setTargetFilmTitle] = useState<string | undefined>();
   
   const [scale, setScale] = useState({ x: 1, y: 1 });
@@ -903,13 +902,6 @@ const AppContent: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [scalingMode]);
 
-  useEffect(() => {
-    if (isSystemPaused && pendingNavigation) {
-      setGameState(pendingNavigation);
-      setPendingNavigation(null);
-    }
-  }, [isSystemPaused, pendingNavigation]);
-  
   const handleSetGameSpeed = useCallback((newSpeed: GameSpeed) => {
     if (newSpeed !== GameSpeed.PAUSED) {
       setLastActiveSpeed(newSpeed);
@@ -956,7 +948,7 @@ const AppContent: React.FC = () => {
 
   const onNavigate = useCallback((state: GameState) => {
     systemPause();
-    setPendingNavigation(state);
+    setGameState(state);
   }, [systemPause]);
 
   const handleNewGame = useCallback(() => {
