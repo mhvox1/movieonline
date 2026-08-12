@@ -92,8 +92,8 @@ const ScriptsTab: React.FC = () => {
     
     const formatCurrency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value);
     
-    const getDaysRemaining = (endDate: Date) => {
-        return Math.max(0, Math.ceil((new Date(endDate).getTime() - new Date(playerData.gameDate).getTime()) / (1000 * 3600 * 24)));
+    const getRemainingHoursAsGameTime = (endDate: Date) => {
+        return Math.max(0, (new Date(endDate).getTime() - new Date(playerData.gameDate).getTime()) / (1000 * 3600 * 24));
     }
 
     const unlockedGenres = useMemo(() => Object.values(Genre), []);
@@ -291,12 +291,12 @@ const ScriptsTab: React.FC = () => {
             const totalDuration = (new Date(endDate).getTime() - new Date(startDate).getTime());
             const elapsed = (new Date(playerData.gameDate).getTime() - new Date(startDate).getTime());
             const progress = totalDuration > 0 ? Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100))) : 100;
-            const daysRemaining = getDaysRemaining(endDate);
+            const remainingHours = getRemainingHoursAsGameTime(endDate);
             return (
                 <div className="text-center space-y-3">
                     <p className="text-lg font-bold text-white">"{script.title}"</p>
                     <p className="text-gray-400">{language === 'de' ? 'Autor' : 'Writer'}: {writerName}</p>
-                    <p className="text-gray-400">{language === 'de' ? 'Verbleibende Zeit' : 'Remaining Time'}: {daysRemaining} {language === 'de' ? 'Tage' : 'days'}</p>
+                    <p className="text-gray-400">{language === 'de' ? 'Verbleibende Zeit' : 'Remaining Time'}: {formatHoursAndMinutes(remainingHours)}</p>
                     <div className="w-full bg-gray-700 rounded-full h-5 overflow-hidden border border-gray-600">
                         <div className="bg-purple-500 h-full rounded-full flex items-center justify-center text-sm font-bold text-black" style={{ width: `${progress}%` }}>{progress}%</div>
                     </div>

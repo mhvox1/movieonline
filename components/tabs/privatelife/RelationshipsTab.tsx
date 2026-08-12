@@ -13,7 +13,7 @@ import StarIcon from '../../icons/StarIcon';
 import HeartIcon from '../../icons/HeartIcon';
 import ArrowLeftIcon from '../../icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../icons/ArrowRightIcon';
-import { msToHours, formatHoursAndMinutes } from '../../../hooks/timeUtils';
+import { formatHoursAndMinutes } from '../../../hooks/timeUtils';
 
 const PRIVATE_INTERACTION_COOLDOWN_HOURS = 7;
 
@@ -197,12 +197,12 @@ export const RelationshipsTab: React.FC = () => {
 
     // Calculate Availability
     const lastSearch = playerData.lastPartnerSearchDate ? new Date(playerData.lastPartnerSearchDate) : null;
-    const hoursSinceSearch = lastSearch ? msToHours(playerData.gameDate.getTime() - lastSearch.getTime()) : 999;
+    const hoursSinceSearch = lastSearch ? (playerData.gameDate.getTime() - lastSearch.getTime()) / (1000 * 60 * 60) : 999;
     const searchAvailable = hoursSinceSearch >= PRIVATE_INTERACTION_COOLDOWN_HOURS || isTestMode;
     const hoursUntilSearch = Math.max(0, PRIVATE_INTERACTION_COOLDOWN_HOURS - hoursSinceSearch);
 
     const lastInteraction = playerData.lastRelationshipInteractionDate ? new Date(playerData.lastRelationshipInteractionDate) : null;
-    const hoursSinceInteraction = lastInteraction ? msToHours(new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) : 999;
+    const hoursSinceInteraction = lastInteraction ? (new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) / (1000 * 60 * 60) : 999;
     const interactionAvailable = hoursSinceInteraction >= PRIVATE_INTERACTION_COOLDOWN_HOURS;
     const hoursUntilInteraction = Math.max(0, PRIVATE_INTERACTION_COOLDOWN_HOURS - hoursSinceInteraction);
 
