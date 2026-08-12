@@ -3,6 +3,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { PlayerData, Child, SkillSet, EmployeeType, ActorAge } from '../../../types';
 import { useGame } from '../../../contexts/GameContext';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { msToHours } from '../../../hooks/timeUtils';
 import SkillBar from '../../SkillBar';
 import { SCHOOL_TYPES, SECONDARY_SCHOOL_TYPES, UNIVERSITY_TYPES, CHILD_INTERACTIONS, UNIVERSITY_MAJORS } from '../../privateLifeData';
 import HeartIcon from '../../icons/HeartIcon';
@@ -136,10 +137,12 @@ const ChildProfile: React.FC<ChildProfileProps> = ({ child, playerData, onIntera
         return CHILD_INTERACTIONS.filter(i => childAge >= i.minAge && childAge <= i.maxAge);
     }, [childAge]);
 
+    const CHILD_INTERACTION_COOLDOWN_HOURS = 76;
+
     const lastInteraction = child.lastInteractionDate ? new Date(child.lastInteractionDate) : null;
-    const daysSinceInteraction = lastInteraction ? Math.floor((new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) / (1000 * 3600 * 24)) : 999;
-    const interactionAvailable = daysSinceInteraction >= 7 || isTestMode;
-    const daysUntilInteraction = Math.max(0, 7 - daysSinceInteraction);
+    const hoursSinceInteraction = lastInteraction ? msToHours(new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) : 999;
+    const interactionAvailable = hoursSinceInteraction >= CHILD_INTERACTION_COOLDOWN_HOURS || isTestMode;
+    const hoursUntilInteraction = Math.max(0, CHILD_INTERACTION_COOLDOWN_HOURS - hoursSinceInteraction);
 
     const trainingCost = 1500; 
 
@@ -337,7 +340,7 @@ const ChildProfile: React.FC<ChildProfileProps> = ({ child, playerData, onIntera
                                                      )}
                                                  </div>
                                             </div>
-                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${daysUntilInteraction}d)` : `Wait (${daysUntilInteraction}d)`}</div>}
+                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilInteraction} Stunden)` : `Wait (${hoursUntilInteraction} hours)`}</div>}
                                         </button>
                                     );
                                 })}

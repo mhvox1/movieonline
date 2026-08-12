@@ -188,9 +188,9 @@ export const usePersonalLifeLoop = ({
 
                 if (success) { 
                     const dueDate = new Date(newDate);
-                    const days = isTestMode ? 10 : (isSameSex ? 45 : 270);
+                    const hours = isTestMode ? 10 : (isSameSex ? 45 : 270);
                     
-                    dueDate.setDate(dueDate.getDate() + days);
+                    dueDate.setHours(dueDate.getHours() + hours);
                     newState.partnerPregnancy = { dueDate, isAdoption: isSameSex };
                     
                     setPregnancyNotification({ dueDate, isAdoption: isSameSex });
@@ -409,7 +409,7 @@ export const usePersonalLifeLoop = ({
                  let daysUntilFirstTuesday = (2 - dayOfWeek + 7) % 7;
                  const schoolStartDate = new Date(currentYear, 7, 1 + daysUntilFirstTuesday + 14);
                  const notificationDate = new Date(schoolStartDate);
-                 notificationDate.setDate(notificationDate.getDate() - 28); // 4 weeks before
+                 notificationDate.setHours(notificationDate.getHours() - 28); // 28 hours before
 
                  const isNotificationDay = isTestMode ? true : newDate >= notificationDate;
 

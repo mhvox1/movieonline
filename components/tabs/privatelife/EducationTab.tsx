@@ -87,7 +87,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({ item, type,
     else if (!hasEnergy) warning = isGerman ? 'Nicht genügend Energie.' : 'Not enough energy.';
     else if (isBusy && type !== 'vacation') warning = isGerman ? 'Sie sind bereits beschäftigt.' : 'You are already busy.';
     else if (isCompleted) warning = t.privatelife.education.alreadyFinished;
-    else if (cooldownActive) warning = isGerman ? 'Wartezeit nach Studium aktiv (2 Monate).' : 'Study cooldown active (2 months).';
+    else if (cooldownActive) warning = isGerman ? 'Wartezeit nach Studium aktiv (60 Stunden).' : 'Study cooldown active (60 hours).';
     else if (frequencyLimitReached) warning = isGerman ? 'Maximal 1 Aktivität pro Monat.' : 'Maximum 1 activity per month.';
 
     return (
@@ -135,7 +135,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({ item, type,
                                             ));
                                         })()}
                                     </div>
-                                    {item.weeklyEnergyCost && <p className="text-[10px] text-red-400 mt-1">pro Woche</p>}
+                                    {item.weeklyEnergyCost && <p className="text-[10px] text-red-400 mt-1">{isGerman ? 'pro Stunde' : 'per hour'}</p>}
                                 </>
                             )}
                         </div>
@@ -237,9 +237,9 @@ export const EducationTab: React.FC = () => {
     const isCourseCooldownActive = () => {
         if (!playerData.lastCourseFinishDate) return false;
         const finishDate = new Date(playerData.lastCourseFinishDate);
-        // Add 2 months (approx 60 days) to finish date
+        // 60-hour cooldown after finishing a study
         const cooldownEnd = new Date(finishDate);
-        cooldownEnd.setDate(cooldownEnd.getDate() + 60);
+        cooldownEnd.setHours(cooldownEnd.getHours() + 60);
         
         return playerData.gameDate < cooldownEnd;
     };
@@ -253,7 +253,7 @@ export const EducationTab: React.FC = () => {
         if ((playerData.energy || 100) < energyCost) return;
   
         const endDate = new Date(playerData.gameDate);
-        endDate.setDate(endDate.getDate() + seminar.duration);
+        endDate.setHours(endDate.getHours() + seminar.duration);
 
         setPlayerData(prev => {
             if (!prev) return null;
@@ -288,8 +288,8 @@ export const EducationTab: React.FC = () => {
       if (playerData.activeCourse) return;
       if (isCourseCooldownActive()) return;
   
-      const endDate = new Date(playerData.gameDate);
-      endDate.setDate(endDate.getDate() + course.duration);
+    const endDate = new Date(playerData.gameDate);
+    endDate.setHours(endDate.getHours() + course.duration);
   
       setPlayerData(prev => {
           if (!prev) return null;
@@ -320,7 +320,7 @@ export const EducationTab: React.FC = () => {
         if (energyCost > 0 && (playerData.energy || 100) < energyCost) return;
   
         const endDate = new Date(playerData.gameDate);
-        endDate.setDate(endDate.getDate() + activity.duration);
+        endDate.setHours(endDate.getHours() + activity.duration);
 
         const energyBonus = activity.energyBonus || 0;
         const netEnergyChange = energyBonus - energyCost;
@@ -357,16 +357,14 @@ export const EducationTab: React.FC = () => {
     };
   
     const handleVacation = () => {
-        // Vacation still jumps time as it is a long "skip" feature, typically requested to skip time.
-        // If user wants that non-blocking too, it would need a 2-week blocking state. 
-        // For now, keeping vacation as a "Wait" mechanic seems appropriate for "2 weeks off".
+        // Vacation still jumps time as it is a long "skip" feature.
         const vacationCost = 50000;
         if (playerData.privateCapital < vacationCost) return;
         
         setPlayerData(prev => {
             if (!prev) return null;
             const newDate = new Date(prev.gameDate);
-            newDate.setDate(newDate.getDate() + 14); // 2 weeks
+            newDate.setHours(newDate.getHours() + 14);
   
             return {
                 ...prev,
@@ -441,7 +439,7 @@ export const EducationTab: React.FC = () => {
                         )}
                         {isCourseCooldownActive() && !playerData.activeCourse && (
                              <div className="mt-8 p-4 bg-gray-900/50 border border-gray-600 rounded-lg text-center">
-                                <p className="text-gray-400 text-sm">{language === 'de' ? 'Wartezeit nach Studium aktiv. Erholung notwendig.' : 'Study cooldown active. Recovery required.'}</p>
+                                <p className="text-gray-400 text-sm">{language === 'de' ? 'Wartezeit nach Studium aktiv (60 Stunden).' : 'Study cooldown active (60 hours).'}</p>
                             </div>
                         )}
                     </div>
@@ -566,7 +564,7 @@ export const EducationTab: React.FC = () => {
                                     <h3 className="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
                                         <span className="text-xl">🎓</span> {t.privatelife.education.studiesTitle}
                                     </h3>
-                                    {isCourseCooldownActive() && !playerData.activeCourse && <p className="text-xs text-red-400 mb-2">Wartezeit aktiv.</p>}
+                                    {isCourseCooldownActive() && !playerData.activeCourse && <p className="text-xs text-red-400 mb-2">{language === 'de' ? 'Wartezeit aktiv (60 Stunden).' : 'Cooldown active (60 hours).'}</p>}
                                     <div className="space-y-3">
                                         {ALL_COURSES.map(course => {
                                             const transName = t.privatelife.education.courses?.[course.id]?.name || course.name;

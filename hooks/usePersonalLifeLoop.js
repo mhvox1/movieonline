@@ -125,7 +125,7 @@ const usePersonalLifeLoop = ({
         if (success) {
           const dueDate = new Date(newDate);
           const days = isTestMode ? 10 : isSameSex ? 45 : 270;
-          dueDate.setDate(dueDate.getDate() + days);
+          dueDate.setHours(dueDate.getHours() + hours);
           newState.partnerPregnancy = { dueDate, isAdoption: isSameSex };
           setPregnancyNotification({ dueDate, isAdoption: isSameSex });
           newState.partnerChildrenAgreementCount += 1;
@@ -407,3 +407,4 @@ const usePersonalLifeLoop = ({
 export {
   usePersonalLifeLoop
 };
+

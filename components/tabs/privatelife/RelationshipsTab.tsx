@@ -15,6 +15,8 @@ import ArrowLeftIcon from '../../icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../icons/ArrowRightIcon';
 import { msToHours } from '../../../hooks/timeUtils';
 
+const PRIVATE_INTERACTION_COOLDOWN_HOURS = 76;
+
 // Helper to get random portrait
 const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
@@ -196,13 +198,13 @@ export const RelationshipsTab: React.FC = () => {
     // Calculate Availability
     const lastSearch = playerData.lastPartnerSearchDate ? new Date(playerData.lastPartnerSearchDate) : null;
     const hoursSinceSearch = lastSearch ? msToHours(playerData.gameDate.getTime() - lastSearch.getTime()) : 999;
-    const searchAvailable = hoursSinceSearch >= 168 || isTestMode;
-    const hoursUntilSearch = Math.max(0, 168 - hoursSinceSearch);
+    const searchAvailable = hoursSinceSearch >= PRIVATE_INTERACTION_COOLDOWN_HOURS || isTestMode;
+    const hoursUntilSearch = Math.max(0, PRIVATE_INTERACTION_COOLDOWN_HOURS - hoursSinceSearch);
 
     const lastInteraction = playerData.lastRelationshipInteractionDate ? new Date(playerData.lastRelationshipInteractionDate) : null;
     const hoursSinceInteraction = lastInteraction ? msToHours(new Date(playerData.gameDate).getTime() - lastInteraction.getTime()) : 999;
-    const interactionAvailable = hoursSinceInteraction >= 168;
-    const hoursUntilInteraction = Math.max(0, 168 - hoursSinceInteraction);
+    const interactionAvailable = hoursSinceInteraction >= PRIVATE_INTERACTION_COOLDOWN_HOURS;
+    const hoursUntilInteraction = Math.max(0, PRIVATE_INTERACTION_COOLDOWN_HOURS - hoursSinceInteraction);
 
     const hasPartner = playerData.maritalStatus !== MaritalStatus.Single;
     const isAcquaintance = playerData.maritalStatus === MaritalStatus.Acquaintance;
@@ -342,7 +344,7 @@ export const RelationshipsTab: React.FC = () => {
             if (!prev || prev.privateCapital < cost) return prev;
             let newState = { ...prev, privateCapital: prev.privateCapital - cost };
             const endDate = new Date(prev.gameDate);
-            endDate.setDate(endDate.getDate() + duration);
+            endDate.setHours(endDate.getHours() + duration);
             const trainingData: FamilyTraining = { skill, startDate: new Date(prev.gameDate), endDate: endDate, duration };
             if (isPartner) {
                 newState.partnerActiveTraining = trainingData;
@@ -482,15 +484,15 @@ export const RelationshipsTab: React.FC = () => {
         const currentInterest = playerData.datingProgress || 0;
         const startDate = playerData.relationshipStartDate ? new Date(playerData.relationshipStartDate) : new Date(playerData.gameDate);
         const timeDiff = new Date(playerData.gameDate).getTime() - startDate.getTime();
-        const daysKnown = Math.floor(timeDiff / (1000 * 3600 * 24));
+        const hoursKnown = msToHours(timeDiff);
         let successChance = 0;
         let rejectionMessage = "";
         let interestDrop = 5;
-        if (daysKnown < 10) {
+        if (hoursKnown < 10) {
             successChance = 0.01; 
             rejectionMessage = `${playerData.partnerName} denkt, dass es zu schnell geht.`; 
             interestDrop = 15; 
-        } else if (daysKnown < 19) {
+        } else if (hoursKnown < 19) {
             successChance = (currentInterest / 100) * 0.2;
             rejectionMessage = `${playerData.partnerName} fühlt sich geschmeichelt, braucht aber noch etwas Zeit.`;
             interestDrop = 10;
@@ -617,7 +619,7 @@ export const RelationshipsTab: React.FC = () => {
         setPlayerData(prev => {
              if (!prev) return null;
              const conceptionDate = new Date(prev.gameDate);
-             conceptionDate.setDate(conceptionDate.getDate() + 14); 
+               conceptionDate.setHours(conceptionDate.getHours() + 14); 
              return { ...prev, pendingConception: { conceptionDate } };
         });
         
@@ -772,7 +774,7 @@ export const RelationshipsTab: React.FC = () => {
                             onTrain={handleTrainFamily}
                             onInteract={(i) => handleRelationshipInteraction(i)}
                             interactionAvailable={interactionAvailable}
-                            daysUntilInteraction={daysUntilInteraction}
+                            hoursUntilInteraction={hoursUntilInteraction}
                             onPropose={() => setIsProposing(true)}
                             onPlanWedding={() => setIsPlanningWedding(true)}
                             onKinderwunsch={handleKinderwunsch}

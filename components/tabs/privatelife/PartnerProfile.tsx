@@ -15,7 +15,7 @@ interface PartnerProfileProps {
     onTrain: (skill: keyof SkillSet, duration: number) => void;
     onInteract: (interaction: RelationshipInteraction) => void;
     interactionAvailable: boolean;
-    daysUntilInteraction: number;
+    hoursUntilInteraction: number;
     onPropose: () => void;
     onPlanWedding: () => void;
     onKinderwunsch: () => void;
@@ -77,7 +77,7 @@ const VitalityStars: React.FC<{ modifier: number; label: string }> = ({ modifier
 };
 
 const PartnerProfile: React.FC<PartnerProfileProps> = ({ 
-    playerData, onHire, onTrain, onInteract, interactionAvailable, daysUntilInteraction,
+    playerData, onHire, onTrain, onInteract, interactionAvailable, hoursUntilInteraction,
     onPropose, onPlanWedding, onKinderwunsch, onBreakup, getPortraitUrl 
 }) => {
     const { t, language } = useTranslation();
@@ -426,7 +426,7 @@ const PartnerProfile: React.FC<PartnerProfileProps> = ({
                                              <VitalityStars modifier={interaction.energyModifier} label="V" />
                                          </div>
                                     </div>
-                                    {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${daysUntilInteraction} Stunden)` : `Wait (${daysUntilInteraction} hours)`}</div>}
+                                    {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilInteraction} Stunden)` : `Wait (${hoursUntilInteraction} hours)`}</div>}
                                 </button>
                             );
                         })}

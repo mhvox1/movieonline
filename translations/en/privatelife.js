@@ -125,12 +125,12 @@ export const privatelife = {
         studiesTitle: 'Long-term Studies',
         energy: 'Energy',
         skill: 'Skill',
-        days: 'days',
+        days: 'hours',
         alreadyFinished: 'Already completed',
         luxuryVacation: 'Luxury Vacation',
-        luxuryVacationDesc: '2 weeks of total relaxation. Restores energy to 100%.',
+        luxuryVacationDesc: '14 hours of total relaxation. Restores energy to 100%.',
         enrollmentTitle: 'School Enrollment',
-        enrollmentText: '{name} is starting school! Classes begin in 4 weeks. Please select the desired type of school.',
+        enrollmentText: '{name} is starting school! Classes begin in 28 hours. Please select the desired type of school.',
         secondaryEnrollmentTitle: 'Secondary School',
         secondaryEnrollmentText: '{name} is moving to secondary school. Please select the desired educational path.',
         universityEnrollmentTitle: 'University',
@@ -386,3 +386,4 @@ export const privatelife = {
         }
     }
 };
+

@@ -125,10 +125,10 @@ export const privatelife = {
         studiesTitle: 'Langzeit-Studium',
         energy: 'Energie',
         skill: 'Skill',
-        days: 'Tage',
+        days: 'Stunden',
         alreadyFinished: 'Bereits absolviert',
         luxuryVacation: 'Luxusurlaub',
-        luxuryVacationDesc: '2 Wochen totale Entspannung. Setzt Energie auf 100%.',
+        luxuryVacationDesc: '14 Stunden totale Entspannung. Setzt Energie auf 100%.',
         enrollmentTitle: 'Einschulung',
         enrollmentText: '{name} kommt in die Schule! In 4 Wochen beginnt der Unterricht. Bitte wählen Sie die gewünschte Schulform.',
         secondaryEnrollmentTitle: 'Weiterführende Schule',
@@ -386,3 +386,4 @@ export const privatelife = {
         }
     }
 };
+
