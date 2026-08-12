@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { PlayerData, SkillSet, EmployeeType, MaritalStatus, RelationshipInteraction } from '../../../types';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useGame } from '../../../contexts/GameContext';
+import { formatHoursAndMinutes } from '../../../hooks/timeUtils';
 import SkillBar from '../../SkillBar';
 import { RELATIONSHIP_INTERACTIONS } from '../../privateLifeData';
 import StarIcon from '../../icons/StarIcon';
@@ -426,7 +427,7 @@ const PartnerProfile: React.FC<PartnerProfileProps> = ({
                                              <VitalityStars modifier={interaction.energyModifier} label="V" />
                                          </div>
                                     </div>
-                                    {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilInteraction} Stunden)` : `Wait (${hoursUntilInteraction} hours)`}</div>}
+                                    {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${formatHoursAndMinutes(hoursUntilInteraction)})` : `Wait (${formatHoursAndMinutes(hoursUntilInteraction)})`}</div>}
                                 </button>
                             );
                         })}
@@ -555,7 +556,7 @@ const PartnerProfile: React.FC<PartnerProfileProps> = ({
                                 : <>Send {partnerName} to training for <strong>{getSkillLabel(showTrainingConfirm.skill)}</strong>?</>}
                         </p>
                         <p className="text-gray-400 text-[10px] mb-3">
-                            {language === 'de' ? 'Dauer' : 'Duration'}: {showTrainingConfirm.duration} {language === 'de' ? 'Stunden' : 'hours'} | {language === 'de' ? 'Kosten' : 'Cost'}: {trainingCost}$
+                            {language === 'de' ? 'Dauer' : 'Duration'}: {formatHoursAndMinutes(showTrainingConfirm.duration)} | {language === 'de' ? 'Kosten' : 'Cost'}: {trainingCost}$
                         </p>
                         <div className="flex justify-center gap-4">
                             <button onClick={() => setShowTrainingConfirm(null)} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1.5 px-6 rounded text-xs uppercase">{t.common.cancel}</button>

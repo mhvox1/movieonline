@@ -13,7 +13,7 @@ import StarIcon from '../../icons/StarIcon';
 import HeartIcon from '../../icons/HeartIcon';
 import ArrowLeftIcon from '../../icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../icons/ArrowRightIcon';
-import { msToHours } from '../../../hooks/timeUtils';
+import { msToHours, formatHoursAndMinutes } from '../../../hooks/timeUtils';
 
 const PRIVATE_INTERACTION_COOLDOWN_HOURS = 7;
 
@@ -667,7 +667,7 @@ export const RelationshipsTab: React.FC = () => {
                                             <p className="text-[10px] text-gray-400 mb-1 leading-tight">{transDesc}</p>
                                             <p className="text-[9px] text-gray-500">Chance: {Math.round(option.successChance * 100)}%</p>
                                         </div>
-                                        {!searchAvailable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilSearch} Stunden)` : `Wait (${hoursUntilSearch} hours)`}</div>}
+                                        {!searchAvailable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${formatHoursAndMinutes(hoursUntilSearch)})` : `Wait (${formatHoursAndMinutes(hoursUntilSearch)})`}</div>}
                                     </button>
                                 )})}
                             </div>
@@ -749,7 +749,7 @@ export const RelationshipsTab: React.FC = () => {
                                                 <VitalityStars modifier={interaction.energyModifier} label="V" />
                                             </div>
 
-                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilInteraction}h)` : `Wait (${hoursUntilInteraction}h)`}</div>}
+                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${formatHoursAndMinutes(hoursUntilInteraction)})` : `Wait (${formatHoursAndMinutes(hoursUntilInteraction)})`}</div>}
                                         </button>
                                     );
                                 })}

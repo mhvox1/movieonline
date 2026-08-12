@@ -8,7 +8,7 @@ import StarRating from './StarRating';
 import { useTranslation } from '../hooks/useTranslation';
 import { getTranslatedScriptDescription, getTranslatedScriptTitle } from './scriptGenerator';
 import { TranslationType } from '../translations/types';
-import { daysToHours } from '../hooks/timeUtils';
+import { daysToHours, formatHoursAndMinutes } from '../hooks/timeUtils';
 
 interface ProjectProgressScreenProps {
   onBack: () => void;
@@ -350,7 +350,7 @@ const ProjectProgressScreen: React.FC<ProjectProgressScreenProps> = ({ onBack, g
         <div className="mb-4 p-3 bg-black/20 rounded-lg">
             <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold text-base text-white">{currentPhaseLabel}</h3>
-                <span className="text-xs text-gray-300">{hoursRemaining > 0 ? t.widgets.currentProject.daysRemaining.replace('{days}', hoursRemaining.toString()) : 'Fast fertig...'}</span>
+                <span className="text-xs text-gray-300">{hoursRemaining > 0 ? t.widgets.currentProject.daysRemaining.replace('{days}', formatHoursAndMinutes(hoursRemaining)) : 'Fast fertig...'}</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden border border-gray-600">
                 <div className={`${progressColor} h-full rounded-full flex items-center justify-center text-xs font-bold text-black`} style={{ width: `${currentProgress}%` }}>

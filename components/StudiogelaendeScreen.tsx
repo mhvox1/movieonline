@@ -18,6 +18,7 @@ import BurogebaudeIcon from './icons/BurogebaudeIcon';
 import ProduktionIcon from './icons/ProduktionIcon';
 import BauhofIcon from './icons/BauhofIcon';
 import LocationIcon from './icons/LocationIcon';
+import { formatHoursAndMinutes } from '../hooks/timeUtils';
 import SchnittIcon from './icons/SchnittIcon';
 import BugIcon from './icons/BugIcon';
 import WardrobeIcon from './icons/WardrobeIcon';
@@ -453,7 +454,7 @@ const StudiogelaendeScreen: React.FC<StudiogelaendeScreenProps> = ({ onBack, gam
                                 {isUnderConstruction && constructionEntry ? (
                                     <div className="text-center p-4 bg-blue-900 rounded-md border border-blue-600">
                                         <h3 className="text-xl font-bold text-white">{t.studiogelaende.screen.upgrading}</h3>
-                                        <p className="text-blue-300 text-lg">{t.studiogelaende.screen.daysRemaining.replace('{days}', getHoursRemaining(constructionEntry.endDate).toString())}</p>
+                                        <p className="text-blue-300 text-lg">{t.studiogelaende.screen.daysRemaining.replace('{days}', formatHoursAndMinutes(getHoursRemaining(constructionEntry.endDate)))}</p>
                                     </div>
                                 ) : nextLevelData ? (() => {
                                     const nextLevelTranslations = buildingTranslations.levels[`level${nextLevelData.level}`];
@@ -463,7 +464,7 @@ const StudiogelaendeScreen: React.FC<StudiogelaendeScreenProps> = ({ onBack, gam
                                         <p className="text-gray-400 mt-1 text-center">{nextLevelTranslations?.desc || nextLevelData.description}</p>
                                         <div className="mt-4 space-y-2 text-lg">
                                             <div className="flex justify-between"><span>{t.studiogelaende.screen.cost}</span> <span className="font-bold">{formatCurrency(nextLevelData.cost)}</span></div>
-                                            <div className="flex justify-between"><span>{t.studiogelaende.screen.duration}</span> <span className="font-bold">{(isTestMode ? 1 : nextLevelData.duration) * 24} {language === 'de' ? 'Stunden' : 'hours'}</span></div>
+                                            <div className="flex justify-between"><span>{t.studiogelaende.screen.duration}</span> <span className="font-bold">{formatHoursAndMinutes((isTestMode ? 1 : nextLevelData.duration) * 24)}</span></div>
                                             <div className="flex justify-between"><span>{t.studiogelaende.screen.monthlyCost.replace(': {cost}', ':')}</span> <span className="font-bold">{formatCurrency(nextLevelData.monthlyCost)}</span></div>
                                             <div className="flex justify-between items-start mt-2">
                                                 <span>{t.studiogelaende.screen.bonus}</span>

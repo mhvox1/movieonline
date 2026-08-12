@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useGame } from '../../../contexts/GameContext';
 import { ALL_COURSES, WEEKEND_SEMINARS, LEISURE_ACTIVITIES } from '../../privateLifeData';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { formatHoursAndMinutes } from '../../../hooks/timeUtils';
 import StarIcon from '../../icons/StarIcon';
 import HeartIcon from '../../icons/HeartIcon';
 
@@ -87,7 +88,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({ item, type,
     else if (!hasEnergy) warning = isGerman ? 'Nicht genügend Energie.' : 'Not enough energy.';
     else if (isBusy && type !== 'vacation') warning = isGerman ? 'Sie sind bereits beschäftigt.' : 'You are already busy.';
     else if (isCompleted) warning = t.privatelife.education.alreadyFinished;
-    else if (cooldownActive) warning = isGerman ? 'Wartezeit nach Studium aktiv (60 Stunden).' : 'Study cooldown active (60 hours).';
+    else if (cooldownActive) warning = isGerman ? 'Wartezeit nach Studium aktiv (60:00).' : 'Study cooldown active (60:00).';
     else if (frequencyLimitReached) warning = isGerman ? 'Maximal 1 Aktivität pro Monat.' : 'Maximum 1 activity per month.';
 
     return (
@@ -104,7 +105,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({ item, type,
                         <div className="bg-gray-900/50 p-3 rounded-lg border border-gray-700">
                             <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{isGerman ? 'Dauer' : 'Duration'}</p>
                             <p className="text-white font-bold">
-                                {type === 'vacation' ? '14' : item.duration} {t.privatelife.education.days}
+                                {formatHoursAndMinutes(type === 'vacation' ? 14 : item.duration)}
                             </p>
                         </div>
                          <div className="bg-gray-900/50 p-3 rounded-lg border border-gray-700">
@@ -439,7 +440,7 @@ export const EducationTab: React.FC = () => {
                         )}
                         {isCourseCooldownActive() && !playerData.activeCourse && (
                              <div className="mt-8 p-4 bg-gray-900/50 border border-gray-600 rounded-lg text-center">
-                                <p className="text-gray-400 text-sm">{language === 'de' ? 'Wartezeit nach Studium aktiv (60 Stunden).' : 'Study cooldown active (60 hours).'}</p>
+                                <p className="text-gray-400 text-sm">{language === 'de' ? 'Wartezeit nach Studium aktiv (60:00).' : 'Study cooldown active (60:00).'}</p>
                             </div>
                         )}
                     </div>
@@ -564,7 +565,7 @@ export const EducationTab: React.FC = () => {
                                     <h3 className="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
                                         <span className="text-xl">🎓</span> {t.privatelife.education.studiesTitle}
                                     </h3>
-                                    {isCourseCooldownActive() && !playerData.activeCourse && <p className="text-xs text-red-400 mb-2">{language === 'de' ? 'Wartezeit aktiv (60 Stunden).' : 'Cooldown active (60 hours).'}</p>}
+                                    {isCourseCooldownActive() && !playerData.activeCourse && <p className="text-xs text-red-400 mb-2">{language === 'de' ? 'Wartezeit aktiv (60:00).' : 'Cooldown active (60:00).'}</p>}
                                     <div className="space-y-3">
                                         {ALL_COURSES.map(course => {
                                             const transName = t.privatelife.education.courses?.[course.id]?.name || course.name;
@@ -586,7 +587,7 @@ export const EducationTab: React.FC = () => {
                                                     {playerData.completedCourses.includes(course.id) && <span className="text-[10px] text-green-500 font-bold uppercase mt-1 block">{t.privatelife.education.alreadyFinished}</span>}
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-xs text-gray-400 mb-1">{course.duration} {t.privatelife.education.days}</p>
+                                                    <p className="text-xs text-gray-400 mb-1">{formatHoursAndMinutes(course.duration)}</p>
                                                     <span className={`text-xs font-bold px-2 py-1 rounded ${playerData.privateCapital >= course.cost ? 'bg-amber-900/40 text-amber-300' : 'bg-red-900/40 text-red-300'}`}>
                                                         {formatCurrency(course.cost)}
                                                     </span>

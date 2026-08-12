@@ -9,7 +9,7 @@ import { useGame } from '../../contexts/GameContext';
 import { GameState, BuildingType, EmployeeType, OfficeTabType, Employee } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 import { CurrentViewType } from '../NewProjectScreen_Phase1';
-import { daysToHours } from '../../hooks/timeUtils';
+import { daysToHours, formatHoursAndMinutes } from '../../hooks/timeUtils';
 
 interface StudioActivitiesWidgetProps {
     onNavigate: (state: GameState) => void;
@@ -110,7 +110,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                     <div>
                         <div className="flex justify-between items-baseline text-sm mb-1">
                             <span className="font-bold text-cyan-400">{t.widgets.activities.planning}</span>
-                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                         </div>
                         <p className="text-xs text-white truncate mb-1">"{activePlanning.workingTitle}"</p>
                         <ProgressBar progress={progress} text={`${Math.round(progress)}%`} color="bg-cyan-500" />
@@ -135,7 +135,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                     <div>
                         <div className="flex justify-between items-baseline text-sm mb-1">
                             <span className="font-bold text-purple-400">{t.widgets.activities.writing}</span>
-                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                         </div>
                         <p className="text-xs text-white truncate mb-1">"{activeWriting.script.title}"</p>
                         <ProgressBar progress={progress} text={`${Math.round(progress)}%`} color="bg-purple-500" />
@@ -194,7 +194,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                         <div>
                             <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-orange-400">{t.widgets.activities.construction}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{construction.buildingType} ({t.widgets.activities.level.replace('{level}', (currentLevel + 1).toString())})</p>
                             <ProgressBar progress={progress} text={`${Math.round(progress)}%`} color="bg-orange-500" />
@@ -223,7 +223,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-cyan-400">{t.widgets.activities.castingScouting}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{agentCasting.talentName} ({agent.name})</p>
                             <ProgressBar progress={progress} color="bg-cyan-400" />
@@ -245,7 +245,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-purple-400">{t.widgets.activities.campaign}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{scopeText} ({agent.name})</p>
                             <ProgressBar progress={progress} color="bg-purple-400" />
@@ -265,7 +265,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-indigo-400">{t.widgets.activities.scouting}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{params.qualityTier} ({agent.name})</p>
                             <ProgressBar progress={100} text="..." color="bg-indigo-400" />
@@ -285,7 +285,7 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-yellow-400">{t.widgets.activities.inTraining}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(hoursRemaining))}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{agent.name}</p>
                             <ProgressBar progress={100} text="..." color="bg-yellow-500" />

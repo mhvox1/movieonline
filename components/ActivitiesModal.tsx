@@ -4,7 +4,7 @@ import { PlayerData, GameState, EmployeeType } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 import { BUILDING_DATA } from './buildings';
 import { RESEARCH_TECHS } from './research';
-import { daysToHours } from '../hooks/timeUtils';
+import { daysToHours, formatHoursAndMinutes } from '../hooks/timeUtils';
 
 interface ActivitiesModalProps {
     onClose: () => void;
@@ -108,7 +108,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                             title={t.widgets.activities.planning}
                             subtitle={`"${playerData.activePlanning.workingTitle}"`}
                             progress={calculateProgress(playerData.activePlanning.scriptStartDate, playerData.activePlanning.scriptEndDate, gameDate)}
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(playerData.activePlanning.scriptEndDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(playerData.activePlanning.scriptEndDate, gameDate)))}
                             color="bg-cyan-500"
                             onGo={() => { onNavigate(GameState.Projects); onClose(); }}
                             t={t}
@@ -121,7 +121,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                             title={t.widgets.activities.writing}
                             subtitle={`"${playerData.activeWriting.script.title}"`}
                             progress={calculateProgress(playerData.activeWriting.startDate, playerData.activeWriting.endDate, gameDate)}
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(playerData.activeWriting.endDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(playerData.activeWriting.endDate, gameDate)))}
                             color="bg-purple-500"
                             onGo={() => { onNavigate(GameState.Projects, 'scripts'); onClose(); }}
                             t={t}
@@ -152,7 +152,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                                 construction.endDate, 
                                 gameDate
                             )}
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(construction.endDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(construction.endDate, gameDate)))}
                             color="bg-orange-500"
                             onGo={() => { onNavigate(GameState.Studiogelaende); onClose(); }}
                             t={t}
@@ -166,7 +166,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                             title={t.widgets.activities.castingScouting}
                             subtitle={`${casting.talentName} (${resolveName(casting.casterId)})`}
                             progress={calculateProgress(casting.startDate!, casting.endDate, gameDate)}
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(casting.endDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(casting.endDate, gameDate)))}
                             color="bg-cyan-400"
                             onGo={() => { onNavigate(GameState.Office, 'talent_management'); onClose(); }}
                             t={t}
@@ -182,7 +182,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                                 title={t.widgets.activities.campaign}
                                 subtitle={`${scopeText} (${resolveName(campaign.casterId)})`}
                                 progress={calculateProgress(campaign.startDate, campaign.endDate, gameDate)}
-                                detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(campaign.endDate, gameDate).toString())}
+                                detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(campaign.endDate, gameDate)))}
                                 color="bg-purple-400"
                                 onGo={() => { onNavigate(GameState.Office, 'talent_management'); onClose(); }}
                                 t={t}
@@ -197,7 +197,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                             title={t.widgets.activities.scouting}
                             subtitle={`${scouting.searchParams.qualityTier} (${resolveName(scouting.scoutId)})`}
                             progress={100} // Indeterminate mostly, or simple countdown
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(scouting.endDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(scouting.endDate, gameDate)))}
                             color="bg-indigo-400"
                             onGo={() => { onNavigate(GameState.Office, 'talent_management'); onClose(); }}
                             t={t}
@@ -213,7 +213,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                                 title={t.widgets.activities.inTraining}
                                 subtitle={emp.name}
                                 progress={calculateProgress(emp.activeTraining.startDate!, emp.activeTraining.endDate, gameDate)}
-                                detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(emp.activeTraining.endDate, gameDate).toString())}
+                                detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(emp.activeTraining.endDate, gameDate)))}
                                 color="bg-yellow-500"
                                 onGo={() => { onNavigate(GameState.Office, 'employees'); onClose(); }}
                                 t={t}
@@ -227,7 +227,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                             title={t.widgets.activities.inTraining}
                             subtitle={`${playerData.partnerName || 'Partner'} (${playerData.partnerActiveTraining.skill})`}
                             progress={calculateProgress(playerData.partnerActiveTraining.startDate, playerData.partnerActiveTraining.endDate, gameDate)}
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(playerData.partnerActiveTraining.endDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(playerData.partnerActiveTraining.endDate, gameDate)))}
                             color="bg-pink-500"
                             onGo={() => { onNavigate(GameState.Privatleben); onClose(); }}
                             t={t}
@@ -243,7 +243,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                                 title={t.widgets.activities.inTraining}
                                 subtitle={`${child.name} (${child.activeTraining.skill})`}
                                 progress={calculateProgress(child.activeTraining.startDate, child.activeTraining.endDate, gameDate)}
-                                detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(child.activeTraining.endDate, gameDate).toString())}
+                                detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(child.activeTraining.endDate, gameDate)))}
                                 color="bg-blue-400"
                                 onGo={() => { onNavigate(GameState.Privatleben); onClose(); }}
                                 t={t}
@@ -261,7 +261,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ onClose, onNavigate, 
                                 playerData.activeSeminar.endDate, 
                                 gameDate
                             )}
-                            detailLabel={t.widgets.activities.days.replace('{days}', getHoursRemaining(playerData.activeSeminar.endDate, gameDate).toString())}
+                            detailLabel={t.widgets.activities.days.replace('{days}', formatHoursAndMinutes(getHoursRemaining(playerData.activeSeminar.endDate, gameDate)))}
                             color={playerData.activeSeminar.type === 'seminar' ? "bg-amber-500" : "bg-green-400"}
                             onGo={() => { onNavigate(GameState.Privatleben); onClose(); }}
                             t={t}

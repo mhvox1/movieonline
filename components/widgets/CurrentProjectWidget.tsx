@@ -10,7 +10,7 @@ import { getCoverPath } from '../coverConfig';
 import NeuesProjektIcon from '../icons/NeuesProjektIcon';
 import { useTranslation } from '../../hooks/useTranslation';
 import { CurrentViewType } from '../NewProjectScreen_Phase1';
-import { daysToHours } from '../../hooks/timeUtils';
+import { daysToHours, formatHoursAndMinutes } from '../../hooks/timeUtils';
 
 interface CurrentProjectWidgetProps {
     onNavigate: (state: GameState) => void;
@@ -178,7 +178,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
                 phaseText = t.widgets.currentProject.phase.casting;
                 if (projectToDisplay.castingStartDate && projectToDisplay.castingEndDate) {
                     progress = calculateProgress(projectToDisplay.castingStartDate, projectToDisplay.castingEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.castingEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', formatHoursAndMinutes(getHoursRemaining(projectToDisplay.castingEndDate, gameDate)));
                 }
                 color = 'bg-green-500';
                 break;
@@ -186,7 +186,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
                 phaseText = t.widgets.currentProject.phase.production;
                 if (projectToDisplay.productionStartDate && projectToDisplay.productionEndDate) {
                     progress = calculateProgress(projectToDisplay.productionStartDate, projectToDisplay.productionEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.productionEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', formatHoursAndMinutes(getHoursRemaining(projectToDisplay.productionEndDate, gameDate)));
                 }
                 color = 'bg-blue-500';
                 break;
@@ -194,7 +194,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
                 phaseText = t.widgets.currentProject.phase.postProduction;
                 if (projectToDisplay.postProductionStartDate && projectToDisplay.postProductionEndDate) {
                     progress = calculateProgress(projectToDisplay.postProductionStartDate, projectToDisplay.postProductionEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.postProductionEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', formatHoursAndMinutes(getHoursRemaining(projectToDisplay.postProductionEndDate, gameDate)));
                 }
                 color = 'bg-violet-500';
                 break;
@@ -215,7 +215,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
             const isUrgent = diffHours < 720;
             contractDeadlineText = (
                 <div className={`mt-2 text-xs font-bold text-center border-t border-gray-600 pt-1 ${isUrgent ? 'text-red-400 animate-pulse' : 'text-blue-300'}`}>
-                    Frist: {deadline.toLocaleDateString(locale)} ({diffHours} Stunden)
+                    Frist: {deadline.toLocaleDateString(locale)} ({formatHoursAndMinutes(diffHours)})
                 </div>
             );
         }

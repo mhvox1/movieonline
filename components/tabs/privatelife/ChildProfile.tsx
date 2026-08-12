@@ -3,7 +3,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { PlayerData, Child, SkillSet, EmployeeType, ActorAge } from '../../../types';
 import { useGame } from '../../../contexts/GameContext';
 import { useTranslation } from '../../../hooks/useTranslation';
-import { msToHours } from '../../../hooks/timeUtils';
+import { msToHours, formatHoursAndMinutes } from '../../../hooks/timeUtils';
 import SkillBar from '../../SkillBar';
 import { SCHOOL_TYPES, SECONDARY_SCHOOL_TYPES, UNIVERSITY_TYPES, CHILD_INTERACTIONS, UNIVERSITY_MAJORS } from '../../privateLifeData';
 import HeartIcon from '../../icons/HeartIcon';
@@ -340,7 +340,7 @@ const ChildProfile: React.FC<ChildProfileProps> = ({ child, playerData, onIntera
                                                      )}
                                                  </div>
                                             </div>
-                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${hoursUntilInteraction} Stunden)` : `Wait (${hoursUntilInteraction} hours)`}</div>}
+                                            {!interactionAvailable && <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] font-bold text-white z-20">{language === 'de' ? `Warten (${formatHoursAndMinutes(hoursUntilInteraction)})` : `Wait (${formatHoursAndMinutes(hoursUntilInteraction)})`}</div>}
                                         </button>
                                     );
                                 })}
@@ -470,7 +470,7 @@ const ChildProfile: React.FC<ChildProfileProps> = ({ child, playerData, onIntera
                                 : <>Send {child.name} to training for <strong>{getSkillLabel(showTrainingConfirm.skill)}</strong>?</>}
                         </p>
                         <p className="text-gray-400 text-[10px] mb-3">
-                            {language === 'de' ? 'Dauer' : 'Duration'}: {showTrainingConfirm.duration} {t.privatelife.education.days} | {language === 'de' ? 'Kosten' : 'Cost'}: {trainingCost}$
+                            {language === 'de' ? 'Dauer' : 'Duration'}: {formatHoursAndMinutes(showTrainingConfirm.duration)} | {language === 'de' ? 'Kosten' : 'Cost'}: {trainingCost}$
                         </p>
                         <div className="flex justify-center gap-4">
                             <button onClick={() => setShowTrainingConfirm(null)} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1.5 px-6 rounded text-xs uppercase">{t.common.cancel}</button>
