@@ -716,7 +716,7 @@ const ProjectPlanningTab = ({ setGameState, setCurrentView, planningMode, onBack
     }
     const startDate = new Date(playerData.gameDate);
     const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + duration);
+    endDate.setHours(startDate.getHours() + duration);
     const movieSizeConfig = isSeriesMode ? null : MOVIE_SIZE_CONFIG[selectedMovieSize];
     const hardCap = movieSizeConfig ? movieSizeConfig.qualityCap : 100;
     const baseScriptQuality = isSeriesMode ? seriesPlanningQuality : selectedScript.quality;

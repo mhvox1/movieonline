@@ -47,7 +47,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
           <div
             onClick={handleCheatReputation}
             className={`inline-block ${isTestMode ? 'cursor-pointer hover:opacity-80' : ''}`}
-            title={isTestMode ? 'Testmodus: Klicke für +10 Ruf' : undefined}
+            title={isTestMode ? 'Testmodus: Klicke fï¿½r +10 Ruf' : undefined}
           >
             <StarRating rating={playerData.reputation} />
           </div>
@@ -55,7 +55,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
         <p
           onClick={handleCheatCapital}
           className={`text-lg font-semibold text-amber-400 mt-1 ${isTestMode ? 'cursor-pointer hover:text-amber-200' : ''}`}
-          title={isTestMode ? 'Testmodus: Klicke für +1.000.000$' : undefined}
+          title={isTestMode ? 'Testmodus: Klicke fï¿½r +1.000.000$' : undefined}
         >
           {t.header.capital}: {new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(playerData.capital)}
         </p>

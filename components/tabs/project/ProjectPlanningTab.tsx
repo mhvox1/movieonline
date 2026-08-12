@@ -796,7 +796,7 @@ const ProjectPlanningTab: React.FC<ProjectPlanningTabProps> = ({ setGameState, s
 
         const startDate = new Date(playerData.gameDate);
         const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + duration);
+        endDate.setHours(startDate.getHours() + duration);
 
         const movieSizeConfig = isSeriesMode ? null : MOVIE_SIZE_CONFIG[selectedMovieSize];
         // Calculate Hard Quality Cap from Movie Size
