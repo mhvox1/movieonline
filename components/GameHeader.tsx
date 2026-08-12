@@ -37,7 +37,8 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
   const weeklyCalendarData = useMemo(() => {
     if (!playerData) return [];
 
-    const today = new Date();
+    const calendarBaseDate = isTestMode ? new Date(playerData.gameDate) : new Date();
+    const today = new Date(calendarBaseDate);
     today.setHours(0, 0, 0, 0);
 
     const scopeTranslations = {
@@ -103,7 +104,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
       date,
       events: allEvents.filter(event => isSameDay(date, event.date)),
     }));
-  }, [playerData, t, language]);
+  }, [playerData, t, language, isTestMode]);
 
   const daysOfWeek = useMemo(() => weeklyCalendarData.map(day => day.date.toLocaleDateString(locale, { weekday: 'short' })), [weeklyCalendarData, locale]);
 
