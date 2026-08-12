@@ -74,13 +74,14 @@
           </div>
 
           <div class="bg-indigo-950/30 border border-indigo-700 rounded p-4 mt-4">
-            <p class="text-sm text-indigo-200 mb-3">Testmodus: Wenn aktiv, entsprechen 10 Echtzeit-Sekunden genau 1 Ingame-Stunde.</p>
+            <p class="text-sm text-indigo-200 mb-3">Testmodus: 1 Ingame-Stunde = 10 Echtzeit-Sekunden.</p>
             <label class="flex items-center gap-3 mb-3">
               <input id="testModeToggle" type="checkbox" class="accent-amber-500 w-4 h-4" />
               <span class="text-sm text-slate-100">Testmodus aktivieren</span>
             </label>
             <div class="flex items-center gap-3">
               <button id="saveTestModeBtn" class="px-4 py-2 rounded bg-indigo-700 hover:bg-indigo-600 font-semibold">Testmodus speichern</button>
+              <button id="startTestModeNowBtn" class="px-4 py-2 rounded bg-fuchsia-700 hover:bg-fuchsia-600 font-semibold">Testmodus nun starten</button>
               <span id="testModeStatus" class="text-xs text-slate-300">Status: -</span>
             </div>
           </div>
@@ -611,6 +612,7 @@
     const resetGameBtn = document.getElementById('resetGameBtn');
     const testModeToggle = document.getElementById('testModeToggle');
     const saveTestModeBtn = document.getElementById('saveTestModeBtn');
+    const startTestModeNowBtn = document.getElementById('startTestModeNowBtn');
     const testModeStatus = document.getElementById('testModeStatus');
     const userSubtabList = document.getElementById('userSubtabList');
     const userSubtabCreate = document.getElementById('userSubtabCreate');
@@ -1385,7 +1387,7 @@
         const enabled = Boolean(settings.testModeEnabled);
         testModeToggle.checked = enabled;
         testModeStatus.textContent = enabled
-          ? 'Status: Aktiv (10 Echtzeit-Sekunden = 1 Ingame-Stunde)'
+          ? 'Status: Aktiv (1 Ingame-Stunde = 10 Echtzeit-Sekunden)'
           : 'Status: Inaktiv (Standardzeit)';
       } catch (error) {
         testModeStatus.textContent = 'Status: Fehler beim Laden';
@@ -1407,11 +1409,27 @@
         const enabled = Boolean(result?.settings?.testModeEnabled);
         testModeToggle.checked = enabled;
         testModeStatus.textContent = enabled
-          ? 'Status: Aktiv (10 Echtzeit-Sekunden = 1 Ingame-Stunde)'
+          ? 'Status: Aktiv (1 Ingame-Stunde = 10 Echtzeit-Sekunden)'
           : 'Status: Inaktiv (Standardzeit)';
         log('Testmodus gespeichert', { testModeEnabled: enabled });
       } catch (error) {
         log('Testmodus speichern fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function startTestModeNow() {
+      const ok = confirm('Testmodus jetzt global starten? Alle Studios/Saves werden fuer alle User zurueckgesetzt. Neuer Start ist jetzt (aktuelle Echtzeit).');
+      if (!ok) return;
+
+      try {
+        const result = await api('/admin/test-mode/start', { method: 'POST' });
+        testModeToggle.checked = true;
+        testModeStatus.textContent = 'Status: Aktiv (1 Ingame-Stunde = 10 Echtzeit-Sekunden)';
+        log('Testmodus global gestartet', result);
+        await refreshAll();
+        setActiveTab('overview');
+      } catch (error) {
+        log('Testmodus-Start fehlgeschlagen', { error: error.message });
       }
     }
 
@@ -2054,6 +2072,7 @@
     tabMarketFeedback.addEventListener('click', () => setActiveTab('marketFeedback'));
     resetGameBtn.addEventListener('click', resetGameData);
     saveTestModeBtn.addEventListener('click', saveAdminSettings);
+    startTestModeNowBtn.addEventListener('click', startTestModeNow);
     userSubtabList.addEventListener('click', () => setUserSubtab('list'));
     userSubtabCreate.addEventListener('click', () => setUserSubtab('create'));
     submitCreateUserBtn.addEventListener('click', createUser);
