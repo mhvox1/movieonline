@@ -1,5 +1,6 @@
 const SERVER_EPOCH_REAL_UTC = new Date(Date.UTC(2026, 0, 1, 0, 0, 0, 0));
 const GAME_EPOCH_UTC = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
+const TEST_MODE_REAL_MS_PER_INGAME_HOUR = 60 * 1000;
 const { readWorldState } = require('./worldStateStore');
 
 function startOfUtcDay(date) {
@@ -28,6 +29,18 @@ function getDaysInUtcMonth(date) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
 }
 
+function getMonthIndexFromIngameDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+    return 0;
+  }
+  return Math.max(0, ((date.getUTCFullYear() - GAME_EPOCH_UTC.getUTCFullYear()) * 12) + (date.getUTCMonth() - GAME_EPOCH_UTC.getUTCMonth()));
+}
+
+function isTestModeEnabled() {
+  const worldState = readWorldState();
+  return Boolean(worldState?.testModeEnabled);
+}
+
 function getServerEpochRealUtc() {
   const worldState = readWorldState();
   const resetStartDateIso = String(worldState?.resetStartDateIso || '').trim();
@@ -44,12 +57,21 @@ function getServerEpochRealUtc() {
 }
 
 function getIngameMonthIndex(now = new Date()) {
+  if (isTestModeEnabled()) {
+    return getMonthIndexFromIngameDate(getCurrentIngameDate(now));
+  }
   return Math.max(0, daysBetweenUtc(getServerEpochRealUtc(), now));
 }
 
 function getCurrentIngameDate(now = new Date()) {
   const epochRealUtc = getServerEpochRealUtc();
   const elapsedRealMs = Math.max(0, now.getTime() - epochRealUtc.getTime());
+
+  if (isTestModeEnabled()) {
+    const elapsedIngameHours = elapsedRealMs / TEST_MODE_REAL_MS_PER_INGAME_HOUR;
+    return new Date(GAME_EPOCH_UTC.getTime() + (elapsedIngameHours * 3600000));
+  }
+
   const elapsedRealDays = elapsedRealMs / 86400000;
   const fullMonthsElapsed = Math.floor(elapsedRealDays);
   const monthFraction = elapsedRealDays - fullMonthsElapsed;
@@ -69,6 +91,12 @@ function calculateElapsedIngameMonths(lastProcessedAtIso, now = new Date()) {
   const lastProcessedAt = new Date(lastProcessedAtIso);
   if (Number.isNaN(lastProcessedAt.getTime())) {
     return 0;
+  }
+
+  if (isTestModeEnabled()) {
+    const previousMonthIndex = getIngameMonthIndex(lastProcessedAt);
+    const nextMonthIndex = getIngameMonthIndex(now);
+    return Math.max(0, nextMonthIndex - previousMonthIndex);
   }
 
   return Math.max(0, daysBetweenUtc(lastProcessedAt, now));

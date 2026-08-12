@@ -10,6 +10,7 @@ function getDefaultWorldState() {
     genreTrends: {},
     chartsHistory: [],
     filmCatalog: {},
+    testModeEnabled: false,
     updatedAtIso: null,
   };
 }

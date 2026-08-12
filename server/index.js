@@ -1239,6 +1239,8 @@ function applyCalculatedIngameDateToState(state, ingameDateIso) {
 
 function resetGameDataForAdmin() {
   const now = new Date();
+  const previousWorldState = readWorldState();
+  const testModeEnabled = Boolean(previousWorldState?.testModeEnabled);
   const resetStartDateIso = getLatestResetStartDateIso() || createResetStartDate(now).toISOString();
   const removedStudios = listStudios().length;
 
@@ -1251,6 +1253,7 @@ function resetGameDataForAdmin() {
     updatedAtIso: now.toISOString(),
     resetAtIso: now.toISOString(),
     resetStartDateIso,
+    testModeEnabled,
   });
   fs.writeFileSync(MARKET_DB_FILE, JSON.stringify({ listings: [] }, null, 2), 'utf-8');
 
@@ -1259,6 +1262,27 @@ function resetGameDataForAdmin() {
     resetWorldState: true,
     resetMarket: true,
     resetStartDateIso,
+  };
+}
+
+function getAdminSettings() {
+  const worldState = readWorldState();
+  return {
+    testModeEnabled: Boolean(worldState?.testModeEnabled),
+  };
+}
+
+function updateAdminSettings(settingsPayload) {
+  const worldState = readWorldState();
+  const nextTestModeEnabled = Boolean(settingsPayload?.testModeEnabled);
+  const nextState = {
+    ...worldState,
+    testModeEnabled: nextTestModeEnabled,
+    updatedAtIso: new Date().toISOString(),
+  };
+  writeWorldState(nextState);
+  return {
+    testModeEnabled: nextTestModeEnabled,
   };
 }
 
@@ -1677,13 +1701,17 @@ function createServer() {
     if (req.method === 'GET' && url.pathname === '/server-time') {
       const now = new Date();
       const worldState = readWorldState();
+      const testModeEnabled = Boolean(worldState?.testModeEnabled);
       sendJson(res, 200, {
         nowIso: now.toISOString(),
         ingameMonthIndex: getIngameMonthIndex(now),
         ingameDateIso: getCurrentIngameDate(now).toISOString(),
         resetStartDateIso: worldState?.resetStartDateIso || null,
         resetAtIso: worldState?.resetAtIso || null,
-        rule: '1 real UTC day = 1 ingame month',
+        testModeEnabled,
+        rule: testModeEnabled
+          ? 'Test mode: 1 real minute = 1 ingame hour'
+          : '1 real UTC day = 1 ingame month',
       });
       return;
     }
@@ -1869,6 +1897,38 @@ function createServer() {
       sendJson(res, 200, {
         overview: collectOverviewForAdmin(),
       });
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/admin/settings') {
+      if (!isAdmin(auth.user)) {
+        sendJson(res, 401, { error: 'Admin login required' });
+        return;
+      }
+      sendJson(res, 200, {
+        settings: getAdminSettings(),
+      });
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/admin/settings') {
+      if (!isAdmin(auth.user)) {
+        sendJson(res, 401, { error: 'Admin login required' });
+        return;
+      }
+      try {
+        const body = await parseJsonBody(req);
+        const settings = body?.settings && typeof body.settings === 'object'
+          ? body.settings
+          : body;
+        const updated = updateAdminSettings(settings);
+        sendJson(res, 200, {
+          ok: true,
+          settings: updated,
+        });
+      } catch (error) {
+        sendJson(res, 400, { error: error instanceof Error ? error.message : 'Unknown error' });
+      }
       return;
     }
 
