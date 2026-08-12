@@ -9,7 +9,7 @@ import { msToHours } from '../../../hooks/timeUtils';
 import PartnerProfile from './PartnerProfile';
 import ChildProfile from './ChildProfile';
 import StarIcon from '../../icons/StarIcon';
-const PRIVATE_INTERACTION_COOLDOWN_HOURS = 76;
+const PRIVATE_INTERACTION_COOLDOWN_HOURS = 7;
 // Helper to get random portrait
 const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 // Generate random skills based on job/background

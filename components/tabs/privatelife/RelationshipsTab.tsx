@@ -15,7 +15,7 @@ import ArrowLeftIcon from '../../icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../icons/ArrowRightIcon';
 import { msToHours } from '../../../hooks/timeUtils';
 
-const PRIVATE_INTERACTION_COOLDOWN_HOURS = 76;
+const PRIVATE_INTERACTION_COOLDOWN_HOURS = 7;
 
 // Helper to get random portrait
 const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
