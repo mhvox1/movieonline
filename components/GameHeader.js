@@ -60,7 +60,9 @@ const GameHeader = ({ gameSpeed, setGameSpeed, disabled, onNavigateToOfficeTab, 
     const weeklyCalendarData = useMemo(() => {
         if (!playerData)
             return [];
-        const calendarBaseDate = isTestMode ? new Date(playerData.gameDate) : new Date();
+        const calendarBaseDate = currentGameDate && !Number.isNaN(currentGameDate.getTime())
+            ? new Date(currentGameDate)
+            : new Date();
         const today = new Date(calendarBaseDate);
         today.setUTCHours(0, 0, 0, 0);
         const scopeTranslations = {
@@ -123,7 +125,7 @@ const GameHeader = ({ gameSpeed, setGameSpeed, disabled, onNavigateToOfficeTab, 
             date,
             events: allEvents.filter(event => isSameDay(date, event.date))
         }));
-    }, [playerData, t, language, isTestMode]);
+    }, [playerData, t, language, currentGameDate]);
     const daysOfWeek = useMemo(() => weeklyCalendarData.map(dayData => dayData.date.toLocaleDateString(locale, { weekday: 'short', timeZone: 'UTC' })), [weeklyCalendarData, locale]);
     const handleCheatCapital = () => {
         if (isTestMode && setPlayerData) {
