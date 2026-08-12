@@ -2517,10 +2517,12 @@ function createServer() {
     if (req.method === 'GET' && url.pathname === '/world/time') {
       const now = new Date();
       const ingameDate = getCurrentIngameDate(now);
+      const worldState = readWorldState();
       sendJson(res, 200, {
         currentIngameDateIso: ingameDate.toISOString(),
         ingameYear: ingameDate.getUTCFullYear(),
         ingameMonth: ingameDate.getUTCMonth() + 1,
+        testModeEnabled: Boolean(worldState?.testModeEnabled),
       });
       return;
     }

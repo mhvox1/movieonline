@@ -7,6 +7,7 @@ export interface OnlineSyncState {
   phase: OnlineSyncPhase;
   studioId: string | null;
   lastSyncIso: string | null;
+  testModeEnabled: boolean | null;
   currentIngameDateIso: string | null;
   ingameYear: number | null;
   ingameMonth: number | null;
@@ -55,6 +56,7 @@ const initialState: OnlineSyncState = {
   phase: 'idle',
   studioId: null,
   lastSyncIso: null,
+  testModeEnabled: null,
   currentIngameDateIso: null,
   ingameYear: null,
   ingameMonth: null,
@@ -238,6 +240,7 @@ export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState =>
 
         const result = await syncStudio(apiBaseUrl, studioId, playerData);
         const world = await fetchWorldSnapshot(apiBaseUrl);
+        const worldTime = await fetchWorldTime(apiBaseUrl);
         if (cancelled) {
           return;
         }
@@ -245,19 +248,22 @@ export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState =>
         const latestChart = world?.chart || null;
         const topFilm = latestChart?.topFilms?.[0] || null;
 
-        setState({
+        setState(prev => ({
           phase: 'ok',
           studioId,
           lastSyncIso: result?.studio?.lastProcessedAtIso || new Date().toISOString(),
-          currentIngameDateIso: String(result?.currentIngameDateIso || result?.studio?.state?.gameDate || '').trim() || null,
-          ingameYear: Number(result?.studio?.ingameYear || 0) || null,
-          ingameMonth: Number(result?.studio?.ingameMonth || 0) || null,
+          testModeEnabled: typeof worldTime?.testModeEnabled === 'boolean'
+            ? Boolean(worldTime.testModeEnabled)
+            : prev.testModeEnabled,
+          currentIngameDateIso: String(result?.currentIngameDateIso || worldTime?.currentIngameDateIso || result?.studio?.state?.gameDate || '').trim() || null,
+          ingameYear: Number(worldTime?.ingameYear || result?.studio?.ingameYear || 0) || null,
+          ingameMonth: Number(worldTime?.ingameMonth || result?.studio?.ingameMonth || 0) || null,
           elapsedMonths: Number(result?.elapsedMonths || 0) || 0,
           worldMonthKey: latestChart?.monthKey || null,
           topFilmTitle: topFilm?.title || null,
           topFilmStudio: topFilm?.studioName || null,
           error: null,
-        });
+        }));
       } catch (error) {
         if (cancelled) {
           return;
@@ -293,6 +299,9 @@ export const useOnlineSync = (playerData: PlayerData | null): OnlineSyncState =>
 
       setState(prev => ({
         ...prev,
+        testModeEnabled: typeof worldTime?.testModeEnabled === 'boolean'
+          ? Boolean(worldTime.testModeEnabled)
+          : prev.testModeEnabled,
         currentIngameDateIso: String(worldTime.currentIngameDateIso),
         ingameYear: Number(worldTime?.ingameYear || prev.ingameYear || 0) || null,
         ingameMonth: Number(worldTime?.ingameMonth || prev.ingameMonth || 0) || null,

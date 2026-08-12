@@ -330,12 +330,16 @@ const AppContent: React.FC = () => {
   const t = translations[language];
 
   useEffect(() => {
-    if (!authToken || !onlineSyncState?.currentIngameDateIso) {
+    if (!authToken) {
       return;
     }
 
-    const serverDate = new Date(onlineSyncState.currentIngameDateIso);
-    if (Number.isNaN(serverDate.getTime())) {
+    const shouldUseServerIngameDate = onlineSyncState?.testModeEnabled === true;
+    const nextDate = shouldUseServerIngameDate
+      ? new Date(String(onlineSyncState?.currentIngameDateIso || ''))
+      : calculateCurrentRealtimeGameDate();
+
+    if (Number.isNaN(nextDate.getTime())) {
       return;
     }
 
@@ -343,16 +347,16 @@ const AppContent: React.FC = () => {
       if (!current) return current;
 
       const localDate = new Date(current.gameDate);
-      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1) {
+      if (Math.abs(nextDate.getTime() - localDate.getTime()) < 1) {
         return current;
       }
 
       return {
         ...current,
-        gameDate: serverDate,
+        gameDate: nextDate,
       };
     });
-  }, [authToken, onlineSyncState?.currentIngameDateIso, setPlayerData]);
+  }, [authToken, onlineSyncState?.currentIngameDateIso, onlineSyncState?.testModeEnabled, setPlayerData]);
 
   // ÄNDERUNG: Basis-Auflösung auf 2560x1440 (WQHD) erhöht.
   const BASE_WIDTH = 1920;

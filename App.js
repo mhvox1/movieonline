@@ -245,25 +245,28 @@ const AppContent = () => {
   const hasPlayerData = Boolean(playerData);
   const t = translations[language];
   useEffect(() => {
-    if (!authToken || !onlineSyncState?.currentIngameDateIso) {
+    if (!authToken) {
       return;
     }
-    const serverDate = new Date(onlineSyncState.currentIngameDateIso);
-    if (Number.isNaN(serverDate.getTime())) {
+    const shouldUseServerIngameDate = onlineSyncState?.testModeEnabled === true;
+    const nextDate = shouldUseServerIngameDate
+      ? new Date(String(onlineSyncState?.currentIngameDateIso || ""))
+      : calculateCurrentRealtimeGameDate();
+    if (Number.isNaN(nextDate.getTime())) {
       return;
     }
     setPlayerData((current) => {
       if (!current) return current;
       const localDate = new Date(current.gameDate);
-      if (Math.abs(serverDate.getTime() - localDate.getTime()) < 1) {
+      if (Math.abs(nextDate.getTime() - localDate.getTime()) < 1) {
         return current;
       }
       return {
         ...current,
-        gameDate: serverDate
+        gameDate: nextDate
       };
     });
-  }, [authToken, onlineSyncState?.currentIngameDateIso, setPlayerData]);
+  }, [authToken, onlineSyncState?.currentIngameDateIso, onlineSyncState?.testModeEnabled, setPlayerData]);
   const BASE_WIDTH = 1920;
   const BASE_HEIGHT = 1080;
   const apiRequest = useCallback(async (path, init, tokenOverride) => {
