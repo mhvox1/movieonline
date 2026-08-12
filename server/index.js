@@ -1738,7 +1738,7 @@ function createServer() {
         resetAtIso: worldState?.resetAtIso || null,
         testModeEnabled,
         rule: testModeEnabled
-          ? 'Test mode: 1 real hour = 10 ingame seconds (+1 ingame day per real UTC day)'
+          ? 'Test mode: 1 real hour = 10 ingame seconds'
           : '1 real UTC day = 1 ingame month',
       });
       return;

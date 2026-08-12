@@ -90,10 +90,8 @@ function getCurrentIngameDate(now = new Date()) {
 
   if (isTestModeEnabled()) {
     const testModeIngameStart = getTestModeIngameStartUtc();
-    const elapsedRealDays = Math.max(0, daysBetweenUtc(epochRealUtc, now));
     const elapsedIngameMsFromClock = (elapsedRealMs / 3600000) * TEST_MODE_INGAME_MS_PER_REAL_HOUR;
-    const elapsedIngameMsFromDayTurnover = elapsedRealDays * 86400000;
-    return new Date(testModeIngameStart.getTime() + elapsedIngameMsFromDayTurnover + elapsedIngameMsFromClock);
+    return new Date(testModeIngameStart.getTime() + elapsedIngameMsFromClock);
   }
 
   const elapsedRealDays = elapsedRealMs / 86400000;
