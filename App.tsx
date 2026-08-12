@@ -577,12 +577,17 @@ const AppContent: React.FC = () => {
             .map((message: any) => {
               const fallbackDate = nextData.gameDate instanceof Date ? nextData.gameDate : new Date();
               const normalizedId = String(message?.id || '').trim();
+              const normalizedDate = toValidDate(message?.date, fallbackDate);
+              const isWelcomeMessage = normalizedId.startsWith('msg_welcome_') || String(message?.subjectTemplate?.key || '') === 'office.messages.ceoWelcomeSubject';
+              const correctedDate = isWelcomeMessage && normalizedDate.getFullYear() === 1990
+                ? new Date()
+                : normalizedDate;
               return {
                 ...message,
                 id: normalizedId || `msg_remote_${Math.random().toString(36).slice(2, 10)}`,
                 sender: String(message?.sender || 'System'),
                 read: Boolean(message?.read),
-                date: toValidDate(message?.date, fallbackDate),
+                date: correctedDate,
                 readDate: message?.readDate ? toValidDate(message.readDate, fallbackDate) : null,
               };
             });
@@ -1267,11 +1272,19 @@ const AppContent: React.FC = () => {
             nextEventDate: parsedData.nextEventDate ? new Date(parsedData.nextEventDate) : undefined,
             eventLog: parsedData.eventLog ? parsedData.eventLog.map((e: any) => ({...e, date: new Date(e.date)})) : [],
             transactionLog: parsedData.transactionLog.map((t: any) => ({...t, date: new Date(t.date)})),
-            messages: parsedData.messages ? parsedData.messages.map((m: any) => ({
-                ...m, 
-                date: new Date(m.date),
-                readDate: m.readDate ? new Date(m.readDate) : null,
-            })) : [],
+            messages: parsedData.messages ? parsedData.messages.map((m: any) => {
+                const normalizedDate = new Date(m.date);
+                const normalizedId = String(m?.id || '').trim();
+                const isWelcomeMessage = normalizedId.startsWith('msg_welcome_') || String(m?.subjectTemplate?.key || '') === 'office.messages.ceoWelcomeSubject';
+                const correctedDate = isWelcomeMessage && normalizedDate.getFullYear() === 1990
+                  ? new Date()
+                  : normalizedDate;
+                return {
+                  ...m,
+                  date: correctedDate,
+                  readDate: m.readDate ? new Date(m.readDate) : null,
+                };
+            }) : [],
             activeResearch: hydratedResearch,
             buildings: hydratedBuildings,
             activeMarketingCampaign: parsedData.activeMarketingCampaign ? { ...parsedData.activeMarketingCampaign, startDate: new Date(parsedData.activeMarketingCampaign.startDate), endDate: new Date(parsedData.activeMarketingCampaign.endDate) } : null,
@@ -1565,7 +1578,7 @@ const AppContent: React.FC = () => {
 
     const welcomeMessage: Message = {
         id: `msg_welcome_${Date.now()}`,
-        date: gameStartDate,
+      date: new Date(),
         sender: t.office.messages.ceoBoardSender,
         subjectTemplate: {
             key: 'office.messages.ceoWelcomeSubject',

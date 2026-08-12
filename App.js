@@ -444,12 +444,15 @@ const AppContent = () => {
           const normalizedRemoteMessages = remoteMessagesRaw.filter((item) => item && typeof item === "object").map((message) => {
             const fallbackDate = nextData.gameDate instanceof Date ? nextData.gameDate : /* @__PURE__ */ new Date();
             const normalizedId = String(message?.id || "").trim();
+            const normalizedDate = toValidDate(message?.date, fallbackDate);
+            const isWelcomeMessage = normalizedId.startsWith("msg_welcome_") || String(message?.subjectTemplate?.key || "") === "office.messages.ceoWelcomeSubject";
+            const correctedDate = isWelcomeMessage && normalizedDate.getFullYear() === 1990 ? /* @__PURE__ */ new Date() : normalizedDate;
             return {
               ...message,
               id: normalizedId || `msg_remote_${Math.random().toString(36).slice(2, 10)}`,
               sender: String(message?.sender || "System"),
               read: Boolean(message?.read),
-              date: toValidDate(message?.date, fallbackDate),
+              date: correctedDate,
               readDate: message?.readDate ? toValidDate(message.readDate, fallbackDate) : null
             };
           });
@@ -1002,11 +1005,17 @@ const AppContent = () => {
         nextEventDate: parsedData.nextEventDate ? new Date(parsedData.nextEventDate) : void 0,
         eventLog: parsedData.eventLog ? parsedData.eventLog.map((e) => ({ ...e, date: new Date(e.date) })) : [],
         transactionLog: parsedData.transactionLog.map((t2) => ({ ...t2, date: new Date(t2.date) })),
-        messages: parsedData.messages ? parsedData.messages.map((m) => ({
-          ...m,
-          date: new Date(m.date),
-          readDate: m.readDate ? new Date(m.readDate) : null
-        })) : [],
+        messages: parsedData.messages ? parsedData.messages.map((m) => {
+          const normalizedDate = new Date(m.date);
+          const normalizedId = String(m?.id || "").trim();
+          const isWelcomeMessage = normalizedId.startsWith("msg_welcome_") || String(m?.subjectTemplate?.key || "") === "office.messages.ceoWelcomeSubject";
+          const correctedDate = isWelcomeMessage && normalizedDate.getFullYear() === 1990 ? /* @__PURE__ */ new Date() : normalizedDate;
+          return {
+            ...m,
+            date: correctedDate,
+            readDate: m.readDate ? new Date(m.readDate) : null
+          };
+        }) : [],
         activeResearch: hydratedResearch,
         buildings: hydratedBuildings,
         activeMarketingCampaign: parsedData.activeMarketingCampaign ? { ...parsedData.activeMarketingCampaign, startDate: new Date(parsedData.activeMarketingCampaign.startDate), endDate: new Date(parsedData.activeMarketingCampaign.endDate) } : null,
@@ -1241,7 +1250,7 @@ const AppContent = () => {
     const salutation = salutationTemplate.replace("{lastName}", effectiveUsername);
     const welcomeMessage = {
       id: `msg_welcome_${Date.now()}`,
-      date: gameStartDate,
+      date: /* @__PURE__ */ new Date(),
       sender: t.office.messages.ceoBoardSender,
       subjectTemplate: {
         key: "office.messages.ceoWelcomeSubject",
