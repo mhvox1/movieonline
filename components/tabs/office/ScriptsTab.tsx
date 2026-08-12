@@ -7,6 +7,7 @@ import { GENRE_UNLOCKS } from '../../constants';
 import ScriptDossierModal from '../../ScriptDossierModal';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { getTranslatedScriptTitle, getTranslatedScriptDescription } from '../../scriptGenerator';
+import { formatHoursAndMinutes } from '../../../hooks/timeUtils';
 
 type ScriptSubTab = 'owned' | 'write' | 'market';
 
@@ -93,7 +94,7 @@ const ScriptsTab: React.FC = () => {
     const formatCurrency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value);
     
     const getRemainingHoursAsGameTime = (endDate: Date) => {
-        return Math.max(0, (new Date(endDate).getTime() - new Date(playerData.gameDate).getTime()) / (1000 * 3600 * 24));
+        return Math.max(0, (new Date(endDate).getTime() - new Date(playerData.gameDate).getTime()) / (1000 * 3600));
     }
 
     const unlockedGenres = useMemo(() => Object.values(Genre), []);

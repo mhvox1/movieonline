@@ -1,6 +1,6 @@
 const SERVER_EPOCH_REAL_UTC = new Date(Date.UTC(2026, 0, 1, 0, 0, 0, 0));
 const GAME_EPOCH_UTC = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
-const TEST_MODE_REAL_MS_PER_INGAME_HOUR = 30 * 1000;
+const TEST_MODE_REAL_MS_PER_INGAME_HOUR = 10 * 1000;
 const { readWorldState } = require('./worldStateStore');
 
 function startOfUtcDay(date) {

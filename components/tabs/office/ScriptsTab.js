@@ -6,6 +6,7 @@ import { useGame } from '../../../contexts/GameContext';
 import ScriptDossierModal from '../../ScriptDossierModal';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { getTranslatedScriptTitle, getTranslatedScriptDescription } from '../../scriptGenerator';
+import { formatHoursAndMinutes } from '../../../hooks/timeUtils';
 const TabButton = ({ title, isActive, onClick, disabled }) => (_jsx("button", { onClick: onClick, disabled: disabled, className: `py-3 px-6 font-bold text-base transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50 relative top-px
             ${isActive
         ? 'bg-gray-800/80 text-amber-400 border-gray-700 border-t border-x rounded-t-lg'
@@ -68,8 +69,8 @@ const ScriptsTab = () => {
         }
     }, [writers, selectedWriterId]);
     const formatCurrency = (value) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value);
-    const getDaysRemaining = (endDate) => {
-        return Math.max(0, Math.ceil((new Date(endDate).getTime() - new Date(playerData.gameDate).getTime()) / (1000 * 3600 * 24)));
+    const getRemainingHoursAsGameTime = (endDate) => {
+        return Math.max(0, (new Date(endDate).getTime() - new Date(playerData.gameDate).getTime()) / (1000 * 3600));
     };
     const unlockedGenres = useMemo(() => Object.values(Genre), []);
     const filteredScriptMarket = useMemo(() => {
@@ -252,8 +253,8 @@ const ScriptsTab = () => {
             const totalDuration = (new Date(endDate).getTime() - new Date(startDate).getTime());
             const elapsed = (new Date(playerData.gameDate).getTime() - new Date(startDate).getTime());
             const progress = totalDuration > 0 ? Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100))) : 100;
-            const daysRemaining = getDaysRemaining(endDate);
-            return (_jsxs("div", { className: "text-center space-y-3", children: [_jsxs("p", { className: "text-lg font-bold text-white", children: ["\"", script.title, "\""] }), _jsxs("p", { className: "text-gray-400", children: [language === 'de' ? 'Autor' : 'Writer', ": ", writerName] }), _jsxs("p", { className: "text-gray-400", children: [language === 'de' ? 'Verbleibende Zeit' : 'Remaining Time', ": ", daysRemaining, " ", language === 'de' ? 'Tage' : 'days'] }), _jsx("div", { className: "w-full bg-gray-700 rounded-full h-5 overflow-hidden border border-gray-600", children: _jsxs("div", { className: "bg-purple-500 h-full rounded-full flex items-center justify-center text-sm font-bold text-black", style: { width: `${progress}%` }, children: [progress, "%"] }) })] }));
+            const daysRemaining = getRemainingHoursAsGameTime(endDate);
+            return (_jsxs("div", { className: "text-center space-y-3", children: [_jsxs("p", { className: "text-lg font-bold text-white", children: ["\"", script.title, "\""] }), _jsxs("p", { className: "text-gray-400", children: [language === 'de' ? 'Autor' : 'Writer', ": ", writerName] }), _jsxs("p", { className: "text-gray-400", children: [language === 'de' ? 'Verbleibende Zeit' : 'Remaining Time', ": ", formatHoursAndMinutes(daysRemaining)] }), _jsx("div", { className: "w-full bg-gray-700 rounded-full h-5 overflow-hidden border border-gray-600", children: _jsxs("div", { className: "bg-purple-500 h-full rounded-full flex items-center justify-center text-sm font-bold text-black", style: { width: `${progress}%` }, children: [progress, "%"] }) })] }));
         }
         if (!hasWritersBungalow) {
             return (_jsxs("div", { className: "text-center p-8 bg-gray-900/50 rounded-lg max-w-2xl mx-auto", children: [_jsx("h3", { className: "text-xl text-amber-300 font-bold", children: t.project.scripts.writersOfficeRequired }), _jsx("p", { className: "text-gray-400 mt-2", children: language === 'de' ? 'Um Drehbücher schreiben zu können, müssen Sie zuerst ein Autorenbüro auf Ihrem Studiogelände bauen.' : 'To write scripts, you must first build a writers office on your studio lot.' })] }));
