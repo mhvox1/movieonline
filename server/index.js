@@ -1238,10 +1238,22 @@ function applyCalculatedIngameDateToState(state, ingameDateIso) {
 }
 
 function resetGameDataForAdmin() {
+  return resetGameDataForAdminWithOptions({ forceTestModeStart: false });
+}
+
+function resetGameDataForAdminWithOptions(options = {}) {
   const now = new Date();
   const previousWorldState = readWorldState();
-  const testModeEnabled = Boolean(previousWorldState?.testModeEnabled);
-  const resetStartDateIso = getLatestResetStartDateIso() || createResetStartDate(now).toISOString();
+  const forceTestModeStart = Boolean(options?.forceTestModeStart);
+  const testModeEnabled = forceTestModeStart
+    ? true
+    : Boolean(previousWorldState?.testModeEnabled);
+  const resetStartDateIso = forceTestModeStart
+    ? now.toISOString()
+    : (getLatestResetStartDateIso() || createResetStartDate(now).toISOString());
+  const testModeIngameStartIso = forceTestModeStart
+    ? now.toISOString()
+    : String(previousWorldState?.testModeIngameStartIso || '').trim();
   const removedStudios = listStudios().length;
 
   fs.writeFileSync(DB_FILE, JSON.stringify({ studios: {} }, null, 2), 'utf-8');
@@ -1254,6 +1266,7 @@ function resetGameDataForAdmin() {
     resetAtIso: now.toISOString(),
     resetStartDateIso,
     testModeEnabled,
+    testModeIngameStartIso: testModeIngameStartIso || null,
   });
   fs.writeFileSync(MARKET_DB_FILE, JSON.stringify({ listings: [] }, null, 2), 'utf-8');
 
@@ -1262,7 +1275,13 @@ function resetGameDataForAdmin() {
     resetWorldState: true,
     resetMarket: true,
     resetStartDateIso,
+    testModeIngameStartIso: testModeIngameStartIso || null,
+    testModeEnabled,
   };
+}
+
+function startTestModeNowForAdmin() {
+  return resetGameDataForAdminWithOptions({ forceTestModeStart: true });
 }
 
 function getAdminSettings() {
@@ -1274,15 +1293,24 @@ function getAdminSettings() {
 
 function updateAdminSettings(settingsPayload) {
   const worldState = readWorldState();
+  const previousTestModeEnabled = Boolean(worldState?.testModeEnabled);
   const nextTestModeEnabled = Boolean(settingsPayload?.testModeEnabled);
+
+  let nextTestModeIngameStartIso = String(worldState?.testModeIngameStartIso || '').trim() || null;
+  if (nextTestModeEnabled && !previousTestModeEnabled && !nextTestModeIngameStartIso) {
+    nextTestModeIngameStartIso = String(worldState?.resetStartDateIso || '').trim() || new Date().toISOString();
+  }
+
   const nextState = {
     ...worldState,
     testModeEnabled: nextTestModeEnabled,
+    testModeIngameStartIso: nextTestModeIngameStartIso,
     updatedAtIso: new Date().toISOString(),
   };
   writeWorldState(nextState);
   return {
     testModeEnabled: nextTestModeEnabled,
+    testModeIngameStartIso: nextTestModeIngameStartIso,
   };
 }
 
@@ -1710,7 +1738,7 @@ function createServer() {
         resetAtIso: worldState?.resetAtIso || null,
         testModeEnabled,
         rule: testModeEnabled
-          ? 'Test mode: 1 real minute = 1 ingame hour'
+          ? 'Test mode: 1 real hour = 10 ingame seconds (+1 ingame day per real UTC day)'
           : '1 real UTC day = 1 ingame month',
       });
       return;
@@ -1942,6 +1970,23 @@ function createServer() {
         sendJson(res, 200, {
           ok: true,
           ...resetResult,
+        });
+      } catch (error) {
+        sendJson(res, 400, { error: error instanceof Error ? error.message : 'Unknown error' });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/admin/test-mode/start') {
+      if (!isAdmin(auth.user)) {
+        sendJson(res, 401, { error: 'Admin login required' });
+        return;
+      }
+      try {
+        const result = startTestModeNowForAdmin();
+        sendJson(res, 200, {
+          ok: true,
+          ...result,
         });
       } catch (error) {
         sendJson(res, 400, { error: error instanceof Error ? error.message : 'Unknown error' });

@@ -11,6 +11,7 @@ function getDefaultWorldState() {
     chartsHistory: [],
     filmCatalog: {},
     testModeEnabled: false,
+    testModeIngameStartIso: null,
     updatedAtIso: null,
   };
 }

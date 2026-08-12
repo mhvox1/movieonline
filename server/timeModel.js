@@ -1,6 +1,6 @@
 const SERVER_EPOCH_REAL_UTC = new Date(Date.UTC(2026, 0, 1, 0, 0, 0, 0));
 const GAME_EPOCH_UTC = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
-const TEST_MODE_REAL_MS_PER_INGAME_HOUR = 10 * 1000;
+const TEST_MODE_INGAME_MS_PER_REAL_HOUR = 10 * 1000;
 const { readWorldState } = require('./worldStateStore');
 
 function startOfUtcDay(date) {
@@ -41,6 +41,27 @@ function isTestModeEnabled() {
   return Boolean(worldState?.testModeEnabled);
 }
 
+function getTestModeIngameStartUtc() {
+  const worldState = readWorldState();
+  const ingameStartIso = String(worldState?.testModeIngameStartIso || '').trim();
+  if (ingameStartIso) {
+    const parsedIngameStart = new Date(ingameStartIso);
+    if (!Number.isNaN(parsedIngameStart.getTime())) {
+      return parsedIngameStart;
+    }
+  }
+
+  const resetStartDateIso = String(worldState?.resetStartDateIso || '').trim();
+  if (resetStartDateIso) {
+    const parsedResetStart = new Date(resetStartDateIso);
+    if (!Number.isNaN(parsedResetStart.getTime())) {
+      return parsedResetStart;
+    }
+  }
+
+  return GAME_EPOCH_UTC;
+}
+
 function getServerEpochRealUtc() {
   const worldState = readWorldState();
   const resetStartDateIso = String(worldState?.resetStartDateIso || '').trim();
@@ -53,7 +74,7 @@ function getServerEpochRealUtc() {
     return SERVER_EPOCH_REAL_UTC;
   }
 
-  return startOfUtcDay(parsed);
+  return parsed;
 }
 
 function getIngameMonthIndex(now = new Date()) {
@@ -68,8 +89,11 @@ function getCurrentIngameDate(now = new Date()) {
   const elapsedRealMs = Math.max(0, now.getTime() - epochRealUtc.getTime());
 
   if (isTestModeEnabled()) {
-    const elapsedIngameHours = elapsedRealMs / TEST_MODE_REAL_MS_PER_INGAME_HOUR;
-    return new Date(GAME_EPOCH_UTC.getTime() + (elapsedIngameHours * 3600000));
+    const testModeIngameStart = getTestModeIngameStartUtc();
+    const elapsedRealDays = Math.max(0, daysBetweenUtc(epochRealUtc, now));
+    const elapsedIngameMsFromClock = (elapsedRealMs / 3600000) * TEST_MODE_INGAME_MS_PER_REAL_HOUR;
+    const elapsedIngameMsFromDayTurnover = elapsedRealDays * 86400000;
+    return new Date(testModeIngameStart.getTime() + elapsedIngameMsFromDayTurnover + elapsedIngameMsFromClock);
   }
 
   const elapsedRealDays = elapsedRealMs / 86400000;
