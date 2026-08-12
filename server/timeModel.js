@@ -1,6 +1,6 @@
 const SERVER_EPOCH_REAL_UTC = new Date(Date.UTC(2026, 0, 1, 0, 0, 0, 0));
 const GAME_EPOCH_UTC = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
-const TEST_MODE_INGAME_MS_PER_REAL_HOUR = 10 * 1000;
+const TEST_MODE_REAL_MS_PER_INGAME_HOUR = 10 * 1000;
 const { readWorldState } = require('./worldStateStore');
 
 function startOfUtcDay(date) {
@@ -90,8 +90,8 @@ function getCurrentIngameDate(now = new Date()) {
 
   if (isTestModeEnabled()) {
     const testModeIngameStart = getTestModeIngameStartUtc();
-    const elapsedIngameMsFromClock = (elapsedRealMs / 3600000) * TEST_MODE_INGAME_MS_PER_REAL_HOUR;
-    return new Date(testModeIngameStart.getTime() + elapsedIngameMsFromClock);
+    const elapsedIngameHours = elapsedRealMs / TEST_MODE_REAL_MS_PER_INGAME_HOUR;
+    return new Date(testModeIngameStart.getTime() + (elapsedIngameHours * 3600000));
   }
 
   const elapsedRealDays = elapsedRealMs / 86400000;

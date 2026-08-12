@@ -74,7 +74,7 @@
           </div>
 
           <div class="bg-indigo-950/30 border border-indigo-700 rounded p-4 mt-4">
-            <p class="text-sm text-indigo-200 mb-3">Testmodus: 1 Echtzeit-Stunde = 10 Ingame-Sekunden.</p>
+            <p class="text-sm text-indigo-200 mb-3">Testmodus: 1 Ingame-Stunde = 10 Echtzeit-Sekunden.</p>
             <label class="flex items-center gap-3 mb-3">
               <input id="testModeToggle" type="checkbox" class="accent-amber-500 w-4 h-4" />
               <span class="text-sm text-slate-100">Testmodus aktivieren</span>
@@ -1387,7 +1387,7 @@
         const enabled = Boolean(settings.testModeEnabled);
         testModeToggle.checked = enabled;
         testModeStatus.textContent = enabled
-          ? 'Status: Aktiv (1 Echtzeit-Stunde = 10 Ingame-Sekunden)'
+          ? 'Status: Aktiv (1 Ingame-Stunde = 10 Echtzeit-Sekunden)'
           : 'Status: Inaktiv (Standardzeit)';
       } catch (error) {
         testModeStatus.textContent = 'Status: Fehler beim Laden';
@@ -1409,7 +1409,7 @@
         const enabled = Boolean(result?.settings?.testModeEnabled);
         testModeToggle.checked = enabled;
         testModeStatus.textContent = enabled
-          ? 'Status: Aktiv (1 Echtzeit-Stunde = 10 Ingame-Sekunden)'
+          ? 'Status: Aktiv (1 Ingame-Stunde = 10 Echtzeit-Sekunden)'
           : 'Status: Inaktiv (Standardzeit)';
         log('Testmodus gespeichert', { testModeEnabled: enabled });
       } catch (error) {
@@ -1424,7 +1424,7 @@
       try {
         const result = await api('/admin/test-mode/start', { method: 'POST' });
         testModeToggle.checked = true;
-        testModeStatus.textContent = 'Status: Aktiv (1 Echtzeit-Stunde = 10 Ingame-Sekunden)';
+        testModeStatus.textContent = 'Status: Aktiv (1 Ingame-Stunde = 10 Echtzeit-Sekunden)';
         log('Testmodus global gestartet', result);
         await refreshAll();
         setActiveTab('overview');
