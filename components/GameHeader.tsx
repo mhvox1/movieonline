@@ -19,6 +19,17 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
   const { playerData, setPlayerData } = useGame();
   const { t, language } = useTranslation();
   const locale = language === 'de' ? 'de-DE' : 'en-US';
+  const currentGameDate = playerData ? new Date(playerData.gameDate) : null;
+  const currentGameTimeLabel = currentGameDate
+    ? currentGameDate.toLocaleString(locale, {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    : '';
 
   const isTestMode = playerData && playerData.playerName === 'Max Mustermann' && playerData.studioName === 'Teststudio';
 
@@ -179,6 +190,12 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
       </div>
 
       <div className="flex-shrink-0 w-auto flex flex-col justify-between items-end mr-[30px]">
+        <div className="w-full flex justify-end mb-1">
+          <div className="rounded-md border border-gray-600 bg-gray-900/70 px-3 py-1.5 text-right shadow-md backdrop-blur-sm">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">{language === 'de' ? 'Uhrzeit' : 'Time'}</p>
+            <p className="text-sm font-semibold text-amber-300 leading-tight">{currentGameTimeLabel}</p>
+          </div>
+        </div>
         <div className="w-full">
           {hasPendingDecision && (
             <div className="mb-1 text-right">
