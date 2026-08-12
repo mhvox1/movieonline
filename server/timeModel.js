@@ -62,7 +62,7 @@ function getTestModeIngameStartUtc() {
   return GAME_EPOCH_UTC;
 }
 
-function getServerEpochRealUtc() {
+function getTestModeStartRealUtc() {
   const worldState = readWorldState();
   const resetStartDateIso = String(worldState?.resetStartDateIso || '').trim();
   if (!resetStartDateIso) {
@@ -77,6 +77,10 @@ function getServerEpochRealUtc() {
   return parsed;
 }
 
+function getServerEpochRealUtc() {
+  return SERVER_EPOCH_REAL_UTC;
+}
+
 function getIngameMonthIndex(now = new Date()) {
   if (isTestModeEnabled()) {
     return getMonthIndexFromIngameDate(getCurrentIngameDate(now));
@@ -85,14 +89,16 @@ function getIngameMonthIndex(now = new Date()) {
 }
 
 function getCurrentIngameDate(now = new Date()) {
-  const epochRealUtc = getServerEpochRealUtc();
-  const elapsedRealMs = Math.max(0, now.getTime() - epochRealUtc.getTime());
-
   if (isTestModeEnabled()) {
+    const epochRealUtc = getTestModeStartRealUtc();
+    const elapsedRealMs = Math.max(0, now.getTime() - epochRealUtc.getTime());
     const testModeIngameStart = getTestModeIngameStartUtc();
     const elapsedIngameHours = elapsedRealMs / TEST_MODE_REAL_MS_PER_INGAME_HOUR;
     return new Date(testModeIngameStart.getTime() + (elapsedIngameHours * 3600000));
   }
+
+  const epochRealUtc = getServerEpochRealUtc();
+  const elapsedRealMs = Math.max(0, now.getTime() - epochRealUtc.getTime());
 
   const elapsedRealDays = elapsedRealMs / 86400000;
   const fullMonthsElapsed = Math.floor(elapsedRealDays);
