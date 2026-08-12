@@ -9,6 +9,7 @@ import { useGame } from '../../contexts/GameContext';
 import { GameState, BuildingType, EmployeeType, OfficeTabType, Employee } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 import { CurrentViewType } from '../NewProjectScreen_Phase1';
+import { daysToHours } from '../../hooks/timeUtils';
 
 interface StudioActivitiesWidgetProps {
     onNavigate: (state: GameState) => void;
@@ -28,7 +29,7 @@ const ProgressBar: React.FC<{ progress: number, text?: string, color?: string }>
     </div>
 );
 
-const getDaysRemaining = (endDate: Date, gameDate: Date) => Math.max(0, Math.ceil((new Date(endDate).getTime() - gameDate.getTime()) / 86400000));
+const getHoursRemaining = (endDate: Date, gameDate: Date) => Math.max(0, daysToHours((new Date(endDate).getTime() - gameDate.getTime()) / 86400000));
 
 const calculateResearchProgress = (progressPoints: number, requiredPoints: number) => {
     if (requiredPoints <= 0) return 100;
@@ -103,13 +104,13 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                 const startDate = new Date(activePlanning.scriptStartDate);
                 const endDate = new Date(activePlanning.scriptEndDate);
                 const progress = calculateProgress(startDate, endDate, gameDate);
-                const daysRemaining = getDaysRemaining(endDate, gameDate);
+                const hoursRemaining = getHoursRemaining(endDate, gameDate);
 
                 return (
                     <div>
                         <div className="flex justify-between items-baseline text-sm mb-1">
                             <span className="font-bold text-cyan-400">{t.widgets.activities.planning}</span>
-                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                         </div>
                         <p className="text-xs text-white truncate mb-1">"{activePlanning.workingTitle}"</p>
                         <ProgressBar progress={progress} text={`${Math.round(progress)}%`} color="bg-cyan-500" />
@@ -128,13 +129,13 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                 const startDate = new Date(activeWriting.startDate);
                 const endDate = new Date(activeWriting.endDate);
                 const progress = calculateProgress(startDate, endDate, gameDate);
-                const daysRemaining = getDaysRemaining(endDate, gameDate);
+                const hoursRemaining = getHoursRemaining(endDate, gameDate);
 
                 return (
                     <div>
                         <div className="flex justify-between items-baseline text-sm mb-1">
                             <span className="font-bold text-purple-400">{t.widgets.activities.writing}</span>
-                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                            <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                         </div>
                         <p className="text-xs text-white truncate mb-1">"{activeWriting.script.title}"</p>
                         <ProgressBar progress={progress} text={`${Math.round(progress)}%`} color="bg-purple-500" />
@@ -187,13 +188,13 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                     startDate.setDate(endDate.getDate() - durationInDays);
 
                     const progress = calculateProgress(startDate, endDate, gameDate);
-                    const daysRemaining = getDaysRemaining(endDate, gameDate);
+                    const hoursRemaining = getHoursRemaining(endDate, gameDate);
                 
                     return (
                         <div>
                             <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-orange-400">{t.widgets.activities.construction}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{construction.buildingType} ({t.widgets.activities.level.replace('{level}', (currentLevel + 1).toString())})</p>
                             <ProgressBar progress={progress} text={`${Math.round(progress)}%`} color="bg-orange-500" />
@@ -217,12 +218,12 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                 endDate: new Date(agentCasting.endDate),
                 render: () => {
                     const progress = calculateProgress(agentCasting.startDate!, agentCasting.endDate, gameDate);
-                    const daysRemaining = getDaysRemaining(agentCasting.endDate, gameDate);
+                    const hoursRemaining = getHoursRemaining(agentCasting.endDate, gameDate);
                     return (
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-cyan-400">{t.widgets.activities.castingScouting}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{agentCasting.talentName} ({agent.name})</p>
                             <ProgressBar progress={progress} color="bg-cyan-400" />
@@ -238,13 +239,13 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                 render: () => {
                     const progress = calculateProgress(agentCampaign.startDate, agentCampaign.endDate, gameDate);
                     const scopeText = scopeTranslations[agentCampaign.scope] || agentCampaign.scope;
-                    const daysRemaining = getDaysRemaining(agentCampaign.endDate, gameDate);
+                    const hoursRemaining = getHoursRemaining(agentCampaign.endDate, gameDate);
                     
                     return (
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-purple-400">{t.widgets.activities.campaign}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{scopeText} ({agent.name})</p>
                             <ProgressBar progress={progress} color="bg-purple-400" />
@@ -259,12 +260,12 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                 endDate: new Date(agentScouting.endDate),
                 render: () => {
                     const params = agentScouting.searchParams;
-                    const daysRemaining = getDaysRemaining(agentScouting.endDate, gameDate);
+                    const hoursRemaining = getHoursRemaining(agentScouting.endDate, gameDate);
                      return (
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-indigo-400">{t.widgets.activities.scouting}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{params.qualityTier} ({agent.name})</p>
                             <ProgressBar progress={100} text="..." color="bg-indigo-400" />
@@ -279,12 +280,12 @@ const StudioActivitiesWidget: React.FC<StudioActivitiesWidgetProps> = ({ onNavig
                 endDate: new Date(agent.activeTraining.endDate),
                 render: () => {
                     const endDate = new Date(agent.activeTraining!.endDate);
-                    const daysRemaining = getDaysRemaining(endDate, gameDate);
+                    const hoursRemaining = getHoursRemaining(endDate, gameDate);
                     return (
                         <div>
                              <div className="flex justify-between items-baseline text-sm mb-1">
                                 <span className="font-bold text-yellow-400">{t.widgets.activities.inTraining}</span>
-                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', daysRemaining.toString())}</span>
+                                <span className="text-xs text-gray-400">{t.widgets.activities.days.replace('{days}', hoursRemaining.toString())}</span>
                             </div>
                             <p className="text-xs text-white truncate mb-1">{agent.name}</p>
                             <ProgressBar progress={100} text="..." color="bg-yellow-500" />

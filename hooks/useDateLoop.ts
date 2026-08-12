@@ -16,17 +16,11 @@ const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.lengt
 
 export const useDateLoop = ({ setPlayerData, enabled = true }: UseDateLoopProps) => {
     const accumulatedRealtimeMsRef = useRef(0);
-  const lastTimestampRef = useRef(0);
+    const lastTimestampRef = useRef(0);
   const animationFrameIdRef = useRef<number | undefined>(undefined);
   const { t, language } = useTranslation();
     const REALTIME_UPDATE_STEP_MS = 1000;
-
-    const getDaysInMonth = (date: Date) =>
-        new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
-
-    const getUtcDayNumber = (date: Date): number => {
-        return Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / (24 * 60 * 60 * 1000));
-    };
+    const INGAME_MS_PER_REAL_MS = 24;
 
     const calculateNextRealtimeGameDate = (currentGameDate: Date, elapsedRealMs: number): Date => {
         const clampedElapsedMs = Math.max(0, elapsedRealMs);
@@ -34,10 +28,8 @@ export const useDateLoop = ({ setPlayerData, enabled = true }: UseDateLoopProps)
             return new Date(currentGameDate);
         }
 
-        // Real-time rule: 1 real day = 1 in-game month.
-        const daysInCurrentIngameMonth = getDaysInMonth(currentGameDate);
-        const ingameMsToAdvance = clampedElapsedMs * daysInCurrentIngameMonth;
-        return new Date(currentGameDate.getTime() + ingameMsToAdvance);
+        // Real-time rule: 1 real hour = 1 in-game day.
+        return new Date(currentGameDate.getTime() + clampedElapsedMs * INGAME_MS_PER_REAL_MS);
     };
 
     useEffect(() => {
@@ -46,28 +38,21 @@ export const useDateLoop = ({ setPlayerData, enabled = true }: UseDateLoopProps)
         }
 
     const gameTick = (timestamp: number) => {
-      let deltaTime = timestamp - lastTimestampRef.current;
-      lastTimestampRef.current = timestamp;
+            const deltaTime = timestamp - lastTimestampRef.current;
+            lastTimestampRef.current = timestamp;
 
             accumulatedRealtimeMsRef.current += deltaTime;
 
             if (accumulatedRealtimeMsRef.current >= REALTIME_UPDATE_STEP_MS) {
+                const stepMs = accumulatedRealtimeMsRef.current;
                 accumulatedRealtimeMsRef.current = 0;
 
                 setPlayerData(currentData => {
                     if (!currentData) return currentData;
 
                     const previousDate = new Date(currentData.gameDate);
-                    const newDate = calculateNextRealtimeGameDate(previousDate, REALTIME_UPDATE_STEP_MS);
-
-                    const daysPassed = getUtcDayNumber(newDate) - getUtcDayNumber(previousDate);
-
-                    if (daysPassed <= 0) {
-                        return {
-                            ...currentData,
-                            gameDate: newDate,
-                        };
-                    }
+                    const newDate = calculateNextRealtimeGameDate(previousDate, stepMs);
+                    const daysPassed = (newDate.getTime() - previousDate.getTime()) / (24 * 60 * 60 * 1000);
 
                     const isTestMode = currentData.playerName === 'Max Mustermann' && currentData.studioName === 'Teststudio';
 

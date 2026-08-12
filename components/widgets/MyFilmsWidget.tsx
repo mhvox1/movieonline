@@ -8,6 +8,7 @@ import { MarketingTab } from '../../types';
 import { useGame } from '../../contexts/GameContext';
 import { getCoverPath } from '../coverConfig';
 import { useTranslation } from '../../hooks/useTranslation';
+import { daysToHours } from '../../hooks/timeUtils';
 
 interface MyFilmsWidgetProps {
     onNavigateToMarketingTab: (tab: MarketingTab, filmTitle?: string) => void;
@@ -75,7 +76,7 @@ const MyFilmsWidget: React.FC<MyFilmsWidgetProps> = ({ onNavigateToMarketingTab 
         }
     };
 
-    const getDaysRemaining = (endDate: Date) => Math.max(0, Math.ceil((new Date(endDate).getTime() - playerData.gameDate.getTime()) / 86400000));
+    const getHoursRemaining = (endDate: Date) => Math.max(0, daysToHours((new Date(endDate).getTime() - playerData.gameDate.getTime()) / 86400000));
 
     const getFilmStatus = (film: ProjectData) => {
         if (film.activeDeal) {
@@ -111,12 +112,12 @@ const MyFilmsWidget: React.FC<MyFilmsWidgetProps> = ({ onNavigateToMarketingTab 
             return { text: t.marketing.myFilms.status.complete, color: 'text-green-400' };
         }
         if (film.payTv?.status === 'active') {
-             const days = getDaysRemaining(film.payTv.endDate);
-             return { text: t.marketing.myFilms.status.payTv.replace('{days}', days.toString()), color: 'text-cyan-400' };
+             const hours = getHoursRemaining(film.payTv.endDate);
+             return { text: t.marketing.myFilms.status.payTv.replace('{days}', hours.toString()), color: 'text-cyan-400' };
         }
         if (film.homeEntertainment?.status === 'active') {
-             const days = getDaysRemaining(film.homeEntertainment.endDate);
-             return { text: t.marketing.myFilms.status.homeEnt.replace('{days}', days.toString()), color: 'text-blue-400' };
+             const hours = getHoursRemaining(film.homeEntertainment.endDate);
+             return { text: t.marketing.myFilms.status.homeEnt.replace('{days}', hours.toString()), color: 'text-blue-400' };
         }
         if (film.cinemaRelease?.status === 'active') {
             return { text: t.marketing.myFilms.status.inCinema, color: 'text-amber-400' };

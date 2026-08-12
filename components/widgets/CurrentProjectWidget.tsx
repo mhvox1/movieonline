@@ -10,6 +10,7 @@ import { getCoverPath } from '../coverConfig';
 import NeuesProjektIcon from '../icons/NeuesProjektIcon';
 import { useTranslation } from '../../hooks/useTranslation';
 import { CurrentViewType } from '../NewProjectScreen_Phase1';
+import { daysToHours } from '../../hooks/timeUtils';
 
 interface CurrentProjectWidgetProps {
     onNavigate: (state: GameState) => void;
@@ -33,7 +34,7 @@ const ProgressBar: React.FC<{ progress: number, text?: string, color?: string }>
     </div>
 );
 
-const getDaysRemaining = (endDate: Date, gameDate: Date) => Math.max(0, Math.ceil((new Date(endDate).getTime() - gameDate.getTime()) / 86400000));
+const getHoursRemaining = (endDate: Date, gameDate: Date) => Math.max(0, daysToHours((new Date(endDate).getTime() - gameDate.getTime()) / 86400000));
 
 const TabButton: React.FC<{ title: string, isActive: boolean, onClick: () => void, disabled?: boolean }> = ({ title, isActive, onClick, disabled }) => (
     <button 
@@ -177,7 +178,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
                 phaseText = t.widgets.currentProject.phase.casting;
                 if (projectToDisplay.castingStartDate && projectToDisplay.castingEndDate) {
                     progress = calculateProgress(projectToDisplay.castingStartDate, projectToDisplay.castingEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getDaysRemaining(projectToDisplay.castingEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.castingEndDate, gameDate).toString());
                 }
                 color = 'bg-green-500';
                 break;
@@ -185,7 +186,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
                 phaseText = t.widgets.currentProject.phase.production;
                 if (projectToDisplay.productionStartDate && projectToDisplay.productionEndDate) {
                     progress = calculateProgress(projectToDisplay.productionStartDate, projectToDisplay.productionEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getDaysRemaining(projectToDisplay.productionEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.productionEndDate, gameDate).toString());
                 }
                 color = 'bg-blue-500';
                 break;
@@ -193,7 +194,7 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
                 phaseText = t.widgets.currentProject.phase.postProduction;
                 if (projectToDisplay.postProductionStartDate && projectToDisplay.postProductionEndDate) {
                     progress = calculateProgress(projectToDisplay.postProductionStartDate, projectToDisplay.postProductionEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getDaysRemaining(projectToDisplay.postProductionEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.postProductionEndDate, gameDate).toString());
                 }
                 color = 'bg-violet-500';
                 break;
@@ -210,11 +211,11 @@ const CurrentProjectWidget: React.FC<CurrentProjectWidgetProps> = ({ onNavigate,
             const deadline = new Date(projectToDisplay.contractDeadline);
             const today = new Date(gameDate);
             const diffTime = deadline.getTime() - today.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const isUrgent = diffDays < 30;
+            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+            const isUrgent = diffHours < 720;
             contractDeadlineText = (
                 <div className={`mt-2 text-xs font-bold text-center border-t border-gray-600 pt-1 ${isUrgent ? 'text-red-400 animate-pulse' : 'text-blue-300'}`}>
-                    Frist: {deadline.toLocaleDateString(locale)} ({diffDays} Tage)
+                    Frist: {deadline.toLocaleDateString(locale)} ({diffHours} Stunden)
                 </div>
             );
         }

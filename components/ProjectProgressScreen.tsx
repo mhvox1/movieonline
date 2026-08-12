@@ -8,6 +8,7 @@ import StarRating from './StarRating';
 import { useTranslation } from '../hooks/useTranslation';
 import { getTranslatedScriptDescription, getTranslatedScriptTitle } from './scriptGenerator';
 import { TranslationType } from '../translations/types';
+import { daysToHours } from '../hooks/timeUtils';
 
 interface ProjectProgressScreenProps {
   onBack: () => void;
@@ -239,7 +240,7 @@ const ProjectProgressScreen: React.FC<ProjectProgressScreenProps> = ({ onBack, g
   const renderProjectProgress = () => {
     let currentPhaseLabel = '';
     let currentProgress = 0;
-    let daysRemaining = 0;
+    let hoursRemaining = 0;
     let progressColor = 'bg-gray-500';
 
     if (project.phase === ProjectPhase.Planning) {
@@ -247,28 +248,28 @@ const ProjectProgressScreen: React.FC<ProjectProgressScreenProps> = ({ onBack, g
         const total = (new Date(project.scriptEndDate).getTime() - new Date(project.scriptStartDate).getTime());
         const elapsed = (playerData.gameDate.getTime() - new Date(project.scriptStartDate).getTime());
         currentProgress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 100;
-        daysRemaining = Math.max(0, Math.ceil((new Date(project.scriptEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24)));
+        hoursRemaining = daysToHours((new Date(project.scriptEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24));
         progressColor = 'bg-cyan-500';
     } else if (project.phase === ProjectPhase.Casting && project.castingStartDate && project.castingEndDate) {
         currentPhaseLabel = t.project.progress.phase.casting;
         const total = (new Date(project.castingEndDate).getTime() - new Date(project.castingStartDate).getTime());
         const elapsed = (playerData.gameDate.getTime() - new Date(project.castingStartDate).getTime());
         currentProgress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 100;
-        daysRemaining = Math.max(0, Math.ceil((new Date(project.castingEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24)));
+        hoursRemaining = daysToHours((new Date(project.castingEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24));
         progressColor = 'bg-green-500';
     } else if (project.phase === ProjectPhase.Production && project.productionStartDate && project.productionEndDate) {
         currentPhaseLabel = t.project.progress.phase.production;
         const total = (new Date(project.productionEndDate).getTime() - new Date(project.productionStartDate).getTime());
         const elapsed = (playerData.gameDate.getTime() - new Date(project.productionStartDate).getTime());
         currentProgress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 100;
-        daysRemaining = Math.max(0, Math.ceil((new Date(project.productionEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24)));
+        hoursRemaining = daysToHours((new Date(project.productionEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24));
         progressColor = 'bg-blue-500';
     } else if (project.phase === ProjectPhase.PostProduction && project.postProductionStartDate && project.postProductionEndDate) {
         currentPhaseLabel = t.project.progress.phase.postProduction;
         const total = (new Date(project.postProductionEndDate).getTime() - new Date(project.postProductionStartDate).getTime());
         const elapsed = (playerData.gameDate.getTime() - new Date(project.postProductionStartDate).getTime());
         currentProgress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 100;
-        daysRemaining = Math.max(0, Math.ceil((new Date(project.postProductionEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24)));
+        hoursRemaining = daysToHours((new Date(project.postProductionEndDate).getTime() - playerData.gameDate.getTime()) / (1000 * 3600 * 24));
         progressColor = 'bg-violet-500';
     }
 
@@ -349,7 +350,7 @@ const ProjectProgressScreen: React.FC<ProjectProgressScreenProps> = ({ onBack, g
         <div className="mb-4 p-3 bg-black/20 rounded-lg">
             <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold text-base text-white">{currentPhaseLabel}</h3>
-                <span className="text-xs text-gray-300">{daysRemaining > 0 ? t.widgets.currentProject.daysRemaining.replace('{days}', daysRemaining.toString()) : 'Fast fertig...'}</span>
+                <span className="text-xs text-gray-300">{hoursRemaining > 0 ? t.widgets.currentProject.daysRemaining.replace('{days}', hoursRemaining.toString()) : 'Fast fertig...'}</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden border border-gray-600">
                 <div className={`${progressColor} h-full rounded-full flex items-center justify-center text-xs font-bold text-black`} style={{ width: `${currentProgress}%` }}>

@@ -66,7 +66,7 @@ export const mainScreen = {
         completed: 'Abgeschlossen',
         preparation: 'In Vorbereitung'
       },
-      daysRemaining: '{days} Tage verbleibend',
+      daysRemaining: '{days} Stunden verbleibend',
       readyForRelease: 'Bereit zur Vermarktung'
     },
     myFilms: {
@@ -86,7 +86,7 @@ export const mainScreen = {
       research: 'Forschung',
       construction: 'Bauauftrag',
       castingScouting: 'Casting & Scouting',
-      days: '{days} Tage',
+      days: '{days} Stunden',
       remainingPoints: '{points} FP offen',
       level: 'Stufe {level}',
       campaign: 'Kampagne',

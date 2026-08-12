@@ -565,7 +565,6 @@ const MainScreenContent: React.FC<MainScreenProps> = ({ onNavigate, onShowProjec
         <GameHeader 
           gameSpeed={gameSpeed} 
           setGameSpeed={setGameSpeed} 
-          onNavigateToOfficeTab={onNavigateToOfficeTab} 
           hasPendingDecision={hasPendingDecision}
         />
 
