@@ -25,7 +25,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
   const weeklyCalendarData = useMemo(() => {
     if (!playerData) return [];
 
-    const today = new Date(playerData.gameDate);
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const scopeTranslations = {

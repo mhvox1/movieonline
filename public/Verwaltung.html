@@ -1666,6 +1666,7 @@
               <button class="px-2 py-1 rounded bg-indigo-700 hover:bg-indigo-600" data-export="${user.id}">Export</button>
               <button class="px-2 py-1 rounded bg-amber-700 hover:bg-amber-600 ${isPrimaryAdmin ? 'opacity-60 cursor-not-allowed' : ''}" data-toggle-role="${user.id}" data-next-role="${nextRole}" ${isPrimaryAdmin ? 'disabled' : ''}>${roleButtonLabel}</button>
               <button class="px-2 py-1 rounded bg-rose-700 hover:bg-rose-600" data-delete="${user.id}">Delete</button>
+              <button class="px-2 py-1 rounded bg-orange-700 hover:bg-orange-600" data-reset="${user.id}">Reset</button>
             </td>
           `;
           tr.addEventListener('click', (event) => {
@@ -1682,6 +1683,9 @@
         });
         usersTable.querySelectorAll('[data-delete]').forEach(btn => {
           btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete')));
+        });
+        usersTable.querySelectorAll('[data-reset]').forEach(btn => {
+          btn.addEventListener('click', () => resetUser(btn.getAttribute('data-reset')));
         });
         usersTable.querySelectorAll('[data-toggle-role]').forEach(btn => {
           btn.addEventListener('click', () => changeUserRole(btn.getAttribute('data-toggle-role'), btn.getAttribute('data-next-role')));
@@ -1961,6 +1965,17 @@
         await refreshUsers();
       } catch (error) {
         log('Nutzer löschen fehlgeschlagen', { error: error.message });
+      }
+    }
+
+    async function resetUser(userId) {
+      if (!confirm(`Nutzer ${userId} wirklich zurücksetzen? Beim nächsten Login startet der Spieler wie neu.`)) return;
+      try {
+        const result = await api(`/admin/users/${encodeURIComponent(userId)}/reset`, { method: 'POST' });
+        log('Nutzer zurückgesetzt', result);
+        await refreshUsers();
+      } catch (error) {
+        log('Nutzer-Reset fehlgeschlagen', { error: error.message });
       }
     }
 

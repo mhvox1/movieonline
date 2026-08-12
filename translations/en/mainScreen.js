@@ -1,4 +1,4 @@
-export const mainScreen = {
+﻿export const mainScreen = {
     mainScreen: {
         menu: {
             projects: 'Projects',
@@ -65,7 +65,7 @@ export const mainScreen = {
                 completed: 'Completed',
                 preparation: 'In Preparation'
             },
-            daysRemaining: '{days} days remaining',
+            daysRemaining: '{days} hours remaining',
             readyForRelease: 'Ready for Release'
         },
         myFilms: {
@@ -105,3 +105,4 @@ export const mainScreen = {
         }
     }
 };
+

@@ -1262,6 +1262,53 @@ function resetGameDataForAdmin() {
   };
 }
 
+function resetUserGameDataForAdmin(userId) {
+  const normalizedUserId = String(userId || '').trim();
+  if (!normalizedUserId) {
+    throw new Error('User ID is required');
+  }
+
+  const targetUser = getUserById(normalizedUserId);
+  if (!targetUser) {
+    throw new Error('User not found');
+  }
+
+  const nowIso = new Date().toISOString();
+  let removedStudios = 0;
+
+  let parsed = { studios: {} };
+  try {
+    const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    const json = JSON.parse(raw);
+    if (json && typeof json === 'object' && json.studios && typeof json.studios === 'object') {
+      parsed = json;
+    }
+  } catch {
+    parsed = { studios: {} };
+  }
+
+  const nextStudios = { ...parsed.studios };
+  Object.entries(nextStudios).forEach(([studioId, studio]) => {
+    if (String(studio?.ownerId || '').trim() === normalizedUserId) {
+      delete nextStudios[studioId];
+      removedStudios += 1;
+    }
+  });
+
+  parsed.studios = nextStudios;
+  fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf-8');
+
+  targetUser.userResetAtIso = nowIso;
+  upsertUser(targetUser);
+
+  return {
+    ok: true,
+    userId: normalizedUserId,
+    removedStudios,
+    userResetAtIso: nowIso,
+  };
+}
+
 function updateTalentInStudios(type, talentKey, payload) {
   const listKey = type === 'actor' ? 'actors' : 'directors';
   const studios = listStudios();
@@ -2071,6 +2118,22 @@ function createServer() {
           return;
         }
         sendJson(res, 200, { ok: true });
+        return;
+      }
+
+      if (req.method === 'POST' && action === 'reset') {
+        const targetUser = getUserById(userId);
+        if (!targetUser) {
+          sendJson(res, 404, { error: 'User not found' });
+          return;
+        }
+
+        try {
+          const result = resetUserGameDataForAdmin(userId);
+          sendJson(res, 200, result);
+        } catch (error) {
+          sendJson(res, 400, { error: error instanceof Error ? error.message : 'Unknown error' });
+        }
         return;
       }
 

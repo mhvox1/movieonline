@@ -1,4 +1,4 @@
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+﻿import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState, useEffect } from 'react';
 import { GameState, ProjectPhase, BuildingType } from '../../types';
 import DashboardWidget from '../DashboardWidget';
@@ -11,7 +11,7 @@ import NeuesProjektIcon from '../icons/NeuesProjektIcon';
 import { useTranslation } from '../../hooks/useTranslation';
 const DetailRow = ({ label, value }) => (_jsxs("div", { className: "flex justify-between items-center text-xs py-1 border-b border-gray-700/50 last:border-b-0", children: [_jsx("span", { className: "text-gray-400", children: label }), _jsx("div", { className: "font-semibold text-white text-right truncate pl-2", children: value })] }));
 const ProgressBar = ({ progress, text, color = 'bg-green-500' }) => (_jsx("div", { className: "w-full bg-gray-700 rounded-full h-5 overflow-hidden border border-gray-600", children: _jsx("div", { className: `${color} h-full rounded-full transition-all duration-500 ease-out flex items-center justify-center text-sm font-bold text-black`, style: { width: `${progress}%` }, children: text || `${Math.round(progress)}%` }) }));
-const getDaysRemaining = (endDate, gameDate) => Math.max(0, Math.ceil((new Date(endDate).getTime() - gameDate.getTime()) / 86400000));
+const getHoursRemaining = (endDate, gameDate) => Math.max(0, Math.ceil((new Date(endDate).getTime() - gameDate.getTime()) / 36e5));
 const TabButton = ({ title, isActive, onClick, disabled }) => (_jsx("button", { onClick: onClick, disabled: disabled, className: `flex-1 px-2 py-2 text-sm font-bold rounded-t-md transition-colors ${isActive
         ? 'bg-gray-800/50 text-amber-400 border-b-2 border-amber-400'
         : 'text-gray-500 hover:text-white'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`, children: title }));
@@ -124,7 +124,7 @@ const CurrentProjectWidget = ({ onNavigate, onNavigateToProjectsView }) => {
                 phaseText = t.widgets.currentProject.phase.casting;
                 if (projectToDisplay.castingStartDate && projectToDisplay.castingEndDate) {
                     progress = calculateProgress(projectToDisplay.castingStartDate, projectToDisplay.castingEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getDaysRemaining(projectToDisplay.castingEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.castingEndDate, gameDate).toString());
                 }
                 color = 'bg-green-500';
                 break;
@@ -132,7 +132,7 @@ const CurrentProjectWidget = ({ onNavigate, onNavigateToProjectsView }) => {
                 phaseText = t.widgets.currentProject.phase.production;
                 if (projectToDisplay.productionStartDate && projectToDisplay.productionEndDate) {
                     progress = calculateProgress(projectToDisplay.productionStartDate, projectToDisplay.productionEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getDaysRemaining(projectToDisplay.productionEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.productionEndDate, gameDate).toString());
                 }
                 color = 'bg-blue-500';
                 break;
@@ -140,7 +140,7 @@ const CurrentProjectWidget = ({ onNavigate, onNavigateToProjectsView }) => {
                 phaseText = t.widgets.currentProject.phase.postProduction;
                 if (projectToDisplay.postProductionStartDate && projectToDisplay.postProductionEndDate) {
                     progress = calculateProgress(projectToDisplay.postProductionStartDate, projectToDisplay.postProductionEndDate);
-                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getDaysRemaining(projectToDisplay.postProductionEndDate, gameDate).toString());
+                    daysRemainingText = t.widgets.currentProject.daysRemaining.replace('{days}', getHoursRemaining(projectToDisplay.postProductionEndDate, gameDate).toString());
                 }
                 color = 'bg-violet-500';
                 break;
@@ -214,3 +214,4 @@ const CurrentProjectWidget = ({ onNavigate, onNavigateToProjectsView }) => {
                                             })()] }) }), _jsx("div", { className: "col-span-2", children: _jsxs("div", { className: "grid grid-cols-1 gap-x-4", children: [_jsx(DetailRow, { label: t.widgets.currentProject.genre, value: projectData.genre }), _jsx(DetailRow, { label: t.widgets.currentProject.size, value: projectData.movieSizeName }), _jsx(DetailRow, { label: t.project.planning.ageRating, value: projectData.ageRatingLabel }), _jsx(DetailRow, { label: t.widgets.currentProject.director, value: projectData.directorName }), _jsx(DetailRow, { label: t.widgets.currentProject.mainActor, value: projectData.mainActorName }), _jsx(DetailRow, { label: t.widgets.currentProject.supportingActor, value: projectData.supportingActorName }), _jsx(DetailRow, { label: t.widgets.currentProject.potential, value: projectData.rawPotential ? _jsx(StarRating, { rating: projectData.rawPotential, size: "sm" }) : '-' }), !projectData.rawProject.contract && (_jsx(DetailRow, { label: t.widgets.currentProject.hype, value: _jsx(HeartRating, { rating: projectData.rawHype, size: "sm" }) })), _jsx(DetailRow, { label: t.widgets.currentProject.runningCosts, value: projectData.laufendeProduktionskosten }), _jsx(DetailRow, { label: t.widgets.currentProject.totalCosts, value: projectData.gesamtkosten }), projectData.contractDeadlineText] }) })] }), projectData.showProgressBar && (_jsxs("div", { className: "mt-4 pt-3 border-t border-gray-700/50 space-y-2", children: [_jsxs("div", { className: "flex justify-between items-baseline text-sm", children: [_jsxs("p", { children: ["Phase: ", _jsx("span", { className: "font-semibold text-amber-300", children: projectData.phaseText })] }), _jsx("p", { className: "text-gray-300", children: projectData.daysRemainingText })] }), _jsx(ProgressBar, { progress: projectData.progress, color: projectData.color })] }))] })) : (_jsxs("div", { onClick: () => onNavigate(GameState.Projects), className: "cursor-pointer space-y-3", children: [_jsx("h4", { className: "text-xl font-bold text-white truncate text-center mb-3", children: t.widgets.currentProject.startNew }), _jsxs("div", { className: "w-full h-[270px] flex flex-col items-center justify-center text-gray-500 bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-600 hover:border-amber-500 transition-colors", children: [_jsx(NeuesProjektIcon, { className: "h-16 w-16 bg-gray-600" }), _jsx("p", { className: "text-xs mt-2", children: `Studio ${activeTab.slice(-1)} ist frei` })] })] }))] }));
 };
 export default CurrentProjectWidget;
+

@@ -1,43 +1,43 @@
-export const mainScreen = {
+﻿export const mainScreen = {
     mainScreen: {
         menu: {
             projects: 'Projekte',
             projectsDesc: 'Planen, verwalten und starten Sie Ihre Filmprojekte.',
             marketing: 'Marketing',
-            marketingDesc: 'Führen Sie Studio-Kampagnen durch.',
+            marketingDesc: 'FÃ¼hren Sie Studio-Kampagnen durch.',
             office: 'Office',
-            officeDesc: 'Verwalten Sie Kontakte, Mitarbeiter, Verträge und Drehbücher.',
-            lot: 'Studiogelände',
+            officeDesc: 'Verwalten Sie Kontakte, Mitarbeiter, VertrÃ¤ge und DrehbÃ¼cher.',
+            lot: 'StudiogelÃ¤nde',
             lotDesc: 'Erweitern Sie Ihre Drehorte und Einrichtungen.',
             research: 'Forschung',
             researchDesc: 'Schalten Sie neue Technologien und Genres frei.',
             researchLocked: 'Bauen Sie ein Forschungslabor (Stufe 1).',
             finance: 'Finanzen',
-            financeDesc: 'Überwachen Sie Einnahmen, Ausgaben und Bilanzen.',
+            financeDesc: 'Ãœberwachen Sie Einnahmen, Ausgaben und Bilanzen.',
             settings: 'Einstellungen',
             privatelife: 'Privatleben',
-            privatelifeDesc: 'Verwalten Sie Ihr Vermögen, Beziehungen und Skills.',
+            privatelifeDesc: 'Verwalten Sie Ihr VermÃ¶gen, Beziehungen und Skills.',
         },
         modals: {
             scriptFinishedTitle: 'Drehbuch abgeschlossen',
-            scriptFinishedText: 'Die Arbeiten am Drehbuch für "{title}" sind abgeschlossen. Sie können jetzt mit der Talentauswahl beginnen.',
+            scriptFinishedText: 'Die Arbeiten am Drehbuch fÃ¼r "{title}" sind abgeschlossen. Sie kÃ¶nnen jetzt mit der Talentauswahl beginnen.',
             toProject: 'Zum Projekt',
             planningFinishedTitle: 'Projektplanung Abgeschlossen',
-            planningFinishedText: 'Die Planung für "{title}" ist fertig. Das Projekt steht nun unter "Projekte" zur Verfügung, um die Produktion zu starten.',
+            planningFinishedText: 'Die Planung fÃ¼r "{title}" ist fertig. Das Projekt steht nun unter "Projekte" zur VerfÃ¼gung, um die Produktion zu starten.',
             toProjects: 'Zu den Projekten',
             castingFinishedTitle: 'Casting Abgeschlossen',
-            castingFinishedText: 'Das Casting für "{title}" ist abgeschlossen. Sie können nun die Besetzung für Ihr Projekt auswählen.',
-            castingRecommendations: 'Das Casting für "{title}" ist abgeschlossen. Hier sind die Empfehlungen:',
+            castingFinishedText: 'Das Casting fÃ¼r "{title}" ist abgeschlossen. Sie kÃ¶nnen nun die Besetzung fÃ¼r Ihr Projekt auswÃ¤hlen.',
+            castingRecommendations: 'Das Casting fÃ¼r "{title}" ist abgeschlossen. Hier sind die Empfehlungen:',
             productionFinishedTitle: 'Dreharbeiten abgeschlossen',
-            productionFinishedText: 'Die Dreharbeiten für "{title}" sind beendet. Der Film geht nun in die Postproduktion.',
+            productionFinishedText: 'Die Dreharbeiten fÃ¼r "{title}" sind beendet. Der Film geht nun in die Postproduktion.',
             toPostProduction: 'Zur Postproduktion',
             filmCompletedTitle: 'Film Fertiggestellt',
-            filmCompletedText: 'Die Produktion für "{title}" ist abgeschlossen.',
-            toOverview: 'Zur Übersicht',
+            filmCompletedText: 'Die Produktion fÃ¼r "{title}" ist abgeschlossen.',
+            toOverview: 'Zur Ãœbersicht',
             excellent: 'Ausgezeichnet!',
             understood: 'Verstanden',
             castingCampaignFinishedTitle: 'Scouting erfolgreich',
-            castingCampaignResults: 'Unsere Scouts sind zurückgekehrt und haben folgende Talente entdeckt:',
+            castingCampaignResults: 'Unsere Scouts sind zurÃ¼ckgekehrt und haben folgende Talente entdeckt:',
             newTalent: 'Neu',
         }
     },
@@ -47,7 +47,7 @@ export const mainScreen = {
             startNew: 'Starten Sie ein neues Projekt',
             noProject: 'Kein Projekt',
             genre: 'Genre',
-            size: 'Größe',
+            size: 'GrÃ¶ÃŸe',
             director: 'Regie',
             mainActor: 'Hauptrolle',
             supportingActor: 'Nebendarsteller',
@@ -65,12 +65,12 @@ export const mainScreen = {
                 completed: 'Abgeschlossen',
                 preparation: 'In Vorbereitung'
             },
-            daysRemaining: '{days} Tage verbleibend',
+            daysRemaining: '{days} Stunden verbleibend',
             readyForRelease: 'Bereit zur Vermarktung'
         },
         myFilms: {
             title: 'Meine Filme',
-            noFilms: 'Noch keine Filme veröffentlicht.',
+            noFilms: 'Noch keine Filme verÃ¶ffentlicht.',
         },
         news: {
             title: 'Nachrichten',
@@ -78,8 +78,8 @@ export const mainScreen = {
             noMessages: 'Keine neuen Nachrichten',
         },
         activities: {
-            title: 'Aufträge',
-            noActivities: 'Keine laufenden Aufträge.',
+            title: 'AuftrÃ¤ge',
+            noActivities: 'Keine laufenden AuftrÃ¤ge.',
             planning: 'Projektplanung',
             writing: 'Drehbuch-Entwicklung',
             research: 'Forschung',
@@ -102,7 +102,8 @@ export const mainScreen = {
             genre: 'Genre',
             viewersWeek: 'Zuschauer',
             viewersTotal: 'Zuschauer (Gesamt)',
-            noData: 'Keine Daten verfügbar.',
+            noData: 'Keine Daten verfÃ¼gbar.',
         }
     }
 };
+

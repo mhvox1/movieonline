@@ -85,6 +85,7 @@ const MS_PER_REAL_DAY = 24 * 60 * 60 * 1000;
 const AUTH_TOKEN_KEY = 'mb_auth_token';
 const LOCAL_STUDIO_ID_KEY = 'movie_business_online_studio_id_v1';
 const LAST_SEEN_RESET_EVENT_KEY = 'movie_business_last_reset_event_v1';
+const LAST_SEEN_USER_RESET_EVENT_KEY_PREFIX = 'movie_business_last_user_reset_event_v1_';
 const normalizeApiBaseUrl = (value: string): string => String(value || '').trim().replace(/\/$/, '');
 
 const safeSessionGet = (key: string): string => {
@@ -209,6 +210,7 @@ type AuthUser = {
   email: string;
   username: string;
   role: string;
+  userResetAtIso?: string | null;
   studioName?: string | null;
   profileImageData?: string | null;
   preferredSkills?: UserPreferredSkills | null;
@@ -1758,6 +1760,28 @@ const AppContent: React.FC = () => {
 
     const bootIntoGame = async () => {
       try {
+        const authUsername = String(authUser.username || '').trim().toLowerCase();
+        const userResetEvent = String(authUser.userResetAtIso || '').trim();
+        const userResetStorageKey = `${LAST_SEEN_USER_RESET_EVENT_KEY_PREFIX}${authUser.id}`;
+        const seenUserResetEvent = String(localStorage.getItem(userResetStorageKey) || '').trim();
+
+        if (userResetEvent && userResetEvent !== seenUserResetEvent) {
+          const existingSaves = await loadSaveFiles();
+          if (cancelled) return;
+
+          const remainingSaves = existingSaves.filter(save => {
+            const savePlayerName = String((save.data as any)?.playerName || '').trim().toLowerCase();
+            return !savePlayerName || savePlayerName !== authUsername;
+          });
+
+          await persistSaveFiles(remainingSaves);
+          if (cancelled) return;
+
+          localStorage.removeItem(SAVE_KEY);
+          clearStoredStudioId();
+          localStorage.setItem(userResetStorageKey, userResetEvent);
+        }
+
         const serverTime = await apiRequest('/server-time', { method: 'GET' }, '');
         if (cancelled) return;
 
@@ -1774,7 +1798,6 @@ const AppContent: React.FC = () => {
         const saves = await loadSaveFiles();
         if (cancelled) return;
 
-        const authUsername = String(authUser.username || '').trim().toLowerCase();
         const candidates = saves.filter(save => {
           if (!save.data) return false;
           const savePlayerName = String((save.data as any)?.playerName || '').trim().toLowerCase();

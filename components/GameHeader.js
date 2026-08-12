@@ -46,7 +46,7 @@ const GameHeader = ({ gameSpeed, setGameSpeed, disabled, onNavigateToOfficeTab, 
     const weeklyCalendarData = useMemo(() => {
         if (!playerData)
             return [];
-        const today = new Date(playerData.gameDate);
+        const today = new Date();
         today.setHours(0, 0, 0, 0);
         const scopeTranslations = {
             small: language === 'de' ? 'klein' : 'small',

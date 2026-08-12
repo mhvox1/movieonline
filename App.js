@@ -1,4 +1,4 @@
-import { jsx, jsxs } from "react/jsx-runtime";
+﻿import { jsx, jsxs } from "react/jsx-runtime";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { GameState, BuildingType, ProjectPhase, GameSpeed, MaritalStatus, EmployeeType, Genre } from "./types";
 import MainMenu from "./components/MainMenu";
@@ -64,7 +64,8 @@ const REALTIME_GAME_START_INGAME = new Date(Date.UTC(1990, 0, 1, 0, 0, 0, 0));
 const MS_PER_REAL_DAY = 24 * 60 * 60 * 1e3;
 const AUTH_TOKEN_KEY = "mb_auth_token";
 const LOCAL_STUDIO_ID_KEY = "movie_business_online_studio_id_v1";
-const LAST_SEEN_RESET_ANCHOR_KEY = "movie_business_last_reset_anchor_v1";
+const LAST_SEEN_RESET_EVENT_KEY = "movie_business_last_reset_event_v1";
+const LAST_SEEN_USER_RESET_EVENT_KEY_PREFIX = "movie_business_last_user_reset_event_v1_";
 const normalizeApiBaseUrl = (value) => String(value || "").trim().replace(/\/$/, "");
 const safeSessionGet = (key) => {
   try {
@@ -1427,19 +1428,35 @@ const AppContent = () => {
     }
     const bootIntoGame = async () => {
       try {
+        const authUsername = String(authUser.username || "").trim().toLowerCase();
+        const userResetEvent = String(authUser?.userResetAtIso || "").trim();
+        const userResetStorageKey = `${LAST_SEEN_USER_RESET_EVENT_KEY_PREFIX}${authUser.id}`;
+        const seenUserResetEvent = String(localStorage.getItem(userResetStorageKey) || "").trim();
+        if (userResetEvent && userResetEvent !== seenUserResetEvent) {
+          const existingSaves = await loadSaveFiles();
+          if (cancelled) return;
+          const remainingSaves = existingSaves.filter((save) => {
+            const savePlayerName = String(save.data?.playerName || "").trim().toLowerCase();
+            return !savePlayerName || savePlayerName !== authUsername;
+          });
+          await persistSaveFiles(remainingSaves);
+          if (cancelled) return;
+          localStorage.removeItem(SAVE_KEY);
+          clearStoredStudioId();
+          localStorage.setItem(userResetStorageKey, userResetEvent);
+        }
         const serverTime = await apiRequest("/server-time", { method: "GET" }, "");
         if (cancelled) return;
-        const serverResetAnchor = String(serverTime?.resetStartDateIso || "").trim();
-        const seenResetAnchor = String(localStorage.getItem(LAST_SEEN_RESET_ANCHOR_KEY) || "").trim();
-        if (serverResetAnchor && serverResetAnchor !== seenResetAnchor) {
+        const serverResetEvent = String(serverTime?.resetAtIso || "").trim();
+        const seenResetEvent = String(localStorage.getItem(LAST_SEEN_RESET_EVENT_KEY) || "").trim();
+        if (serverResetEvent && serverResetEvent !== seenResetEvent) {
           await persistSaveFiles([]);
           localStorage.removeItem(SAVE_KEY);
           clearStoredStudioId();
-          localStorage.setItem(LAST_SEEN_RESET_ANCHOR_KEY, serverResetAnchor);
+          localStorage.setItem(LAST_SEEN_RESET_EVENT_KEY, serverResetEvent);
         }
         const saves = await loadSaveFiles();
         if (cancelled) return;
-        const authUsername = String(authUser.username || "").trim().toLowerCase();
         const candidates = saves.filter((save) => {
           if (!save.data) return false;
           const savePlayerName = String(save.data?.playerName || "").trim().toLowerCase();
@@ -1696,3 +1713,4 @@ var App_default = App;
 export {
   App_default as default
 };
+
