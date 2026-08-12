@@ -29,7 +29,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ gameSpeed, setGameSpeed, disabl
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        ...(isTestMode ? { fractionalSecondDigits: 3 as const } : {}),
+        fractionalSecondDigits: 3,
         hour12: false,
       })
     : '';

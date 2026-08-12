@@ -52,7 +52,7 @@ const GameHeader = ({ gameSpeed, setGameSpeed, disabled, onNavigateToOfficeTab, 
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            ...(isTestMode ? { fractionalSecondDigits: 3 } : {}),
+            fractionalSecondDigits: 3,
             hour12: false,
         })
         : '';
